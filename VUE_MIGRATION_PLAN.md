@@ -78,7 +78,7 @@ DONE
 ### Phase 3.0 — Install Vue packages
 
 ```bash
-npm install @vueuse/motion @vueuse/core vuedraggable@next
+npm install @vueuse/motion @vueuse/core @vueuse/integrations sortablejs
 ```
 
 ### Phase 3.1 — Decouple Vue from React `src/`
@@ -212,32 +212,145 @@ Custom orchestration: check cache version → hit or fetch → convert → store
 
 ## Phase 5 — Animation Strategy
 
-- **Scale/opacity entrances** (Hero, popups) → Vue `<Transition>` with CSS `@keyframes`
-- **AnimatePresence** → built-in `<Transition>`/`<TransitionGroup>`
+### Keyframe / Transition animations
+
+- **Scale/opacity entrances** (Hero) → `@vueuse/motion` or Vue `<Transition>` with CSS `@keyframes`
+- **AnimatePresence** → built-in `<Transition>`/`<TransitionGroup>` with `v-if`/`v-show`
 - **Logo position animation** → CSS `transition: top 1.2s ease-out` toggled by prop
-- **Drag reorder** (admin) → `vuedraggable` package
+
+### Custom CSS property animation (popups)
+
+The React popups animate a custom CSS property `--scale` via `motion/react`:
+
+```typescript
+// React pattern:
+initial={{ '--scale': 0.8, 'opacity': 0 }}
+animate={{ '--scale': 1, 'opacity': 1 }}
+exit={{ '--scale': 0.8, 'opacity': 0 }}
+
+// Applied via:
+style={{ transform: 'translate(-50%, -50%) scale(var(--scale, 1))' }}
+```
+
+This avoids Framer Motion overriding the `translate(-50%, -50%)` centering transform. In Vue, use `<Transition>` with CSS classes that animate `--scale`:
+
+```css
+.popup-enter-active, .popup-leave-active {
+  transition: --scale 0.3s ease-out, opacity 0.3s ease-out;
+}
+.popup-enter-from, .popup-leave-to {
+  --scale: 0.8;
+  opacity: 0;
+}
+.popup-enter-to, .popup-leave-from {
+  --scale: 1;
+  opacity: 1;
+}
+```
+
+The `transform: translate(-50%, -50%) scale(var(--scale, 1))` stays as an inline style on the element itself, never touched by the transition classes.
+
+### Scroll-driven reactive styles (carousel blur)
+
+The carousel blur effect is **not** a keyframe or transition — it's a reactive computed value driven by scroll position in real time:
+
+```typescript
+// Continuous binding, updated on every scroll frame:
+style={{ backdropFilter: `blur(${8 * blurIntensity}px)` }}
+```
+
+In Vue, derive `blurIntensity` as a `computed()` from the `useScroll` reactive `x` value (see Phase 4), then bind it directly:
+
+```vue
+<div :style="{ backdropFilter: `blur(${8 * blurIntensity}px)` }" />
+```
+
+This category of animation (scroll-driven inline styles) requires no animation library — just reactive computation.
+
+### Drag reorder (admin)
+
+The React app uses `motion/react`'s `<Reorder.Group>` / `<Reorder.Item>` with `whileDrag={{ scale: 1.01, boxShadow: '...' }}` for project ordering in the admin dashboard.
+
+Vue alternative: `useSortable` from `@vueuse/integrations`, which wraps SortableJS. Requires installing `@vueuse/integrations` and `sortablejs`:
+
+```bash
+npm install @vueuse/integrations sortablejs
+```
+
+Key differences from React's Reorder API:
+- `useSortable` provides `animation: 200` option for smooth reorder transitions
+- No built-in `whileDrag` style — add drag styles manually via SortableJS's `onStart`/`onEnd` callbacks or CSS classes (`.sortable-drag`, `.sortable-ghost`)
+- Returns `start()`, `stop()`, and `option()` for runtime control
 
 ## Phase 6 — Admin Pages
 
-14. `AdminLogin.vue`, `AdminDashboard.vue`, `ProjectEditor.vue`, `SettingsSidebar.vue`, `ProjectPopupPreview.vue`
-15. Lazy-load admin routes with `() => import()`
+### Route guard (improvement over React)
 
-## Phase 7 — Polish
+The React app checks `pb.authStore.isValid` on mount in `AdminDashboard.tsx` — no route-level protection. The Vue version should use `vue-router` navigation guards:
 
-16. Verify both `npm run dev` (React) and `npm run dev:vue` (Vue) work independently
-17. Test scroll-snap, PocketBase subscriptions, responsive breakpoints
-18. Ensure shared assets/types work for both apps
+```typescript
+// router/index.ts
+{
+  path: '/admin/dashboard',
+  component: () => import('../pages/admin/AdminDashboard.vue'),
+  beforeEnter: () => {
+    if (!pb.authStore.isValid) return '/admin'
+  },
+}
+```
+
+### Lazy-loaded routes
+
+All admin pages lazy-loaded with `() => import()` (already configured in `vue/router/index.ts`).
+
+### Component complexity notes
+
+**`AdminLogin.vue`**
+
+- React uses `isMountedRef` to prevent `setState` after unmount during async auth. In Vue 3, this is not needed if using `onUnmounted` + a cancellation flag, since Vue's reactivity system handles unmounted components more gracefully.
+- Auth flow: `pb.collection('users').authWithPassword()` → on success navigate to `/admin/dashboard`.
+
+**`AdminDashboard.vue`**
+
+- **Drag-to-reorder projects**: Replace `<Reorder.Group>` with `useSortable`. On reorder, batch-update PocketBase with `Promise.all` using `requestKey: null` to prevent auto-cancellation of parallel requests:
+  ```typescript
+  const updates = newOrder.map((project, i) =>
+    pb.collection('Portfolio_Projects').update(project.id, { Order: i + 1 }, { requestKey: null })
+  )
+  await Promise.all(updates)
+  ```
+- **Toast notifications**: Use the custom `useToast()` composable for CRUD feedback.
+- **Project CRUD**: Create/delete operations via PocketBase SDK with FormData.
+
+**`ProjectEditor.vue`**
+
+The most complex admin component. Key challenges:
+
+- **Image reordering**: PocketBase does not preserve array order on update. The React workaround is: (1) delete all existing images from the record, (2) download existing images as blobs, (3) re-upload all images (existing + new) in the desired order via FormData. This must be preserved exactly in Vue.
+- **Form state management**: Tracks each image as `{ src: string, file?: File, isExisting: boolean }`. New uploads use `URL.createObjectURL(file)` for preview. Existing images use PocketBase file URLs.
+- **File input handling**: Hidden `<input type="file">` triggered by button clicks via template refs (`heroFileInputRef`, `heroMobileFileInputRef`).
+- **FormData construction**: Multiple `formData.append('Images', file)` calls for multi-image upload. Framework-agnostic but the state orchestration around it is complex.
+
+**`SettingsSidebar.vue`**
+
+- Form state for hero title, responsive font sizes, checkboxes, client list.
+- Favicon upload with file input ref.
+- Settings update via PocketBase SDK.
+
+**`ProjectPopupPreview.vue`**
+
+- Preview component using the same `--scale` custom CSS property animation pattern as the main `ProjectPopup.vue` (see Phase 5).
+- SVG background image import from `vue/assets/`.
 
 ## Execution Order
 
 1. Phase 1 (scaffolding) — blank Vue app running alongside React
 2. Phase 2 (shared imports) — confirm Vue can use `src/` code
-3. Phase 3.0 — install `@vueuse/motion`, `@vueuse/core`, `vuedraggable@next`
+3. Phase 3.0 — install `@vueuse/motion`, `@vueuse/core`, `@vueuse/integrations`, `sortablejs`
 4. Phase 3.1 — decouple: duplicate config/types/utils/assets into `vue/`, update Vite alias
 5. Phase 3.2–3.4 — icons → Home.vue skeleton → logos → hero → carousels → popups → full wiring
 6. Phases 4–5 happen alongside Phase 3.2–3.4
-7. Phase 6 (admin)
-8. Phase 7 (verify both apps)
+7. Phase 6 (admin) — route guards, drag reorder, image reordering, ProjectEditor
 
 ## Key Dependency Changes
 
@@ -249,4 +362,4 @@ Custom orchestration: check cache version → hit or fetch → convert → store
 | Animations | `motion` | `@vueuse/motion` + `@vueuse/core` |
 | Error tracking | `@sentry/react` | `@sentry/vue` |
 | Linting | `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh` | `eslint-plugin-vue` |
-| Drag reorder | `motion` Reorder API | `vuedraggable` |
+| Drag reorder | `motion` Reorder API | `useSortable` (`@vueuse/integrations` + `sortablejs`) |
