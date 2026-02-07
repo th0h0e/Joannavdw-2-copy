@@ -47,9 +47,9 @@
 │   │       ├── AdminLogin.vue
 │   │       └── AdminDashboard.vue
 │   ├── composables/            # Vue equivalents of React hooks
-│   │   ├── useResponsive.ts
-│   │   ├── usePocketBase.ts
-│   │   └── useSectionTracking.ts
+│   │   ├── usePocketBase.ts    # Custom — PB SDK + useStorage + tryOnScopeDispose
+│   │   ├── useFaviconCache.ts  # Custom — useFavicon + useLocalStorage + fetch/blob
+│   │   └── useToast.ts         # Custom — useTimeoutFn + reactive toast array
 │   └── router/
 │       └── index.ts
 ├── index-vue.html              # Vue entry HTML
@@ -169,9 +169,46 @@ Build components in this order so each step is testable:
 
 ## Phase 4 — Composables (replacing React patterns)
 
-11. **`useResponsive()`** — `ref(isMobile)` + `resize` listener in `onMounted`/`onUnmounted`
-12. **`usePocketBase()`** — data fetching, caching, real-time subscriptions, returns reactive refs
-13. **`useSectionTracking()`** — IntersectionObserver, returns `currentSectionIndex` ref
+### Direct from VueUse (no custom composable needed)
+
+These VueUse composables are drop-in replacements. Use them directly in components instead of writing custom wrappers.
+
+| React pattern | VueUse replacement | Usage |
+|---|---|---|
+| `useState(isMobile)` + `resize` listener | `useBreakpoints` | `const bp = useBreakpoints({ mobile: 0, tablet: 640, desktop: 1024 })`; `bp.smaller('tablet')` → `isMobile`; `bp.greaterOrEqual('desktop')` → `isDesktop`. Uses `matchMedia` internally — more performant than resize listeners. Tailwind preset available. |
+| `IntersectionObserver` setup + cleanup | `useIntersectionObserver` | Wrap each section ref with `useIntersectionObserver(sectionRef, callback, { threshold: 0.5 })`. Auto-cleans up on unmount. Supports `pause()`/`resume()`. |
+| Scroll listener + `scrollLeft` tracking | `useScroll` | `const { x, isScrolling, arrivedState, directions } = useScroll(carouselRef, { throttle: 5 })`. `x` is a **writable** ref — assigning to it scrolls programmatically. Derive `scrollProgress` and `currentSlide` as trivial `computed()` wrappers over `x`. |
+| `document.addEventListener('touchstart', ...)` | `useEventListener` | `useEventListener(document, 'touchstart', handler, { passive: false })`. Auto-cleans up on unmount. |
+
+### Custom composables (built on VueUse primitives)
+
+These require custom logic but leverage VueUse building blocks.
+
+**`usePocketBase()`** — data fetching, caching, real-time subscriptions
+
+The most complex composable. Wraps the PocketBase JS SDK with Vue reactivity.
+
+- **Caching**: `useStorage` from VueUse for localStorage persistence with cross-tab sync and custom serializers. Replaces the manual `getCachedData`/`setCachedData` helpers.
+- **Cleanup**: `tryOnScopeDispose` from VueUse to unsubscribe PocketBase real-time listeners on unmount. Replaces the `useEffect` cleanup return.
+- **Data**: Returns reactive `ref()` values for `projectsData`, `homepageData`, `aboutData`, `settingsData`.
+- **Subscriptions**: Uses PocketBase SDK's `.subscribe('*', callback)` directly — PocketBase uses SSE internally, so VueUse's `useWebSocket`/`useEventSource` don't apply here.
+- **Error handling**: Auth-aware (401/403 → clear auth → redirect via `vue-router`).
+
+**`useFaviconCache(settingsData)`** — favicon with version-aware caching
+
+Combines three VueUse composables:
+
+- **`useFavicon`**: Reactively sets the `<link rel="icon">` href. Returns a writable ref.
+- **`useLocalStorage`**: Stores the base64-encoded favicon with a version key. Invalidation by changing the key (e.g. `favicon-v${settings.updated}`).
+- **Fetch + blob conversion**: `fetch()` the favicon URL → `.blob()` → convert to data URL via `FileReader` or VueUse's `useBase64`. Cache the result.
+
+Custom orchestration: check cache version → hit or fetch → convert → store → set favicon.
+
+**`useToast()`** — notification state with auto-dismiss
+
+- **`useTimeoutFn`** from VueUse: per-toast auto-dismiss timer with `start()`/`stop()` control. Replaces manual `setTimeout`/`clearTimeout`.
+- **Custom state**: reactive `ref<Toast[]>([])` array, `addToast(message, type)` and `removeToast(id)` functions.
+- Types: `{ id: number, message: string, type: 'success' | 'error' }`.
 
 ## Phase 5 — Animation Strategy
 
