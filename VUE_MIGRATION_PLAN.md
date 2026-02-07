@@ -130,6 +130,8 @@ Vue components live in `vue/components/` and import from `vue/config`, `vue/type
 | `App.tsx` (routing shell) | `App.vue` | Already done — bare `<router-view />` |
 | `App.tsx` (portfolio logic) | `pages/Home.vue` | The orchestrator: PocketBase data fetching, real-time subscriptions, popup state, section tracking, favicon caching. `useState` → `ref()`, `useEffect` → `onMounted()`/`watch()` |
 
+**Note on CarouselContext:** The project's `CLAUDE.md` references a `CarouselContext` using React Context for carousel state management. This is outdated — the actual React codebase uses **no Context API**. All carousel state (`scrollProgress`, `currentSlide`, `blurIntensity`) is computed locally inside each carousel component from native scroll events, and communication between components uses props and callbacks only. The Vue version should follow the same pattern: local reactive state within each carousel component via `useScroll` + `computed()`, with props/emits for parent communication. No `provide`/`inject` is needed.
+
 ### Phase 3.3 — Edge Gesture Prevention
 
 Vue equivalent of React's `preventEdgeNavigation` — blocks browser back-swipe on iOS/Safari when touching near the left screen edge.
