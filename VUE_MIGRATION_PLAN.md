@@ -50,21 +50,17 @@
 ├── package.json                # Both React + Vue deps
 ```
 
-## Phase 1 — Setup (no React changes)
+## Phase 1 — Setup
 
-1. **Add Vue dependencies** to existing `package.json` — `vue`, `vue-router`, `@vitejs/plugin-vue`, `@sentry/vue`, `eslint-plugin-vue`
-2. **Create `vite.config.vue.ts`** — separate Vite config pointing at `vue/main.ts` and `index-vue.html`
-3. **Create `index-vue.html`** — copy of `index.html` with mount point `<div id="app">` and entry `vue/main.ts`
-4. **Add npm script** — `"dev:vue": "vite --config vite.config.vue.ts"` (and `build:vue`)
-5. **Update `tailwind.config.js`** — add `./vue/**/*.{vue,ts}` to content paths
-6. **Create `vue/main.ts`** — Vue app bootstrap, Sentry init, router setup
-7. **Create `vue/router/index.ts`** — same 3 routes (`/`, `/admin`, `/admin/dashboard`)
+Add Vue deps, create `vite.config.vue.ts`, `index-vue.html`, `vue/main.ts`, `vue/router/index.ts`, and `dev:vue`/`build:vue` npm scripts. Update Tailwind content paths for `vue/` files.
+
+DONE
 
 ## Phase 2 — Shared Code Imports
 
-8. **Import directly from `src/`** — Vue components import `src/config/pocketbase.ts`, `src/types/*`, `src/utils/sharedStyles.ts`, and `src/assets/*` using path aliases
-9. **Update Vite alias** in `vite.config.vue.ts` — `@` → `src/`, `@vue` → `vue/`
-10. **CSS** — `vue/main.ts` imports `src/index.css` (same fonts, global styles, Tailwind)
+Vue components import shared code from `src/` via the `@` alias. Verified PocketBase config, types, utils, and assets all resolve. Scoped React Vite config to avoid scanning Vue files.
+
+DONE
 
 ## Phase 3 — Component Migration (Portfolio)
 
