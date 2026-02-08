@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { PortfolioProject } from '@/config/pocketbase'
+import type { PortfolioProject } from '@/plugins/pocketbase'
 import { onMounted, onUnmounted, ref, watch } from 'vue'
-import pb, { getImageUrl } from '@/config/pocketbase'
+import pb, { getImageUrl } from '@/plugins/pocketbase'
 import ProjectPopupPreview from './ProjectPopupPreview.vue'
 
 interface ImageItem {

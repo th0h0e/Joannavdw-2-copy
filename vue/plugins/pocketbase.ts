@@ -4,7 +4,7 @@ import type {
   HomepageResponse,
   PortfolioProjectsResponse,
   SettingsResponse,
-} from '../types/pocketbase-types'
+} from '../shared/types/pocketbase-types'
 import PocketBase from 'pocketbase'
 
 // PocketBase client configuration

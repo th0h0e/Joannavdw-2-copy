@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Homepage, PortfolioProject } from '@/config/pocketbase'
+import type { Homepage, PortfolioProject } from '@/plugins/pocketbase'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import ProjectEditor from '@/components/admin/ProjectEditor.vue'
 import SettingsSidebar from '@/components/admin/SettingsSidebar.vue'
 import { useToast } from '@/composables/useToast'
-import pb, { getImageUrl } from '@/config/pocketbase'
+import pb, { getImageUrl } from '@/plugins/pocketbase'
 
 const router = useRouter()
 const { toasts, showToast } = useToast()

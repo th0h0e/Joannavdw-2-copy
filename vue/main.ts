@@ -1,8 +1,8 @@
 import * as Sentry from '@sentry/vue'
 import { createApp } from 'vue'
-import App from './App.vue'
+import App from './app.vue'
 import { router } from './router'
-import './index.css'
+import '@/assets/css/main.css'
 
 const app = createApp(App)
 

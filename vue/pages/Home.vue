@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { About, Homepage, PortfolioProject, Settings } from '@/config/pocketbase'
+import type { About, Homepage, PortfolioProject, Settings } from '@/plugins/pocketbase'
 import { useEventListener } from '@vueuse/core'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import AboutPopup from '@/components/AboutPopup.vue'
@@ -12,7 +12,7 @@ import MotionCarousel from '@/components/MotionCarousel.vue'
 import MotionCarouselDesktop from '@/components/MotionCarouselDesktop.vue'
 import ProjectIndex from '@/components/ProjectIndex.vue'
 import ProjectPopup from '@/components/ProjectPopup.vue'
-import pb, { getCachedData, getImageUrl, setCachedData } from '@/config/pocketbase'
+import pb, { getCachedData, getImageUrl, setCachedData } from '@/plugins/pocketbase'
 
 // Type for converted project data used in the app
 interface ConvertedProject {

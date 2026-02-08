@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Settings } from '@/config/pocketbase'
-import type { ProjectImage } from '@/types/project'
+import type { Settings } from '@/plugins/pocketbase'
+import type { ProjectImage } from '@/shared/types/project'
 import { computed, onBeforeUnmount, onMounted, onUnmounted, ref, watchEffect } from 'vue'
-import { getResponsiveFontSizes } from '@/config/pocketbase'
+import { getResponsiveFontSizes } from '@/plugins/pocketbase'
 import { projectTitleClasses, projectTitleContainerClasses } from '@/utils/sharedStyles'
 import ChevronDown from './icons/ChevronDown.vue'
 

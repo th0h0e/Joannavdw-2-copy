@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Settings } from '@/config/pocketbase'
+import type { Settings } from '@/plugins/pocketbase'
 import ProjectNavigation from './ProjectNavigation.vue'
 
 withDefaults(defineProps<{

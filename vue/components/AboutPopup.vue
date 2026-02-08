@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { About } from '@/config/pocketbase'
+import type { About } from '@/plugins/pocketbase'
 import Asset7Logo from '@/assets/logo svg/Asset 7.svg'
 import Asset11Logo from '@/assets/logo svg/Asset 11.svg'
 import ProjectCardSVG from '@/assets/Project Card/JVDW WEB LIGHT BOX copy.svg'

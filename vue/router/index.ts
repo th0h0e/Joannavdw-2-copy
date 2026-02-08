@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import pb from '@/config/pocketbase'
+import pb from '@/plugins/pocketbase'
 
 const router = createRouter({
   history: createWebHistory(),

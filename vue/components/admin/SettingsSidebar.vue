@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { About, Homepage, Settings } from '@/config/pocketbase'
+import type { About, Homepage, Settings } from '@/plugins/pocketbase'
 import { ref, watch } from 'vue'
 import AboutPopup from '@/components/AboutPopup.vue'
-import pb, { getImageUrl } from '@/config/pocketbase'
+import pb, { getImageUrl } from '@/plugins/pocketbase'
 
 const props = defineProps<{
   isOpen: boolean

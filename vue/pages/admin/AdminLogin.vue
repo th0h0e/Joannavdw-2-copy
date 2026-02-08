@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import loginBackground from '@/assets/admin-login-bg.jpg'
-import pb from '@/config/pocketbase'
+import pb from '@/plugins/pocketbase'
 
 const email = ref('')
 const password = ref('')

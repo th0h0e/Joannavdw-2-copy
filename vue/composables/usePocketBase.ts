@@ -1,6 +1,6 @@
-import type { About, Homepage, PortfolioProject, Settings } from '@/config/pocketbase'
+import type { About, Homepage, PortfolioProject, Settings } from '@/plugins/pocketbase'
 import { onUnmounted, ref } from 'vue'
-import pb, { getCachedData, getImageUrl, setCachedData } from '@/config/pocketbase'
+import pb, { getCachedData, getImageUrl, setCachedData } from '@/plugins/pocketbase'
 
 export interface ConvertedProject {
   title: string

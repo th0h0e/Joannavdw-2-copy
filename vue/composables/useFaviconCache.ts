@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
-import type { Settings } from '@/config/pocketbase'
+import type { Settings } from '@/plugins/pocketbase'
 import { watch } from 'vue'
-import { getImageUrl } from '@/config/pocketbase'
+import { getImageUrl } from '@/plugins/pocketbase'
 
 // eslint-disable-next-line react/no-unnecessary-use-prefix
 export function useFaviconCache(settingsRef: Ref<Settings | null>) {
