@@ -15,9 +15,8 @@
     "noEmit": true,
     "skipLibCheck": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "~vue/*": ["./vue/*"]
+      "@/*": ["./vue/*"]
     }
   },
-  "include": ["vue", "src/config", "src/types", "src/utils"]
+  "include": ["vue"]
 }
