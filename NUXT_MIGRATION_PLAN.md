@@ -422,7 +422,22 @@ definePageMeta({
 
 ## Phase 6 — Auto-Imports (Remove Manual Imports)
 
-Nuxt auto-imports Vue APIs, composables, and utils. After migration, remove manual import lines throughout all components and pages.
+Nuxt auto-imports from five sources. Only what you actually use ends up in your production bundle — tree-shaking is built in.
+
+| Source | What's auto-imported | How it works |
+|---|---|---|
+| **Vue core** | `ref`, `computed`, `watch`, `onMounted`, `onUnmounted`, `nextTick`, `reactive`, `type Ref`, etc. | Built into Nuxt — always available |
+| **Nuxt runtime** | `navigateTo`, `useRouter`, `useRoute`, `useHead`, `useFetch`, `useNuxtApp`, `definePageMeta`, `defineNuxtPlugin`, `defineNuxtRouteMiddleware`, etc. | Built into Nuxt — always available |
+| **`app/composables/`** | All named exports from files in this directory | Scanned at build time |
+| **`app/utils/`** | All named exports from files in this directory | Scanned at build time |
+| **`app/components/`** | All `.vue` files, usable directly in templates | Scanned at build time, path-based naming for subdirs |
+
+**Context rule:** Auto-imported composables (both Vue and Nuxt) must be called inside `<script setup>`, `setup()`, `defineNuxtPlugin`, or `defineNuxtRouteMiddleware`. Calling them outside these contexts causes "Nuxt instance is unavailable" errors.
+
+**Explicit imports fallback:** If you ever need to be explicit (e.g. for clarity or to resolve naming conflicts), you can import from the `#imports` alias:
+```typescript
+import { ref, computed } from '#imports'
+```
 
 ### 6.1 — Vue core APIs (auto-imported everywhere)
 
@@ -433,7 +448,11 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick, reactive } from
 import type { Ref } from 'vue'
 ```
 
+Vue types like `Ref` are also auto-imported. If you ever need to be explicit, use `import type { Ref } from '#imports'`.
+
 ### 6.2 — Composables (auto-imported from `app/composables/`)
+
+Nuxt scans `app/composables/` and auto-imports all named exports. Only top-level files and `index.ts` files in immediate subdirectories are scanned by default.
 
 Remove these imports:
 ```typescript
@@ -443,9 +462,13 @@ import { useFaviconCache } from '@/composables/useFaviconCache'
 import { useToast } from '@/composables/useToast'
 ```
 
-Just call `usePocketBase()`, `useFaviconCache()`, `useToast()` directly.
+Just call `usePocketBase()`, `useFaviconCache()`, `useToast()` directly — they're globally available.
+
+The `ConvertedProject` interface exported from `usePocketBase.ts` and the `Toast` interface exported from `useToast.ts` are also auto-imported as types.
 
 ### 6.3 — VueUse composables (auto-imported via `@vueuse/nuxt` module)
+
+The `@vueuse/nuxt` module (installed in Phase 1.6) registers auto-imports for all `@vueuse/core` and `@vueuse/integrations` composables.
 
 Remove these imports:
 ```typescript
@@ -456,7 +479,9 @@ import { useSortable } from '@vueuse/integrations'
 
 ### 6.4 — Utils (auto-imported from `app/utils/`)
 
-Functions exported from `app/utils/sharedStyles.ts` become globally available. Remove:
+All named exports from files in `app/utils/` become globally available. Only top-level files are scanned by default.
+
+Remove:
 ```typescript
 // DELETE:
 import { someStyle } from '@/utils/sharedStyles'
@@ -481,7 +506,8 @@ import ProjectNavigation from '@/components/ProjectNavigation.vue'
 // etc.
 ```
 
-Components in subdirectories use path-based naming by default:
+**Component naming for subdirectories:** Nuxt prefixes component names with the directory path by default:
+- `components/Hero.vue` → `<Hero />`  (top-level — no prefix)
 - `components/icons/ChevronDown.vue` → `<IconsChevronDown />`
 - `components/admin/ProjectEditor.vue` → `<AdminProjectEditor />`
 - `components/admin/SettingsSidebar.vue` → `<AdminSettingsSidebar />`
@@ -498,9 +524,11 @@ export default defineNuxtConfig({
 })
 ```
 
+**Trade-off:** `pathPrefix: false` is simpler but risks name collisions if two subdirectories have files with the same name. The default path-prefix approach is safer and more explicit.
+
 ### 6.6 — Update `@/` alias to `~/`
 
-Nuxt uses `~/` (or `~`) as the alias for the app directory. Replace all occurrences:
+Nuxt uses `~/` (or `~`) as the alias for the `app/` directory. Replace all remaining `@/` occurrences:
 
 ```typescript
 // BEFORE
@@ -512,11 +540,11 @@ import pb from '~/plugins/pocketbase.client'
 import cardBg from '~/assets/Project Card/JVDW WEB LIGHT BOX copy.svg'
 ```
 
-> **Note:** Most of these explicit imports will be removed by auto-imports anyway (Phase 6.1–6.5). The `~/` alias is only needed for imports that Nuxt does NOT auto-import: plugin files, asset files, and type-only imports from `shared/types/`.
+> **Note:** Most of these explicit imports will be removed by auto-imports anyway (Phase 6.1–6.5). The `~/` alias is only needed for imports that Nuxt does NOT auto-import: plugin files, asset files (images, SVGs, CSS), and type-only imports from `shared/types/`.
 
 ### 6.7 — Type imports from `shared/types/`
 
-Type imports are **not** auto-imported by default. Keep explicit type imports but update the alias:
+Types exported from plugin files and `shared/types/` are **not** auto-imported by default. Keep explicit type imports but update the alias:
 
 ```typescript
 // BEFORE
@@ -526,13 +554,15 @@ import type { PortfolioProject } from '@/plugins/pocketbase'
 import type { PortfolioProject } from '~/plugins/pocketbase.client'
 ```
 
-Alternatively, move types to `app/types/` or configure auto-import for the types directory in `nuxt.config.ts`:
+To auto-import types from `shared/types/`, add the directory to the imports scan in `nuxt.config.ts`:
 ```typescript
-// nuxt.config.ts — optional, to auto-import types
+// nuxt.config.ts — optional
 imports: {
   dirs: ['shared/types'],
 },
 ```
+
+This makes all named type exports from `shared/types/*.ts` globally available without import statements.
 
 ---
 
