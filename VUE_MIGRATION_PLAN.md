@@ -46,7 +46,7 @@
 │   │   └── admin/
 │   │       ├── AdminLogin.vue
 │   │       └── AdminDashboard.vue
-│   ├── composables/            # Vue equivalents of React hooks
+│   ├── composables/
 │   │   ├── usePocketBase.ts    # Custom — PB SDK + useStorage + tryOnScopeDispose
 │   │   ├── useFaviconCache.ts  # Custom — useFavicon + useLocalStorage + fetch/blob
 │   │   └── useToast.ts         # Custom — useTimeoutFn + reactive toast array
@@ -83,13 +83,13 @@ npm install @vueuse/motion @vueuse/core @vueuse/integrations sortablejs
 
 ### Phase 3.1 — Decouple Vue from React `src/`
 
-The Vue app must be fully self-contained. No Vue file should import from `src/` (the React app). Duplicate framework-agnostic code into `vue/` so neither app depends on the other's directory.
+No Vue file should import from `src/`. Duplicate framework-agnostic code into `vue/`.
 
 **Duplicate into `vue/`:**
 
 | Source | Destination | Notes |
 |---|---|---|
-| `src/config/pocketbase.ts` | `vue/config/pocketbase.ts` | Verbatim — pure TS + PocketBase SDK, no React |
+| `src/config/pocketbase.ts` | `vue/config/pocketbase.ts` | Verbatim — pure TS + PocketBase SDK |
 | `src/types/pocketbase-types.ts` | `vue/types/pocketbase-types.ts` | Verbatim — auto-generated types |
 | `src/types/project.ts` | `vue/types/project.ts` | Verbatim — `ProjectImage` interface |
 | `src/utils/sharedStyles.ts` | `vue/utils/sharedStyles.ts` | Verbatim — Tailwind class strings |
@@ -98,19 +98,19 @@ The Vue app must be fully self-contained. No Vue file should import from `src/` 
 | `src/assets/admin-login-bg.jpg` | `vue/assets/admin-login-bg.jpg` | Admin login background |
 
 **Update `vite.config.vue.ts`:**
-- Change `@` alias: `resolve(__dirname, 'src')` → `resolve(__dirname, 'vue')` — Vue code resolves to itself
-- Remove `~vue` alias (no longer needed, `@` already points to `vue/`)
+- Change `@` alias: `resolve(__dirname, 'src')` → `resolve(__dirname, 'vue')`
+- Remove `~vue` alias (redundant once `@` points to `vue/`)
 
 **Update existing Vue file imports:**
-- `vue/main.ts`: keep `import '../src/index.css'` → change to `import './index.css'` after copying Tailwind entry CSS into `vue/` (or keep the relative import to the shared Tailwind config — either approach is fine since `index.css` is just Tailwind directives)
-- `vue/pages/Home.vue`: imports like `@/config/pocketbase` now resolve to `vue/config/pocketbase.ts` automatically
-- Asset imports: `@/assets/logo svg/Asset 7.svg` now resolves to `vue/assets/`
+- `vue/main.ts`: change `import '../src/index.css'` → `import './index.css'` after copying Tailwind entry CSS into `vue/`, or keep the relative import (`index.css` contains only Tailwind directives)
+- `vue/pages/Home.vue`: `@/config/pocketbase` resolves to `vue/config/pocketbase.ts` automatically
+- Asset imports: `@/assets/logo svg/Asset 7.svg` resolves to `vue/assets/`
 
-**Maintenance note:** When PocketBase schema changes, run `typegen` and copy the output to both `src/types/` and `vue/types/`.
+**Maintenance:** When PocketBase schema changes, run `typegen` and copy the output to both `src/types/` and `vue/types/`.
 
 ### Phase 3.2 — Component Migration
 
-Vue components live in `vue/components/` and import from `vue/config`, `vue/types`, `vue/utils`, and `vue/assets` — never from `src/`.
+All Vue components import from `vue/config`, `vue/types`, `vue/utils`, and `vue/assets` — never from `src/`.
 
 | React | Vue | Key Notes |
 |---|---|---|
@@ -123,20 +123,20 @@ Vue components live in `vue/components/` and import from `vue/config`, `vue/type
 | `LogoTop.tsx` | `LogoTop.vue` | CSS `transition` on `top` property |
 | `LogoBottom.tsx` | `LogoBottom.vue` | Same |
 | `HamburgerMenu.tsx` | `HamburgerMenu.vue` | `createPortal` → `<Teleport to="body">` |
-| `ProjectIndex.tsx` | `ProjectIndex.vue` | Straightforward |
+| `ProjectIndex.tsx` | `ProjectIndex.vue` | Anchor links, no custom logic |
 | `ProjectNavigation.tsx` | `ProjectNavigation.vue` | `onClick` callback → `@click` emit |
 | `ChevronDown.tsx` | `icons/ChevronDown.vue` | `defineProps()` |
 | `ChevronRight.tsx` | `icons/ChevronRight.vue` | Same |
-| `App.tsx` (routing shell) | `App.vue` | Already done — bare `<router-view />` |
-| `App.tsx` (portfolio logic) | `pages/Home.vue` | The orchestrator: PocketBase data fetching, real-time subscriptions, popup state, section tracking, favicon caching. `useState` → `ref()`, `useEffect` → `onMounted()`/`watch()` |
+| `App.tsx` (routing shell) | `App.vue` | Done — bare `<router-view />` |
+| `App.tsx` (portfolio logic) | `pages/Home.vue` | Orchestrator: PocketBase fetching, real-time subscriptions, popup state, section tracking, favicon caching. `useState` → `ref()`, `useEffect` → `onMounted()`/`watch()` |
 
-**Note on CarouselContext:** The project's `CLAUDE.md` references a `CarouselContext` using React Context for carousel state management. This is outdated — the actual React codebase uses **no Context API**. All carousel state (`scrollProgress`, `currentSlide`, `blurIntensity`) is computed locally inside each carousel component from native scroll events, and communication between components uses props and callbacks only. The Vue version should follow the same pattern: local reactive state within each carousel component via `useScroll` + `computed()`, with props/emits for parent communication. No `provide`/`inject` is needed.
+**Note on CarouselContext:** `CLAUDE.md` references a `CarouselContext` using React Context. This is outdated — the codebase uses **no Context API**. Carousel state (`scrollProgress`, `currentSlide`, `blurIntensity`) is computed locally inside each carousel component from scroll events. Communication uses props and callbacks. The Vue version follows the same pattern: local state via `useScroll` + `computed()`, props/emits for parent communication. No `provide`/`inject` needed.
 
 ### Phase 3.3 — Edge Gesture Prevention
 
-Vue equivalent of React's `preventEdgeNavigation` — blocks browser back-swipe on iOS/Safari when touching near the left screen edge.
+Blocks browser back-swipe on iOS/Safari when touching near the left screen edge.
 
-In `Home.vue`, use `useEventListener` from `@vueuse/core` (auto-cleans up on unmount, no manual `removeEventListener` needed):
+In `Home.vue`, use `useEventListener` from `@vueuse/core`:
 
 ```typescript
 import { useEventListener } from '@vueuse/core'
@@ -154,42 +154,38 @@ useEventListener(document, 'touchstart', (e: TouchEvent) => {
 
 ### Phase 3.4 — Migration Order
 
-Build components in this order so each step is testable:
-
-1. Icons (`ChevronDown.vue`, `ChevronRight.vue`) — trivial, no dependencies
+1. Icons (`ChevronDown.vue`, `ChevronRight.vue`) — no dependencies
 2. `Home.vue` skeleton — PocketBase fetch + section structure, renders raw data
-3. `LogoTop.vue`, `LogoBottom.vue` — simple CSS transition
+3. `LogoTop.vue`, `LogoBottom.vue` — CSS transition on `top`
 4. `Hero.vue`, `HeroMobile.vue` — `@vueuse/motion` scale animation
 5. `MotionCarousel.vue`, `MotionCarouselDesktop.vue` — scroll-snap + scroll state
 6. `ProjectPopup.vue`, `AboutPopup.vue`, `HamburgerMenu.vue` — `<Transition>` / `<Teleport>`
-7. `ProjectIndex.vue`, `ProjectNavigation.vue` — straightforward
-8. Wire everything into `Home.vue` — full orchestrator with popup state, section tracking, edge gesture prevention
+7. `ProjectIndex.vue`, `ProjectNavigation.vue`
+8. Wire into `Home.vue` — popup state, section tracking, edge gesture prevention
 
 ## Phase 4 — Composables (replacing React patterns)
 
-### Direct from VueUse (no custom composable needed)
+### Direct from VueUse
 
-These VueUse composables are drop-in replacements. Use them directly in components instead of writing custom wrappers.
+Use directly in components — no custom wrappers needed.
 
 | React pattern | VueUse replacement | Usage |
 |---|---|---|
-| `useState(isMobile)` + `resize` listener | `useBreakpoints` | `const bp = useBreakpoints({ mobile: 0, tablet: 640, desktop: 1024 })`; `bp.smaller('tablet')` → `isMobile`; `bp.greaterOrEqual('desktop')` → `isDesktop`. Uses `matchMedia` internally — more performant than resize listeners. Tailwind preset available. |
-| `IntersectionObserver` setup + cleanup | `useIntersectionObserver` | Wrap each section ref with `useIntersectionObserver(sectionRef, callback, { threshold: 0.5 })`. Auto-cleans up on unmount. Supports `pause()`/`resume()`. |
-| Scroll listener + `scrollLeft` tracking | `useScroll` | `const { x, isScrolling, arrivedState, directions } = useScroll(carouselRef, { throttle: 5 })`. `x` is a **writable** ref — assigning to it scrolls programmatically. Derive `scrollProgress` and `currentSlide` as trivial `computed()` wrappers over `x`. |
+| `useState(isMobile)` + `resize` listener | `useBreakpoints` | `const bp = useBreakpoints({ mobile: 0, tablet: 640, desktop: 1024 })`; `bp.smaller('tablet')` → `isMobile`; `bp.greaterOrEqual('desktop')` → `isDesktop`. Uses `matchMedia` internally. Tailwind preset available. |
+| `IntersectionObserver` setup + cleanup | `useIntersectionObserver` | `useIntersectionObserver(sectionRef, callback, { threshold: 0.5 })`. Auto-cleans up on unmount. Supports `pause()`/`resume()`. |
+| Scroll listener + `scrollLeft` tracking | `useScroll` | `const { x, isScrolling, arrivedState, directions } = useScroll(carouselRef, { throttle: 5 })`. `x` is a **writable** ref — assigning to it scrolls programmatically. Derive `scrollProgress` and `currentSlide` as `computed()` wrappers over `x`. |
 | `document.addEventListener('touchstart', ...)` | `useEventListener` | `useEventListener(document, 'touchstart', handler, { passive: false })`. Auto-cleans up on unmount. |
 
 ### Custom composables (built on VueUse primitives)
 
-These require custom logic but leverage VueUse building blocks.
-
 **`usePocketBase()`** — data fetching, caching, real-time subscriptions
 
-The most complex composable. Wraps the PocketBase JS SDK with Vue reactivity.
+Wraps the PocketBase JS SDK with Vue reactivity.
 
-- **Caching**: `useStorage` from VueUse for localStorage persistence with cross-tab sync and custom serializers. Replaces the manual `getCachedData`/`setCachedData` helpers.
-- **Cleanup**: `tryOnScopeDispose` from VueUse to unsubscribe PocketBase real-time listeners on unmount. Replaces the `useEffect` cleanup return.
+- **Caching**: `useStorage` for localStorage persistence with cross-tab sync and custom serializers. Replaces `getCachedData`/`setCachedData`.
+- **Cleanup**: `tryOnScopeDispose` to unsubscribe PocketBase real-time listeners on unmount.
 - **Data**: Returns reactive `ref()` values for `projectsData`, `homepageData`, `aboutData`, `settingsData`.
-- **Subscriptions**: Uses PocketBase SDK's `.subscribe('*', callback)` directly — PocketBase uses SSE internally, so VueUse's `useWebSocket`/`useEventSource` don't apply here.
+- **Subscriptions**: PocketBase SDK's `.subscribe('*', callback)` directly — PocketBase uses SSE, so VueUse's `useWebSocket`/`useEventSource` don't apply.
 - **Error handling**: Auth-aware (401/403 → clear auth → redirect via `vue-router`).
 
 **`useFaviconCache(settingsData)`** — favicon with version-aware caching
@@ -200,11 +196,11 @@ Combines three VueUse composables:
 - **`useLocalStorage`**: Stores the base64-encoded favicon with a version key. Invalidation by changing the key (e.g. `favicon-v${settings.updated}`).
 - **Fetch + blob conversion**: `fetch()` the favicon URL → `.blob()` → convert to data URL via `FileReader` or VueUse's `useBase64`. Cache the result.
 
-Custom orchestration: check cache version → hit or fetch → convert → store → set favicon.
+Flow: check cache version → hit or fetch → convert → store → set favicon.
 
 **`useToast()`** — notification state with auto-dismiss
 
-- **`useTimeoutFn`** from VueUse: per-toast auto-dismiss timer with `start()`/`stop()` control. Replaces manual `setTimeout`/`clearTimeout`.
+- **`useTimeoutFn`**: Per-toast auto-dismiss timer with `start()`/`stop()` control.
 - **Custom state**: reactive `ref<Toast[]>([])` array, `addToast(message, type)` and `removeToast(id)` functions.
 - Types: `{ id: number, message: string, type: 'success' | 'error' }`.
 
@@ -218,7 +214,7 @@ Custom orchestration: check cache version → hit or fetch → convert → store
 
 ### Custom CSS property animation (popups)
 
-The React popups animate a custom CSS property `--scale` via `motion/react`:
+React animates a custom CSS property `--scale` via `motion/react`:
 
 ```typescript
 // React pattern:
@@ -230,7 +226,7 @@ exit={{ '--scale': 0.8, 'opacity': 0 }}
 style={{ transform: 'translate(-50%, -50%) scale(var(--scale, 1))' }}
 ```
 
-This avoids Framer Motion overriding the `translate(-50%, -50%)` centering transform. In Vue, use `<Transition>` with CSS classes that animate `--scale`:
+This prevents the animation library from overriding the `translate(-50%, -50%)` centering transform. In Vue, use `<Transition>` with CSS classes that animate `--scale`:
 
 ```css
 .popup-enter-active, .popup-leave-active {
@@ -246,45 +242,40 @@ This avoids Framer Motion overriding the `translate(-50%, -50%)` centering trans
 }
 ```
 
-The `transform: translate(-50%, -50%) scale(var(--scale, 1))` stays as an inline style on the element itself, never touched by the transition classes.
+The `transform: translate(-50%, -50%) scale(var(--scale, 1))` stays as an inline style, not touched by transition classes.
 
 ### Scroll-driven reactive styles (carousel blur)
 
-The carousel blur effect is **not** a keyframe or transition — it's a reactive computed value driven by scroll position in real time:
+The carousel blur is a reactive computed value driven by scroll position, not a keyframe or transition:
 
 ```typescript
-// Continuous binding, updated on every scroll frame:
 style={{ backdropFilter: `blur(${8 * blurIntensity}px)` }}
 ```
 
-In Vue, derive `blurIntensity` as a `computed()` from the `useScroll` reactive `x` value (see Phase 4), then bind it directly:
+In Vue, derive `blurIntensity` as a `computed()` from `useScroll`'s reactive `x` value (see Phase 4), then bind directly:
 
 ```vue
 <div :style="{ backdropFilter: `blur(${8 * blurIntensity}px)` }" />
 ```
 
-This category of animation (scroll-driven inline styles) requires no animation library — just reactive computation.
+No animation library needed — reactive computation only.
 
 ### Drag reorder (admin)
 
-The React app uses `motion/react`'s `<Reorder.Group>` / `<Reorder.Item>` with `whileDrag={{ scale: 1.01, boxShadow: '...' }}` for project ordering in the admin dashboard.
+React uses `motion/react`'s `<Reorder.Group>` / `<Reorder.Item>` with `whileDrag={{ scale: 1.01, boxShadow: '...' }}`.
 
-Vue alternative: `useSortable` from `@vueuse/integrations`, which wraps SortableJS. Requires installing `@vueuse/integrations` and `sortablejs`:
+Vue: `useSortable` from `@vueuse/integrations` (wraps SortableJS).
 
-```bash
-npm install @vueuse/integrations sortablejs
-```
-
-Key differences from React's Reorder API:
-- `useSortable` provides `animation: 200` option for smooth reorder transitions
-- No built-in `whileDrag` style — add drag styles manually via SortableJS's `onStart`/`onEnd` callbacks or CSS classes (`.sortable-drag`, `.sortable-ghost`)
+Differences from React's Reorder API:
+- `useSortable` provides `animation: 200` for smooth reorder transitions
+- No built-in `whileDrag` style — use SortableJS's `onStart`/`onEnd` callbacks or CSS classes (`.sortable-drag`, `.sortable-ghost`)
 - Returns `start()`, `stop()`, and `option()` for runtime control
 
 ## Phase 6 — Admin Pages
 
-### Route guard (improvement over React)
+### Route guard
 
-The React app checks `pb.authStore.isValid` on mount in `AdminDashboard.tsx` — no route-level protection. The Vue version should use `vue-router` navigation guards:
+React checks `pb.authStore.isValid` on mount in `AdminDashboard.tsx`. Vue uses `vue-router` navigation guards:
 
 ```typescript
 // router/index.ts
@@ -299,35 +290,33 @@ The React app checks `pb.authStore.isValid` on mount in `AdminDashboard.tsx` —
 
 ### Lazy-loaded routes
 
-All admin pages lazy-loaded with `() => import()` (already configured in `vue/router/index.ts`).
+All admin pages lazy-loaded with `() => import()` (configured in `vue/router/index.ts`).
 
-### Component complexity notes
+### Component notes
 
 **`AdminLogin.vue`**
 
-- React uses `isMountedRef` to prevent `setState` after unmount during async auth. In Vue 3, this is not needed if using `onUnmounted` + a cancellation flag, since Vue's reactivity system handles unmounted components more gracefully.
-- Auth flow: `pb.collection('users').authWithPassword()` → on success navigate to `/admin/dashboard`.
+- React uses `isMountedRef` to prevent `setState` after unmount during async auth. Vue 3 does not require this — use `onUnmounted` + a cancellation flag instead.
+- Auth flow: `pb.collection('users').authWithPassword()` → navigate to `/admin/dashboard`.
 
 **`AdminDashboard.vue`**
 
-- **Drag-to-reorder projects**: Replace `<Reorder.Group>` with `useSortable`. On reorder, batch-update PocketBase with `Promise.all` using `requestKey: null` to prevent auto-cancellation of parallel requests:
+- **Drag-to-reorder projects**: Replace `<Reorder.Group>` with `useSortable`. On reorder, batch-update PocketBase with `Promise.all` using `requestKey: null` to prevent auto-cancellation:
   ```typescript
   const updates = newOrder.map((project, i) =>
     pb.collection('Portfolio_Projects').update(project.id, { Order: i + 1 }, { requestKey: null })
   )
   await Promise.all(updates)
   ```
-- **Toast notifications**: Use the custom `useToast()` composable for CRUD feedback.
-- **Project CRUD**: Create/delete operations via PocketBase SDK with FormData.
+- **Toast notifications**: Use `useToast()` composable for CRUD feedback.
+- **Project CRUD**: Create/delete via PocketBase SDK with FormData.
 
 **`ProjectEditor.vue`**
 
-The most complex admin component. Key challenges:
-
-- **Image reordering**: PocketBase does not preserve array order on update. The React workaround is: (1) delete all existing images from the record, (2) download existing images as blobs, (3) re-upload all images (existing + new) in the desired order via FormData. This must be preserved exactly in Vue.
-- **Form state management**: Tracks each image as `{ src: string, file?: File, isExisting: boolean }`. New uploads use `URL.createObjectURL(file)` for preview. Existing images use PocketBase file URLs.
-- **File input handling**: Hidden `<input type="file">` triggered by button clicks via template refs (`heroFileInputRef`, `heroMobileFileInputRef`).
-- **FormData construction**: Multiple `formData.append('Images', file)` calls for multi-image upload. Framework-agnostic but the state orchestration around it is complex.
+- **Image reordering**: PocketBase does not preserve array order on update. Workaround: (1) delete all existing images from the record, (2) download existing images as blobs, (3) re-upload all images (existing + new) in desired order via FormData. Preserve this pattern in Vue.
+- **Form state**: Tracks each image as `{ src: string, file?: File, isExisting: boolean }`. New uploads use `URL.createObjectURL(file)` for preview. Existing images use PocketBase file URLs.
+- **File input handling**: Hidden `<input type="file">` triggered by button clicks via template refs.
+- **FormData construction**: Multiple `formData.append('Images', file)` calls for multi-image upload.
 
 **`SettingsSidebar.vue`**
 
@@ -337,7 +326,7 @@ The most complex admin component. Key challenges:
 
 **`ProjectPopupPreview.vue`**
 
-- Preview component using the same `--scale` custom CSS property animation pattern as the main `ProjectPopup.vue` (see Phase 5).
+- Uses the same `--scale` custom CSS property animation as `ProjectPopup.vue` (see Phase 5).
 - SVG background image import from `vue/assets/`.
 
 ## Execution Order
@@ -364,28 +353,28 @@ The most complex admin component. Key challenges:
 
 ## VueUse Primitives Inventory
 
-Every VueUse composable used in this migration, which package it comes from, and where it's used.
+Every VueUse composable used in this migration, its package, purpose, and location.
 
 ### `@vueuse/core`
 
 | Composable | Purpose | Used in |
 |---|---|---|
-| `useBreakpoints` | Reactive viewport breakpoint tracking via `matchMedia`. Replaces manual `resize` listeners + `useState(isMobile)`. Tailwind preset available. | `Home.vue`, any component needing responsive logic |
+| `useBreakpoints` | Reactive viewport breakpoint tracking via `matchMedia`. Tailwind preset available. | `Home.vue`, any component needing responsive logic |
 | `useIntersectionObserver` | Wraps native IntersectionObserver with auto-cleanup. `threshold: 0.5` for section visibility. | `Home.vue` (section tracking) |
-| `useScroll` | Reactive scroll position (`x`, `y`), `isScrolling`, `arrivedState`, `directions`. `x` is writable for programmatic scrolling. `throttle` option replaces debounced listeners. | `MotionCarousel.vue`, `MotionCarouselDesktop.vue` |
-| `useEventListener` | Auto-cleaning event listener. Replaces manual `addEventListener`/`removeEventListener` pairs. | `Home.vue` (edge gesture prevention) |
-| `useStorage` | Reactive localStorage with cross-tab sync, custom serializers, and TTL support. | `usePocketBase` composable (response caching) |
+| `useScroll` | Reactive scroll position (`x`, `y`), `isScrolling`, `arrivedState`, `directions`. `x` is writable for programmatic scrolling. `throttle` option for debouncing. | `MotionCarousel.vue`, `MotionCarouselDesktop.vue` |
+| `useEventListener` | Auto-cleaning event listener. | `Home.vue` (edge gesture prevention) |
+| `useStorage` | Reactive localStorage with cross-tab sync and custom serializers. | `usePocketBase` composable (response caching) |
 | `useLocalStorage` | Shorthand for `useStorage` with localStorage. | `useFaviconCache` composable (favicon base64 caching) |
 | `useFavicon` | Reactively sets `<link rel="icon">` href. Returns writable ref. | `useFaviconCache` composable |
 | `useBase64` | Converts Blob/File to base64 string. | `useFaviconCache` composable (favicon blob → data URL) |
 | `useTimeoutFn` | Controllable timeout with `start()`/`stop()`/`isPending`. | `useToast` composable (auto-dismiss timers) |
-| `tryOnScopeDispose` | Safe cleanup hook — works inside and outside component lifecycle. | `usePocketBase` composable (PocketBase subscription cleanup) |
+| `tryOnScopeDispose` | Cleanup hook that works inside and outside component lifecycle. | `usePocketBase` composable (subscription cleanup) |
 
 ### `@vueuse/integrations`
 
 | Composable | Purpose | Used in |
 |---|---|---|
-| `useSortable` | Wraps SortableJS for drag-and-drop list reordering. `animation: 200` for smooth transitions. CSS classes `.sortable-drag`/`.sortable-ghost` for drag styles. | `AdminDashboard.vue` (project reorder) |
+| `useSortable` | Wraps SortableJS for drag-and-drop list reordering. `animation: 200` for transitions. CSS classes `.sortable-drag`/`.sortable-ghost` for drag styles. | `AdminDashboard.vue` (project reorder) |
 
 ### `@vueuse/motion`
 
