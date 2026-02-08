@@ -13,7 +13,7 @@ const emit = defineEmits<{
   close: []
 }>()
 
-const handleContact = (aboutData: About | null) => {
+function handleContact(aboutData: About | null) {
   const email = aboutData?.Contact_Email || 'hello@joannavanderwerf.com'
   window.location.href = `mailto:${email}`
 }

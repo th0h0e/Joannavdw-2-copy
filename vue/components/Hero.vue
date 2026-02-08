@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Settings } from '@/config/pocketbase'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue'
 import { getResponsiveFontSizes } from '@/config/pocketbase'
 import { projectTitleClasses, projectTitleContainerClasses } from '@/utils/sharedStyles'
 import ChevronDown from './icons/ChevronDown.vue'
@@ -16,6 +16,35 @@ const fontSizes = computed(() => getResponsiveFontSizes(props.settingsData))
 const hasAnimatedIn = ref(false)
 const hasTriggered = ref(false)
 const imageScaled = ref(false)
+
+// Dynamic style injection for responsive font sizes
+const styleEl = document.createElement('style')
+document.head.appendChild(styleEl)
+watchEffect(() => {
+  styleEl.textContent = `
+    .hero-title {
+      font-size: ${fontSizes.value.mobile}rem;
+    }
+    @media (min-width: 768px) {
+      .hero-title {
+        font-size: ${fontSizes.value.tablet}rem;
+      }
+    }
+    @media (min-width: 1024px) {
+      .hero-title {
+        font-size: ${fontSizes.value.desktop}rem;
+      }
+    }
+    @media (min-width: 1280px) {
+      .hero-title {
+        font-size: ${fontSizes.value.largeDesktop}rem;
+      }
+    }
+  `
+})
+onBeforeUnmount(() => {
+  styleEl.remove()
+})
 
 onMounted(() => {
   if (!hasTriggered.value && !props.isAboutPopupVisible) {
@@ -34,27 +63,6 @@ const chevronSize = computed(() => window.innerWidth >= 768 ? 28 : 24)
 </script>
 
 <template>
-  <component :is="'style'">
-    .hero-title {
-      font-size: {{ fontSizes.mobile }}rem;
-    }
-    @media (min-width: 768px) {
-      .hero-title {
-        font-size: {{ fontSizes.tablet }}rem;
-      }
-    }
-    @media (min-width: 1024px) {
-      .hero-title {
-        font-size: {{ fontSizes.desktop }}rem;
-      }
-    }
-    @media (min-width: 1280px) {
-      .hero-title {
-        font-size: {{ fontSizes.largeDesktop }}rem;
-      }
-    }
-  </component>
-
   <section
     id="hero-section"
     class="relative w-full snap-center bg-white flex items-center justify-center overflow-hidden"

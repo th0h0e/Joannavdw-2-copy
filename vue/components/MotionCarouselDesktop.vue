@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Settings } from '@/config/pocketbase'
 import type { ProjectImage } from '@/types/project'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import { getResponsiveFontSizes } from '@/config/pocketbase'
 import { projectTitleClasses, projectTitleContainerClasses } from '@/utils/sharedStyles'
 import ChevronDown from './icons/ChevronDown.vue'
@@ -32,95 +32,11 @@ const isOnBlurSlide = ref(false)
 const fontSizes = computed(() => getResponsiveFontSizes(props.settingsData))
 const lastImage = computed(() => props.images[props.images.length - 1])
 
-const handleScroll = () => {
-  const carousel = containerRef.value
-  if (!carousel) return
-
-  const scrollLeft = carousel.scrollLeft
-  const containerWidth = carousel.offsetWidth
-  const maxScroll = carousel.scrollWidth - containerWidth
-  const rawProgress = maxScroll > 0 ? scrollLeft / maxScroll : 0
-  scrollProgress.value = rawProgress
-
-  const halfWidth = containerWidth * 0.5
-
-  if (scrollLeft >= maxScroll - 5) {
-    currentSlide.value = props.totalSlides - 1
-    isOnBlurSlide.value = true
-  } else {
-    const slideIndex = Math.round(scrollLeft / halfWidth)
-    const actualSlide = Math.min(slideIndex, props.images.length - 1)
-    currentSlide.value = actualSlide
-    isOnBlurSlide.value = false
-  }
-}
-
-const handleKeyDown = (e: KeyboardEvent) => {
-  const carousel = containerRef.value
-  if (!carousel) return
-
-  const containerWidth = carousel.offsetWidth
-  const halfWidth = containerWidth * 0.5
-
-  if (e.key === 'ArrowRight' && currentSlide.value < props.totalSlides - 1) {
-    e.preventDefault()
-    const nextSlideIndex = currentSlide.value + 1
-    carousel.scrollTo({ left: nextSlideIndex * halfWidth, behavior: 'smooth' })
-  } else if (e.key === 'ArrowLeft' && currentSlide.value > 0) {
-    e.preventDefault()
-    const prevSlideIndex = currentSlide.value - 1
-    carousel.scrollTo({ left: prevSlideIndex * halfWidth, behavior: 'smooth' })
-  }
-}
-
-onMounted(() => {
-  const carousel = containerRef.value
-  if (carousel) {
-    carousel.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-  }
-  window.addEventListener('keydown', handleKeyDown)
-})
-
-onUnmounted(() => {
-  const carousel = containerRef.value
-  if (carousel) {
-    carousel.removeEventListener('scroll', handleScroll)
-  }
-  window.removeEventListener('keydown', handleKeyDown)
-})
-
-const scrollToNextSection = () => {
-  const main = document.querySelector('main')
-  if (main) {
-    main.scrollBy({ top: window.innerHeight, behavior: 'smooth' })
-  }
-}
-
-const handleTitleClick = () => {
-  if (isOnBlurSlide.value) {
-    scrollToNextSection()
-  } else {
-    emit('showPopup', props.projectTitle)
-  }
-}
-
-const handleNextSlide = () => {
-  const carousel = containerRef.value
-  if (!carousel) return
-  const containerWidth = carousel.offsetWidth
-  const halfWidth = containerWidth * 0.5
-  const nextSlideIndex = currentSlide.value + 1
-  carousel.scrollTo({ left: nextSlideIndex * halfWidth, behavior: 'smooth' })
-}
-
-const titleText = computed(() => isOnBlurSlide.value ? 'NEXT PROJECT' : props.projectTitle)
-const titleHidden = computed(() => props.isPopupVisible || props.isAboutPopupVisible)
-const showRightChevron = computed(() => props.images.length > 1 && currentSlide.value < props.images.length - 1)
-</script>
-
-<template>
-  <component :is="'style'">
+// Dynamic style injection for carousel and responsive font sizes
+const styleEl = document.createElement('style')
+document.head.appendChild(styleEl)
+watchEffect(() => {
+  styleEl.textContent = `
     .motion-carousel-desktop {
       position: relative; height: 100%; width: 100%;
       background-size: cover; background-position: center;
@@ -148,13 +64,111 @@ const showRightChevron = computed(() => props.images.length > 1 && currentSlide.
       background: transparent; z-index: 15;
     }
     .motion-project-title-desktop {
-      font-size: {{ fontSizes.desktop }}rem;
+      font-size: ${fontSizes.value.desktop}rem;
     }
     @media (min-width: 1280px) {
-      .motion-project-title-desktop { font-size: {{ fontSizes.largeDesktop }}rem; }
+      .motion-project-title-desktop { font-size: ${fontSizes.value.largeDesktop}rem; }
     }
-  </component>
+  `
+})
+onBeforeUnmount(() => {
+  styleEl.remove()
+})
 
+function handleScroll() {
+  const carousel = containerRef.value
+  if (!carousel)
+    return
+
+  const scrollLeft = carousel.scrollLeft
+  const containerWidth = carousel.offsetWidth
+  const maxScroll = carousel.scrollWidth - containerWidth
+  const rawProgress = maxScroll > 0 ? scrollLeft / maxScroll : 0
+  scrollProgress.value = rawProgress
+
+  const halfWidth = containerWidth * 0.5
+
+  if (scrollLeft >= maxScroll - 5) {
+    currentSlide.value = props.totalSlides - 1
+    isOnBlurSlide.value = true
+  }
+  else {
+    const slideIndex = Math.round(scrollLeft / halfWidth)
+    const actualSlide = Math.min(slideIndex, props.images.length - 1)
+    currentSlide.value = actualSlide
+    isOnBlurSlide.value = false
+  }
+}
+
+function handleKeyDown(e: KeyboardEvent) {
+  const carousel = containerRef.value
+  if (!carousel)
+    return
+
+  const containerWidth = carousel.offsetWidth
+  const halfWidth = containerWidth * 0.5
+
+  if (e.key === 'ArrowRight' && currentSlide.value < props.totalSlides - 1) {
+    e.preventDefault()
+    const nextSlideIndex = currentSlide.value + 1
+    carousel.scrollTo({ left: nextSlideIndex * halfWidth, behavior: 'smooth' })
+  }
+  else if (e.key === 'ArrowLeft' && currentSlide.value > 0) {
+    e.preventDefault()
+    const prevSlideIndex = currentSlide.value - 1
+    carousel.scrollTo({ left: prevSlideIndex * halfWidth, behavior: 'smooth' })
+  }
+}
+
+onMounted(() => {
+  const carousel = containerRef.value
+  if (carousel) {
+    carousel.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+  }
+  window.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  const carousel = containerRef.value
+  if (carousel) {
+    carousel.removeEventListener('scroll', handleScroll)
+  }
+  window.removeEventListener('keydown', handleKeyDown)
+})
+
+function scrollToNextSection() {
+  const main = document.querySelector('main')
+  if (main) {
+    main.scrollBy({ top: window.innerHeight, behavior: 'smooth' })
+  }
+}
+
+function handleTitleClick() {
+  if (isOnBlurSlide.value) {
+    scrollToNextSection()
+  }
+  else {
+    emit('showPopup', props.projectTitle)
+  }
+}
+
+function handleNextSlide() {
+  const carousel = containerRef.value
+  if (!carousel)
+    return
+  const containerWidth = carousel.offsetWidth
+  const halfWidth = containerWidth * 0.5
+  const nextSlideIndex = currentSlide.value + 1
+  carousel.scrollTo({ left: nextSlideIndex * halfWidth, behavior: 'smooth' })
+}
+
+const titleText = computed(() => isOnBlurSlide.value ? 'NEXT PROJECT' : props.projectTitle)
+const titleHidden = computed(() => props.isPopupVisible || props.isAboutPopupVisible)
+const showRightChevron = computed(() => props.images.length > 1 && currentSlide.value < props.images.length - 1)
+</script>
+
+<template>
   <div
     ref="containerRef"
     class="motion-carousel-desktop"
@@ -182,13 +196,19 @@ const showRightChevron = computed(() => props.images.length > 1 && currentSlide.
         style="cursor: pointer"
         @click="scrollToNextSection"
       >
-        <div :style="{
-          position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-          background: 'rgba(0, 0, 0, 0.3)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          zIndex: 1,
-        }" />
+        <div
+          :style="{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'rgba(0, 0, 0, 0.3)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            zIndex: 1,
+          }"
+        />
       </div>
     </div>
   </div>
@@ -221,13 +241,15 @@ const showRightChevron = computed(() => props.images.length > 1 && currentSlide.
     class="absolute bottom-7 left-1/2 -translate-x-1/2 z-20 w-4/5"
     :style="{ transform: 'translate(-50%, 0) translateZ(0)', willChange: 'transform' }"
   >
-    <div :style="{
-      opacity: currentSlide > 0 && !isOnBlurSlide ? 1 : 0,
-      transform: !isOnBlurSlide ? 'translateY(0) translateZ(0)' : 'translateY(10px) translateZ(0)',
-      transition: 'opacity 0.15s ease-in-out, transform 0.15s ease-in-out',
-      pointerEvents: currentSlide > 0 && !isOnBlurSlide ? 'auto' : 'none',
-      width: '100%',
-    }">
+    <div
+      :style="{
+        opacity: currentSlide > 0 && !isOnBlurSlide ? 1 : 0,
+        transform: !isOnBlurSlide ? 'translateY(0) translateZ(0)' : 'translateY(10px) translateZ(0)',
+        transition: 'opacity 0.15s ease-in-out, transform 0.15s ease-in-out',
+        pointerEvents: currentSlide > 0 && !isOnBlurSlide ? 'auto' : 'none',
+        width: '100%',
+      }"
+    >
       <div class="h-0.5 bg-gray-500/50 rounded-full overflow-hidden backdrop-blur-sm">
         <div class="h-full bg-gray-50" :style="{ width: `${scrollProgress * 100}%` }" />
       </div>

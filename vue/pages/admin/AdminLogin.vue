@@ -16,7 +16,7 @@ onMounted(() => {
   }
 })
 
-const handleLogin = async (e: Event) => {
+async function handleLogin(e: Event) {
   e.preventDefault()
   error.value = ''
   loading.value = true
@@ -24,7 +24,8 @@ const handleLogin = async (e: Event) => {
   try {
     await pb.collection('users').authWithPassword(email.value, password.value)
     router.push('/admin/dashboard')
-  } catch (err: unknown) {
+  }
+  catch (err: unknown) {
     console.error('Login error:', err)
     const typedErr = err as { response?: { message?: string }, message?: string }
     error.value = typedErr?.response?.message || typedErr?.message || 'Failed to login. Please check your credentials.'
@@ -54,8 +55,12 @@ const handleLogin = async (e: Event) => {
     <!-- Login Form -->
     <div class="max-w-md w-full bg-black/80 rounded-sm border border-neutral-800/60 p-10 backdrop-blur-xl relative z-10">
       <div class="text-center mb-8">
-        <h1 class="text-xl font-medium text-white tracking-tight">Admin Login</h1>
-        <p class="text-xs text-neutral-400 mt-2 tracking-wide uppercase">Access Dashboard</p>
+        <h1 class="text-xl font-medium text-white tracking-tight">
+          Admin Login
+        </h1>
+        <p class="text-xs text-neutral-400 mt-2 tracking-wide uppercase">
+          Access Dashboard
+        </p>
       </div>
 
       <form class="space-y-6" @submit="handleLogin">

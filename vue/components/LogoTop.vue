@@ -28,7 +28,8 @@ const containerHeight = computed(() => props.isMobile ? '60px' : '80px')
 const isHidden = computed(() => props.showAboutPopup || (props.showPopup && props.isMobile))
 
 const topPosition = computed(() => {
-  if (!hasAnimated.value && props.isHero) return 'calc(50% - 18vh)'
+  if (!hasAnimated.value && props.isHero)
+    return 'calc(50% - 18vh)'
   return '60px'
 })
 </script>

@@ -1,8 +1,9 @@
+import type { Ref } from 'vue'
 import type { Settings } from '@/config/pocketbase'
 import { watch } from 'vue'
-import type { Ref } from 'vue'
 import { getImageUrl } from '@/config/pocketbase'
 
+// eslint-disable-next-line react/no-unnecessary-use-prefix
 export function useFaviconCache(settingsRef: Ref<Settings | null>) {
   const updateFavicon = (href: string) => {
     const existingLinks = document.querySelectorAll('link[rel="icon"]')
@@ -15,7 +16,8 @@ export function useFaviconCache(settingsRef: Ref<Settings | null>) {
   }
 
   watch(settingsRef, (settings) => {
-    if (!settings || !settings.favicon) return
+    if (!settings || !settings.favicon)
+      return
 
     const faviconUrl = getImageUrl(settings, settings.favicon)
     const cacheKey = 'favicon_cache'
@@ -37,7 +39,8 @@ export function useFaviconCache(settingsRef: Ref<Settings | null>) {
           try {
             localStorage.setItem(cacheKey, dataUrl)
             localStorage.setItem(versionKey, settings.updated)
-          } catch (e) {
+          }
+          catch (e) {
             console.warn('Failed to cache favicon:', e)
           }
           updateFavicon(dataUrl)

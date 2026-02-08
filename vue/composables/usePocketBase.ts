@@ -20,6 +20,7 @@ function convertPocketBaseProject(project: PortfolioProject): ConvertedProject {
   }
 }
 
+// eslint-disable-next-line react/no-unnecessary-use-prefix
 export function usePocketBase() {
   const projects = ref<ConvertedProject[]>([])
   const homepage = ref<Homepage | null>(null)
@@ -64,10 +65,12 @@ export function usePocketBase() {
       about.value = aboutResponse[0] || null
       settings.value = settingsResponse[0] || null
       error.value = null
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Error fetching data:', err)
       error.value = 'Failed to load data'
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }

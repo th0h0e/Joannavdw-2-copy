@@ -16,7 +16,8 @@ const router = createRouter({
       path: '/admin/dashboard',
       component: () => import('../pages/admin/AdminDashboard.vue'),
       beforeEnter: () => {
-        if (!pb.authStore.isValid) return '/admin'
+        if (!pb.authStore.isValid)
+          return '/admin'
       },
     },
   ],

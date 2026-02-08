@@ -34,7 +34,9 @@ const draggedIndex = ref<number | null>(null)
 const isDraggingFile = ref(false)
 const isMobile = ref(window.innerWidth < 768)
 
-const handleResize = () => { isMobile.value = window.innerWidth < 768 }
+function handleResize() {
+  isMobile.value = window.innerWidth < 768
+}
 onMounted(() => {
   window.addEventListener('resize', handleResize)
   document.body.style.overflow = 'hidden'
@@ -56,20 +58,21 @@ watch(() => props.project, (project) => {
   }
 }, { immediate: true })
 
-const handleAddResponsibility = () => {
+function handleAddResponsibility() {
   if (newResponsibility.value.trim()) {
     responsibilities.value.push(newResponsibility.value.trim().toUpperCase())
     newResponsibility.value = ''
   }
 }
 
-const handleRemoveResponsibility = (index: number) => {
+function handleRemoveResponsibility(index: number) {
   responsibilities.value = responsibilities.value.filter((_, i) => i !== index)
 }
 
-const handleImageUpload = (e: Event) => {
+function handleImageUpload(e: Event) {
   const files = (e.target as HTMLInputElement).files
-  if (!files) return
+  if (!files)
+    return
 
   const newImages: ImageItem[] = Array.from(files).map((file, index) => ({
     id: `new-${Date.now()}-${index}`,
@@ -82,30 +85,31 @@ const handleImageUpload = (e: Event) => {
   images.value = [...images.value, ...newImages]
 }
 
-const handleFileDragEnter = (e: DragEvent) => {
+function handleFileDragEnter(e: DragEvent) {
   e.preventDefault()
   e.stopPropagation()
   isDraggingFile.value = true
 }
 
-const handleFileDragLeave = (e: DragEvent) => {
+function handleFileDragLeave(e: DragEvent) {
   e.preventDefault()
   e.stopPropagation()
   isDraggingFile.value = false
 }
 
-const handleFileDragOver = (e: DragEvent) => {
+function handleFileDragOver(e: DragEvent) {
   e.preventDefault()
   e.stopPropagation()
 }
 
-const handleFileDrop = (e: DragEvent) => {
+function handleFileDrop(e: DragEvent) {
   e.preventDefault()
   e.stopPropagation()
   isDraggingFile.value = false
 
   const files = e.dataTransfer?.files
-  if (!files || files.length === 0) return
+  if (!files || files.length === 0)
+    return
 
   const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'))
   const newImages: ImageItem[] = imageFiles.map((file, index) => ({
@@ -119,7 +123,7 @@ const handleFileDrop = (e: DragEvent) => {
   images.value = [...images.value, ...newImages]
 }
 
-const handleDeleteImage = (image: ImageItem) => {
+function handleDeleteImage(image: ImageItem) {
   if (image.isExisting) {
     imagesToDelete.value.push(image.filename)
   }
@@ -129,10 +133,13 @@ const handleDeleteImage = (image: ImageItem) => {
   }
 }
 
-const handleDragStart = (index: number) => { draggedIndex.value = index }
-const handleDragOver = (e: DragEvent, index: number) => {
+function handleDragStart(index: number) {
+  draggedIndex.value = index
+}
+function handleDragOver(e: DragEvent, index: number) {
   e.preventDefault()
-  if (draggedIndex.value === null || draggedIndex.value === index) return
+  if (draggedIndex.value === null || draggedIndex.value === index)
+    return
   const newImages = [...images.value]
   const draggedItem = newImages[draggedIndex.value]
   newImages.splice(draggedIndex.value, 1)
@@ -140,9 +147,11 @@ const handleDragOver = (e: DragEvent, index: number) => {
   images.value = newImages
   draggedIndex.value = index
 }
-const handleDragEnd = () => { draggedIndex.value = null }
+function handleDragEnd() {
+  draggedIndex.value = null
+}
 
-const handleSubmit = async (e: Event) => {
+async function handleSubmit(e: Event) {
   e.preventDefault()
   loading.value = true
 
@@ -166,19 +175,22 @@ const handleSubmit = async (e: Event) => {
       for (const img of images.value) {
         if (img.file) {
           formData.append('Images', img.file)
-        } else if (img.isExisting) {
+        }
+        else if (img.isExisting) {
           try {
             const response = await fetch(img.url)
             const blob = await response.blob()
             const file = new File([blob], img.filename, { type: blob.type })
             formData.append('Images', file)
-          } catch (error) {
+          }
+          catch (error) {
             console.error('Error downloading existing image:', error)
             throw new Error(`Failed to download image: ${img.filename}`)
           }
         }
       }
-    } else {
+    }
+    else {
       images.value.forEach((img) => {
         if (img.file) {
           formData.append('Images', img.file)
@@ -188,12 +200,14 @@ const handleSubmit = async (e: Event) => {
 
     if (props.project) {
       await pb.collection('Portfolio_Projects').update(props.project.id, formData)
-    } else {
+    }
+    else {
       await pb.collection('Portfolio_Projects').create(formData)
     }
 
     emit('save')
-  } catch (err: unknown) {
+  }
+  catch (err: unknown) {
     console.error('Error saving project:', err)
     const error = err as { status?: number, message?: string }
     if (error?.status === 401 || error?.status === 403) {
@@ -203,7 +217,8 @@ const handleSubmit = async (e: Event) => {
       return
     }
     emit('showToast', `Failed to save project: ${error?.message || 'Unknown error'}`, 'error')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -256,8 +271,7 @@ const handleSubmit = async (e: Event) => {
 
             <!-- Drag and Drop Upload Zone with Images -->
             <div
-              :class="[
-                'relative border-2 border-dashed rounded-sm transition-all',
+              class="relative border-2 border-dashed rounded-sm transition-all" :class="[
                 isDraggingFile ? 'border-white/40 bg-white/5' : 'border-neutral-700/60 bg-black/30',
                 images.length === 0 ? 'cursor-pointer hover:border-neutral-600/60 hover:bg-black/40' : '',
               ]"
@@ -280,7 +294,7 @@ const handleSubmit = async (e: Event) => {
               <label v-if="images.length === 0" for="image-upload" class="block py-12 px-6 text-center cursor-pointer">
                 <div class="flex flex-col items-center gap-3">
                   <svg
-                    :class="['w-12 h-12 transition-colors', isDraggingFile ? 'text-white' : 'text-neutral-500']"
+                    class="w-12 h-12 transition-colors" :class="[isDraggingFile ? 'text-white' : 'text-neutral-500']"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -288,7 +302,7 @@ const handleSubmit = async (e: Event) => {
                     <path stroke-linecap="round" stroke-linejoin="round" :stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
                   <div>
-                    <p :class="['text-sm font-medium transition-colors uppercase tracking-wide', isDraggingFile ? 'text-white' : 'text-neutral-300']">
+                    <p class="text-sm font-medium transition-colors uppercase tracking-wide" :class="[isDraggingFile ? 'text-white' : 'text-neutral-300']">
                       {{ isDraggingFile ? 'Drop images here' : 'Drag & drop images' }}
                     </p>
                     <p class="text-xs text-neutral-500 mt-1 tracking-wide">or click to browse</p>
@@ -303,8 +317,7 @@ const handleSubmit = async (e: Event) => {
                     v-for="(image, index) in images"
                     :key="image.id"
                     draggable="true"
-                    :class="[
-                      'relative group cursor-move border rounded-sm overflow-hidden hover:border-neutral-600 transition-all',
+                    class="relative group cursor-move border rounded-sm overflow-hidden hover:border-neutral-600 transition-all" :class="[
                       draggedIndex === index ? 'border-neutral-500 opacity-50' : 'border-neutral-700/60',
                     ]"
                     @dragstart="handleDragStart(index)"

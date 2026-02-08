@@ -14,16 +14,17 @@ const props = withDefaults(defineProps<{
 
 const isOpen = ref(false)
 
-const toggleMenu = () => {
-  if (props.isPopupVisible) return
+function toggleMenu() {
+  if (props.isPopupVisible)
+    return
   isOpen.value = !isOpen.value
 }
 
-const closeMenu = () => {
+function closeMenu() {
   isOpen.value = false
 }
 
-const handleLinkClick = (index: number) => {
+function handleLinkClick(index: number) {
   closeMenu()
 
   // Navigate after menu closes to avoid state conflicts

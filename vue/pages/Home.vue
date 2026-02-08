@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { About, Homepage, PortfolioProject, Settings } from '@/config/pocketbase'
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import AboutPopup from '@/components/AboutPopup.vue'
 import HamburgerMenu from '@/components/HamburgerMenu.vue'
 import Hero from '@/components/Hero.vue'
@@ -69,7 +69,7 @@ useEventListener(window, 'resize', () => {
 })
 
 // Fetch data from PocketBase
-const fetchData = async () => {
+async function fetchData() {
   try {
     loading.value = true
 
@@ -105,16 +105,18 @@ const fetchData = async () => {
     aboutData.value = aboutResponse[0] || null
     settingsData.value = settingsResponse[0] || null
     error.value = null
-  } catch (err) {
+  }
+  catch (err) {
     console.error('Error fetching data:', err)
     error.value = 'Failed to load data'
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
 
 // Set up realtime subscriptions
-const setupSubscriptions = () => {
+function setupSubscriptions() {
   pb.collection('Portfolio_Projects').subscribe('*', async () => {
     const freshProjects = await pb.collection('Portfolio_Projects').getFullList<PortfolioProject>({ sort: 'Order' })
     setCachedData('Portfolio_Projects', freshProjects)
@@ -161,7 +163,8 @@ watch(settingsData, (settings) => {
 
     if (cachedVersion === settings.updated && cachedFavicon) {
       updateFavicon(cachedFavicon)
-    } else {
+    }
+    else {
       fetch(faviconUrl)
         .then(response => response.blob())
         .then((blob) => {
@@ -171,7 +174,8 @@ watch(settingsData, (settings) => {
             try {
               localStorage.setItem(cacheKey, dataUrl)
               localStorage.setItem(versionKey, settings.updated)
-            } catch (e) {
+            }
+            catch (e) {
               console.warn('Failed to cache favicon:', e)
             }
             updateFavicon(dataUrl)
@@ -187,15 +191,18 @@ watch(settingsData, (settings) => {
 })
 
 // Reset inactive project carousels
-const resetInactiveCarousels = (currentSectionId: string) => {
+function resetInactiveCarousels(currentSectionId: string) {
   setTimeout(() => {
     projectsData.value.forEach((_, index) => {
       const sectionId = `project-${index}`
-      if (sectionId === currentSectionId) return
+      if (sectionId === currentSectionId)
+        return
       const section = document.getElementById(sectionId)
-      if (!section) return
+      if (!section)
+        return
       const carousel = section.querySelector('.motion-carousel, .motion-carousel-desktop') as HTMLElement
-      if (!carousel) return
+      if (!carousel)
+        return
       carousel.scrollLeft = 0
     })
   }, 300)
@@ -204,8 +211,9 @@ const resetInactiveCarousels = (currentSectionId: string) => {
 // Section tracking with IntersectionObserver
 let observer: IntersectionObserver | null = null
 
-const setupSectionTracking = () => {
-  if (observer) observer.disconnect()
+function setupSectionTracking() {
+  if (observer)
+    observer.disconnect()
 
   observer = new IntersectionObserver(
     (entries) => {
@@ -216,9 +224,11 @@ const setupSectionTracking = () => {
 
           if (sectionId === 'hero-section') {
             index = 0
-          } else if (sectionId.startsWith('project-')) {
-            index = parseInt(sectionId.replace('project-', '')) + 1
-          } else if (sectionId === 'project-index') {
+          }
+          else if (sectionId.startsWith('project-')) {
+            index = Number.parseInt(sectionId.replace('project-', '')) + 1
+          }
+          else if (sectionId === 'project-index') {
             index = projectsData.value.length + 1
           }
 
@@ -235,15 +245,18 @@ const setupSectionTracking = () => {
   )
 
   const heroSection = document.getElementById('hero-section')
-  if (heroSection) observer.observe(heroSection)
+  if (heroSection)
+    observer.observe(heroSection)
 
   projectsData.value.forEach((_, index) => {
     const section = document.getElementById(`project-${index}`)
-    if (section) observer!.observe(section)
+    if (section)
+      observer!.observe(section)
   })
 
   const indexSection = document.getElementById('project-index')
-  if (indexSection) observer.observe(indexSection)
+  if (indexSection)
+    observer.observe(indexSection)
 }
 
 // Watch for projectsData changes to re-setup section tracking
@@ -263,7 +276,7 @@ useEventListener(document, 'touchstart', (e: TouchEvent) => {
 }, { passive: false })
 
 // Hide address bar for immersive experience
-const hideAddressBar = () => {
+function hideAddressBar() {
   setTimeout(() => {
     window.scrollTo(0, 1)
     setTimeout(() => window.scrollTo(0, 0), 0)
@@ -271,8 +284,9 @@ const hideAddressBar = () => {
 }
 
 // Mobile swipe hint
-const setupMobileSwipeHint = () => {
-  if (window.innerWidth >= 1024 || hasShownMobileHint.value || projectsData.value.length === 0) return
+function setupMobileSwipeHint() {
+  if (window.innerWidth >= 1024 || hasShownMobileHint.value || projectsData.value.length === 0)
+    return
 
   const hintObserver = new IntersectionObserver(
     (entries) => {
@@ -284,10 +298,12 @@ const setupMobileSwipeHint = () => {
           setTimeout(() => {
             const firstProjectSection = document.getElementById('project-0')
             const carousel = firstProjectSection?.querySelector('.motion-carousel') as HTMLDivElement
-            if (!carousel) return
+            if (!carousel)
+              return
 
             const slides = carousel.querySelectorAll('.motion-carousel__slide')
-            if (slides.length < 2) return
+            if (slides.length < 2)
+              return
 
             const firstSlide = slides[0]
             const secondSlide = slides[1]
@@ -306,7 +322,8 @@ const setupMobileSwipeHint = () => {
   )
 
   const firstProjectSection = document.getElementById('project-0')
-  if (firstProjectSection) hintObserver.observe(firstProjectSection)
+  if (firstProjectSection)
+    hintObserver.observe(firstProjectSection)
 }
 
 watch(() => projectsData.value.length, () => {
@@ -322,7 +339,8 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-  if (observer) observer.disconnect()
+  if (observer)
+    observer.disconnect()
   pb.collection('Portfolio_Projects').unsubscribe()
   pb.collection('Homepage').unsubscribe()
   pb.collection('About').unsubscribe()
@@ -333,7 +351,7 @@ onUnmounted(() => {
 const projectTitles = computed(() => projectsData.value.map(p => p.title))
 
 // Popup handlers
-const handleShowPopup = (projectTitle: string) => {
+function handleShowPopup(projectTitle: string) {
   const project = projectsData.value.find(p => p.title === projectTitle)
   popupProjectTitle.value = projectTitle
   popupProjectDescription.value = project?.description || ''
@@ -342,19 +360,22 @@ const handleShowPopup = (projectTitle: string) => {
   showPopup.value = true
 }
 
-const handleClosePopup = () => {
+function handleClosePopup() {
   showPopup.value = false
   canOpenAboutPopup.value = false
-  setTimeout(() => { canOpenAboutPopup.value = true }, 100)
+  setTimeout(() => {
+    canOpenAboutPopup.value = true
+  }, 100)
 }
 
-const handleShowAboutPopup = () => {
-  if (showPopup.value || !canOpenAboutPopup.value) return
+function handleShowAboutPopup() {
+  if (showPopup.value || !canOpenAboutPopup.value)
+    return
   showPopup.value = false
   showAboutPopup.value = true
 }
 
-const handleCloseAboutPopup = () => {
+function handleCloseAboutPopup() {
   showAboutPopup.value = false
 }
 </script>
@@ -363,14 +384,18 @@ const handleCloseAboutPopup = () => {
   <!-- Loading state -->
   <div v-if="loading" class="h-dvh w-full flex items-center justify-center">
     <div class="text-center">
-      <div class="text-xl mb-4">Loading Portfolio...</div>
+      <div class="text-xl mb-4">
+        Loading Portfolio...
+      </div>
     </div>
   </div>
 
   <!-- Error state -->
   <div v-else-if="error" class="h-dvh w-full flex items-center justify-center">
     <div class="text-center text-red-500">
-      <div class="text-xl mb-4">Error: {{ error }}</div>
+      <div class="text-xl mb-4">
+        Error: {{ error }}
+      </div>
       <button
         class="px-4 py-2 bg-gray-200 text-black rounded"
         @click="() => window.location.reload()"
@@ -426,8 +451,8 @@ const handleCloseAboutPopup = () => {
       <!-- Desktop Project Sections -->
       <section
         v-for="(project, index) in projectsData"
-        :key="project.title"
         :id="`project-${index}`"
+        :key="project.title"
         class="relative w-full snap-center"
         style="height: 100lvh"
       >
@@ -468,8 +493,8 @@ const handleCloseAboutPopup = () => {
       <!-- Mobile Project Sections -->
       <section
         v-for="(project, index) in projectsData"
-        :key="project.title"
         :id="`project-${index}`"
+        :key="project.title"
         class="relative w-full snap-center"
         style="height: 100lvh"
       >

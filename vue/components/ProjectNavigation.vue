@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Settings } from '@/config/pocketbase'
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, watchEffect } from 'vue'
 import { getResponsiveFontSizes } from '@/config/pocketbase'
 import { navigationContainerClasses, navigationLinkClasses, navigationListClasses } from '@/utils/sharedStyles'
 
@@ -17,7 +17,30 @@ const emit = defineEmits<{
 
 const fontSizes = computed(() => getResponsiveFontSizes(props.settingsData))
 
-const handleClick = (e: MouseEvent, index: number) => {
+// Dynamic style injection for responsive font sizes
+const styleEl = document.createElement('style')
+document.head.appendChild(styleEl)
+watchEffect(() => {
+  styleEl.textContent = `
+    .project-navigation__link {
+      font-size: ${fontSizes.value.mobile}rem;
+    }
+    @media (min-width: 768px) {
+      .project-navigation__link { font-size: ${fontSizes.value.tablet}rem; }
+    }
+    @media (min-width: 1024px) {
+      .project-navigation__link { font-size: ${fontSizes.value.desktop}rem; }
+    }
+    @media (min-width: 1280px) {
+      .project-navigation__link { font-size: ${fontSizes.value.largeDesktop}rem; }
+    }
+  `
+})
+onBeforeUnmount(() => {
+  styleEl.remove()
+})
+
+function handleClick(e: MouseEvent, index: number) {
   // If there are listeners for linkClick, prevent default and emit
   e.preventDefault()
   emit('linkClick', index)
@@ -25,21 +48,6 @@ const handleClick = (e: MouseEvent, index: number) => {
 </script>
 
 <template>
-  <component :is="'style'">
-    .project-navigation__link {
-      font-size: {{ fontSizes.mobile }}rem;
-    }
-    @media (min-width: 768px) {
-      .project-navigation__link { font-size: {{ fontSizes.tablet }}rem; }
-    }
-    @media (min-width: 1024px) {
-      .project-navigation__link { font-size: {{ fontSizes.desktop }}rem; }
-    }
-    @media (min-width: 1280px) {
-      .project-navigation__link { font-size: {{ fontSizes.largeDesktop }}rem; }
-    }
-  </component>
-
   <div :class="navigationContainerClasses">
     <ul :class="navigationListClasses">
       <li v-for="(title, index) in projectTitles" :key="`${title}-${index}`">

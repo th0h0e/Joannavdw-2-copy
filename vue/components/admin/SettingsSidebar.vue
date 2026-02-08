@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { About, Homepage, Settings } from '@/config/pocketbase'
 import { ref, watch } from 'vue'
-import pb, { getImageUrl } from '@/config/pocketbase'
 import AboutPopup from '@/components/AboutPopup.vue'
+import pb, { getImageUrl } from '@/config/pocketbase'
 
 const props = defineProps<{
   isOpen: boolean
@@ -37,7 +37,7 @@ const clientList = ref<string[]>([])
 const newClient = ref('')
 const contactEmail = ref('')
 
-const fetchData = async () => {
+async function fetchData() {
   try {
     loading.value = true
 
@@ -63,31 +63,35 @@ const fetchData = async () => {
     if (settings.favicon) {
       faviconUrl.value = getImageUrl(settings, settings.favicon)
     }
-  } catch (err) {
+  }
+  catch (err) {
     console.error('Error fetching settings:', err)
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
 
 watch(() => props.isOpen, (isOpen) => {
-  if (isOpen) fetchData()
+  if (isOpen)
+    fetchData()
 })
 
-const handleAddClient = () => {
+function handleAddClient() {
   if (newClient.value.trim()) {
     clientList.value.push(newClient.value.trim().toUpperCase())
     newClient.value = ''
   }
 }
 
-const handleRemoveClient = (index: number) => {
+function handleRemoveClient(index: number) {
   clientList.value = clientList.value.filter((_, i) => i !== index)
 }
 
-const handleFaviconUpdate = async (event: Event) => {
+async function handleFaviconUpdate(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file || !settingsData.value) return
+  if (!file || !settingsData.value)
+    return
 
   try {
     const formData = new FormData()
@@ -101,14 +105,15 @@ const handleFaviconUpdate = async (event: Event) => {
     }
 
     emit('showToast', 'Favicon updated! Please refresh the page to see the changes.', 'success')
-  } catch (err: unknown) {
+  }
+  catch (err: unknown) {
     console.error('Error updating favicon:', err)
     const error = err as { message?: string }
     emit('showToast', `Failed to update favicon: ${error?.message || 'Unknown error'}`, 'error')
   }
 }
 
-const handleSubmit = async (e: Event) => {
+async function handleSubmit(e: Event) {
   e.preventDefault()
   loading.value = true
 
@@ -140,11 +145,13 @@ const handleSubmit = async (e: Event) => {
 
     emit('showToast', 'Settings saved successfully!', 'success')
     emit('close')
-  } catch (err: unknown) {
+  }
+  catch (err: unknown) {
     console.error('Error saving settings:', err)
     const error = err as { message?: string }
     emit('showToast', `Failed to save settings: ${error?.message || 'Unknown error'}`, 'error')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -193,8 +200,12 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
         <!-- Sticky Header -->
         <div class="flex-shrink-0 p-8 border-b border-neutral-800/60 flex items-center gap-4 backdrop-blur-sm">
           <div class="flex-1">
-            <h2 class="text-xl font-medium text-white tracking-tight">Settings</h2>
-            <p class="text-xs text-neutral-400 mt-1 tracking-wide uppercase">Configure site content</p>
+            <h2 class="text-xl font-medium text-white tracking-tight">
+              Settings
+            </h2>
+            <p class="text-xs text-neutral-400 mt-1 tracking-wide uppercase">
+              Configure site content
+            </p>
           </div>
 
           <!-- Favicon Avatar -->
@@ -234,7 +245,9 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
         <div class="flex-1 overflow-y-auto p-8 space-y-8">
           <!-- Hero Section -->
           <div>
-            <h3 class="text-sm font-medium text-white mb-4 uppercase tracking-wider">Hero Section</h3>
+            <h3 class="text-sm font-medium text-white mb-4 uppercase tracking-wider">
+              Hero Section
+            </h3>
             <div>
               <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">Hero Title</label>
               <input
@@ -250,7 +263,9 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
 
           <!-- About Section -->
           <div>
-            <h3 class="text-sm font-medium text-white mb-4 uppercase tracking-wider">About Section</h3>
+            <h3 class="text-sm font-medium text-white mb-4 uppercase tracking-wider">
+              About Section
+            </h3>
             <div class="space-y-4">
               <div>
                 <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">About Description</label>
@@ -310,7 +325,9 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
 
           <!-- Global Settings -->
           <div>
-            <h3 class="text-sm font-medium text-white mb-4 uppercase tracking-wider">Global Settings</h3>
+            <h3 class="text-sm font-medium text-white mb-4 uppercase tracking-wider">
+              Global Settings
+            </h3>
             <div class="space-y-4">
               <div>
                 <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">Contact Email</label>
@@ -371,7 +388,9 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
                   >
                   <span class="text-xs font-medium text-neutral-300 uppercase tracking-wider">Show Top Progress Bar</span>
                 </label>
-                <p class="text-xs text-neutral-500 mt-1 ml-7">Display progress bar at top of carousel</p>
+                <p class="text-xs text-neutral-500 mt-1 ml-7">
+                  Display progress bar at top of carousel
+                </p>
               </div>
             </div>
           </div>

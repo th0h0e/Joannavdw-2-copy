@@ -4,8 +4,8 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import ProjectEditor from '@/components/admin/ProjectEditor.vue'
 import SettingsSidebar from '@/components/admin/SettingsSidebar.vue'
-import pb, { getImageUrl } from '@/config/pocketbase'
 import { useToast } from '@/composables/useToast'
+import pb, { getImageUrl } from '@/config/pocketbase'
 
 const router = useRouter()
 const { toasts, showToast } = useToast()
@@ -40,27 +40,31 @@ onMounted(() => {
   fetchHeroImage()
 })
 
-const fetchHeroImage = async () => {
+async function fetchHeroImage() {
   try {
     const homepage = await pb.collection('Homepage').getFirstListItem<Homepage>('Is_Active = true', { requestKey: null })
     if (homepage) {
-      if (homepage.Hero_Image) heroImage.value = getImageUrl(homepage, homepage.Hero_Image)
-      if (homepage.Hero_Image_Mobile) heroImageMobile.value = getImageUrl(homepage, homepage.Hero_Image_Mobile)
+      if (homepage.Hero_Image)
+        heroImage.value = getImageUrl(homepage, homepage.Hero_Image)
+      if (homepage.Hero_Image_Mobile)
+        heroImageMobile.value = getImageUrl(homepage, homepage.Hero_Image_Mobile)
       heroTitle.value = homepage.Hero_Title || ''
       homepageId.value = homepage.id
     }
-  } catch (err) {
+  }
+  catch (err) {
     console.error('Error fetching hero image:', err)
   }
 }
 
-const fetchProjects = async () => {
+async function fetchProjects() {
   try {
     loading.value = true
     const response = await pb.collection('Portfolio_Projects').getFullList<PortfolioProject>({ sort: 'Order', requestKey: null })
     projects.value = response
     error.value = null
-  } catch (err: unknown) {
+  }
+  catch (err: unknown) {
     console.error('Error fetching projects:', err)
     const typedErr = err as { status?: number }
     if (typedErr?.status === 401 || typedErr?.status === 403) {
@@ -69,50 +73,55 @@ const fetchProjects = async () => {
       return
     }
     error.value = 'Failed to load projects'
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
 
-const handleHeroImageUpdate = async (event: Event) => {
+async function handleHeroImageUpdate(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file || !homepageId.value) return
+  if (!file || !homepageId.value)
+    return
   try {
     const formData = new FormData()
     formData.append('Hero_Image', file)
     await pb.collection('Homepage').update(homepageId.value, formData)
     await fetchHeroImage()
-  } catch (err: unknown) {
+  }
+  catch (err: unknown) {
     const typedErr = err as { message?: string }
     showToast(`Failed to update hero image: ${typedErr?.message || 'Unknown error'}`, 'error')
   }
 }
 
-const handleHeroImageMobileUpdate = async (event: Event) => {
+async function handleHeroImageMobileUpdate(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file || !homepageId.value) return
+  if (!file || !homepageId.value)
+    return
   try {
     const formData = new FormData()
     formData.append('Hero_Image_Mobile', file)
     await pb.collection('Homepage').update(homepageId.value, formData)
     await fetchHeroImage()
-  } catch (err: unknown) {
+  }
+  catch (err: unknown) {
     const typedErr = err as { message?: string }
     showToast(`Failed to update mobile hero image: ${typedErr?.message || 'Unknown error'}`, 'error')
   }
 }
 
-const handleLogout = () => {
+function handleLogout() {
   pb.authStore.clear()
   router.push('/admin')
 }
 
-const handleTitleClick = () => {
+function handleTitleClick() {
   tempTitle.value = heroTitle.value
   isEditingTitle.value = true
 }
 
-const handleTitleSave = async () => {
+async function handleTitleSave() {
   if (!homepageId.value || tempTitle.value.trim() === heroTitle.value) {
     isEditingTitle.value = false
     return
@@ -121,30 +130,33 @@ const handleTitleSave = async () => {
     await pb.collection('Homepage').update(homepageId.value, { Hero_Title: tempTitle.value.trim() })
     heroTitle.value = tempTitle.value.trim()
     isEditingTitle.value = false
-  } catch (err: unknown) {
+  }
+  catch (err: unknown) {
     const typedErr = err as { message?: string }
     showToast(`Failed to update hero title: ${typedErr?.message || 'Unknown error'}`, 'error')
     isEditingTitle.value = false
   }
 }
 
-const handleTitleCancel = () => {
+function handleTitleCancel() {
   isEditingTitle.value = false
   tempTitle.value = ''
 }
 
-const handleDelete = (projectId: string) => {
+function handleDelete(projectId: string) {
   deleteConfirmation.value = { projectId }
 }
 
-const confirmDelete = async () => {
-  if (!deleteConfirmation.value) return
+async function confirmDelete() {
+  if (!deleteConfirmation.value)
+    return
   try {
     await pb.collection('Portfolio_Projects').delete(deleteConfirmation.value.projectId)
     deleteConfirmation.value = null
     await fetchProjects()
     showToast('Project deleted successfully', 'success')
-  } catch (err: unknown) {
+  }
+  catch (err: unknown) {
     const typedErr = err as { status?: number, message?: string }
     if (typedErr?.status === 401 || typedErr?.status === 403) {
       pb.authStore.clear()
@@ -156,7 +168,7 @@ const confirmDelete = async () => {
   }
 }
 
-const handleSave = async () => {
+async function handleSave() {
   const isCreating = showNewProjectForm.value
   editingProject.value = null
   showNewProjectForm.value = false
@@ -165,20 +177,22 @@ const handleSave = async () => {
 }
 
 // Drag reorder handlers
-const handleDragStart = (e: DragEvent, projectId: string) => {
+function handleDragStart(e: DragEvent, projectId: string) {
   draggedProjectId.value = projectId
   if (e.dataTransfer) {
     e.dataTransfer.effectAllowed = 'move'
   }
 }
 
-const handleDragOver = (e: DragEvent, targetProjectId: string) => {
+function handleDragOver(e: DragEvent, targetProjectId: string) {
   e.preventDefault()
-  if (!draggedProjectId.value || draggedProjectId.value === targetProjectId) return
+  if (!draggedProjectId.value || draggedProjectId.value === targetProjectId)
+    return
 
   const draggedIdx = projects.value.findIndex(p => p.id === draggedProjectId.value)
   const targetIdx = projects.value.findIndex(p => p.id === targetProjectId)
-  if (draggedIdx === -1 || targetIdx === -1) return
+  if (draggedIdx === -1 || targetIdx === -1)
+    return
 
   const newProjects = [...projects.value]
   const [draggedItem] = newProjects.splice(draggedIdx, 1)
@@ -186,7 +200,7 @@ const handleDragOver = (e: DragEvent, targetProjectId: string) => {
   projects.value = newProjects
 }
 
-const handleDragEnd = async () => {
+async function handleDragEnd() {
   if (!draggedProjectId.value || isReordering.value) {
     draggedProjectId.value = null
     return
@@ -200,11 +214,13 @@ const handleDragEnd = async () => {
       pb.collection('Portfolio_Projects').update(project.id, { Order: index + 1 }, { requestKey: null }),
     )
     await Promise.all(updatePromises)
-  } catch (err: unknown) {
+  }
+  catch (err: unknown) {
     await fetchProjects()
     const typedErr = err as { message?: string }
     showToast(`Failed to reorder projects: ${typedErr?.message || 'Unknown error'}`, 'error')
-  } finally {
+  }
+  finally {
     isReordering.value = false
   }
 }
@@ -215,7 +231,9 @@ const handleDragEnd = async () => {
     v-if="loading"
     class="min-h-screen bg-black flex items-center justify-center"
   >
-    <div class="text-xl text-white">Loading...</div>
+    <div class="text-xl text-white">
+      Loading...
+    </div>
   </div>
 
   <div
@@ -227,7 +245,9 @@ const handleDragEnd = async () => {
     <header class="border-b border-neutral-800/70 backdrop-blur-sm bg-black/80 sticky top-0 z-10">
       <div class="max-w-7xl mx-auto px-6 lg:px-8 py-6 flex justify-between items-center">
         <div>
-          <h1 class="text-xl font-medium text-white tracking-tight">Portfolio</h1>
+          <h1 class="text-xl font-medium text-white tracking-tight">
+            Portfolio
+          </h1>
           <p class="text-xs text-neutral-500 mt-1 tracking-wide">
             {{ projects.length }} {{ projects.length === 1 ? 'project' : 'projects' }}
           </p>
@@ -279,8 +299,7 @@ const handleDragEnd = async () => {
                   <div class="text-center px-6">
                     <h1
                       :contenteditable="isEditingTitle"
-                      :class="[
-                        'text-white uppercase leading-none text-4xl outline-none pointer-events-auto inline-block',
+                      class="text-white uppercase leading-none text-4xl outline-none pointer-events-auto inline-block" :class="[
                         isEditingTitle ? 'cursor-text' : 'cursor-pointer hover:opacity-80 transition-opacity',
                       ]"
                       :style="{ fontFamily: 'EnduroWeb, sans-serif', letterSpacing: '0.03em' }"
@@ -405,9 +424,13 @@ const handleDragEnd = async () => {
           <!-- Content -->
           <div class="flex-1 min-w-0 p-5">
             <div class="mb-2">
-              <h3 class="font-semibold text-base text-white tracking-tight">{{ project.Title }}</h3>
+              <h3 class="font-semibold text-base text-white tracking-tight">
+                {{ project.Title }}
+              </h3>
             </div>
-            <p class="text-sm text-neutral-400 line-clamp-2 leading-relaxed mb-3">{{ project.Description }}</p>
+            <p class="text-sm text-neutral-400 line-clamp-2 leading-relaxed mb-3">
+              {{ project.Description }}
+            </p>
 
             <!-- Responsibilities -->
             <div
@@ -451,8 +474,12 @@ const handleDragEnd = async () => {
       </div>
 
       <div v-if="projects.length === 0" class="text-center py-20">
-        <p class="text-neutral-600 text-sm uppercase tracking-wider">No projects yet</p>
-        <p class="text-neutral-700 text-xs mt-2">Create your first project to get started</p>
+        <p class="text-neutral-600 text-sm uppercase tracking-wider">
+          No projects yet
+        </p>
+        <p class="text-neutral-700 text-xs mt-2">
+          Create your first project to get started
+        </p>
       </div>
 
       <!-- Create New Project Button -->
@@ -487,8 +514,7 @@ const handleDragEnd = async () => {
       <div
         v-for="toast in toasts"
         :key="toast.id"
-        :class="[
-          'px-4 py-3 rounded-sm text-sm font-medium backdrop-blur-md pointer-events-auto transition-all duration-300',
+        class="px-4 py-3 rounded-sm text-sm font-medium backdrop-blur-md pointer-events-auto transition-all duration-300" :class="[
           toast.type === 'success' ? 'bg-green-500/20 border border-green-500/40 text-green-200' : 'bg-red-500/20 border border-red-500/40 text-red-200',
         ]"
       >
@@ -506,7 +532,9 @@ const handleDragEnd = async () => {
           class="bg-neutral-900/95 border border-neutral-800/70 rounded-sm p-6 max-w-sm mx-4"
           @click.stop
         >
-          <h3 class="text-lg font-medium text-white mb-2">Delete Project</h3>
+          <h3 class="text-lg font-medium text-white mb-2">
+            Delete Project
+          </h3>
           <p class="text-sm text-neutral-400 mb-6">
             Are you sure you want to delete this project? This action cannot be undone.
           </p>
