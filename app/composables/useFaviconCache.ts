@@ -26,8 +26,7 @@ export function useFaviconCache(settingsRef: Ref<Settings | null>) {
       return
     }
 
-    fetch(faviconUrl)
-      .then(r => r.blob())
+    $fetch<Blob>('/api/proxy-image', { query: { url: faviconUrl }, responseType: 'blob' })
       .then((blob) => {
         const reader = new FileReader()
         reader.onloadend = () => {

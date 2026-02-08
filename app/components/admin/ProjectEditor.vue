@@ -176,8 +176,7 @@ async function handleSubmit(e: Event) {
         }
         else if (img.isExisting) {
           try {
-            const response = await fetch(img.url)
-            const blob = await response.blob()
+            const blob = await $fetch<Blob>('/api/proxy-image', { query: { url: img.url }, responseType: 'blob' })
             const file = new File([blob], img.filename, { type: blob.type })
             formData.append('Images', file)
           }

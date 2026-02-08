@@ -31,8 +31,7 @@ These benefit from SSR and caching. Both approaches shown.
 <!-- app/pages/projects.vue -->
 <script setup lang="ts">
 const { data: projects, status, error, refresh } = await useAsyncData('projects', () =>
-  pb.collection('Portfolio_Projects').getFullList<PortfolioProject>({ sort: 'Order' })
-)
+  pb.collection('Portfolio_Projects').getFullList<PortfolioProject>({ sort: 'Order' }))
 </script>
 
 <template>
@@ -78,8 +77,7 @@ const { data: projects } = await useFetch('/api/projects')
 <!-- app/pages/featured.vue -->
 <script setup lang="ts">
 const { data: featured } = await useAsyncData('featured-project', () =>
-  pb.collection('Portfolio_Projects').getFirstListItem('featured = true')
-)
+  pb.collection('Portfolio_Projects').getFirstListItem('featured = true'))
 </script>
 ```
 
@@ -111,8 +109,7 @@ const route = useRoute()
 const id = route.params.id as string
 
 const { data: project } = await useAsyncData(`project-${id}`, () =>
-  pb.collection('Portfolio_Projects').getOne<PortfolioProject>(id)
-)
+  pb.collection('Portfolio_Projects').getOne<PortfolioProject>(id))
 </script>
 ```
 
@@ -168,8 +165,7 @@ Both approaches shown — the server route approach is recommended for mutations
 ```vue
 <script setup lang="ts">
 const { data: projects, refresh } = await useAsyncData('projects', () =>
-  pb.collection('Portfolio_Projects').getFullList()
-)
+  pb.collection('Portfolio_Projects').getFullList())
 
 async function createProject(formData: Record<string, any>) {
   await pb.collection('Portfolio_Projects').create(formData)
@@ -332,7 +328,7 @@ const imageUrl = pb.files.getURL(record, record.avatar)
 </script>
 
 <template>
-  <img :src="imageUrl" />
+  <img :src="imageUrl">
 </template>
 ```
 
