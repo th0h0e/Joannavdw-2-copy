@@ -1,34 +1,8 @@
 <script setup lang="ts">
-import type { About, Homepage, PortfolioProject, Settings } from '~/plugins/pocketbase.client'
-import { getCachedData, getImageUrl, pb, setCachedData } from '~/plugins/pocketbase.client'
+import { getImageUrl } from '~/plugins/pocketbase.client'
 
-// Type for converted project data used in the app
-interface ConvertedProject {
-  title: string
-  description: string
-  images: { src: string }[]
-  responsibility?: string[]
-}
-
-// Convert PocketBase project to expected format
-function convertPocketBaseProject(project: PortfolioProject): ConvertedProject {
-  return {
-    title: project.Title,
-    description: project.Description,
-    images: project.Images.map(filename => ({
-      src: getImageUrl(project, filename),
-    })),
-    responsibility: project.Responsibility_json || project.Responsibility,
-  }
-}
-
-// State for PocketBase data
-const projectsData = ref<ConvertedProject[]>([])
-const homepageData = ref<Homepage | null>(null)
-const aboutData = ref<About | null>(null)
-const settingsData = ref<Settings | null>(null)
-const loading = ref(true)
-const error = ref<string | null>(null)
+// Data fetching via composable (useAsyncData + realtime subscriptions)
+const { projects: projectsData, homepage: homepageData, about: aboutData, settings: settingsData, loading, error, setupSubscriptions } = usePocketBase()
 
 // State for tracking current section
 const currentSectionIndex = ref(0)
@@ -55,80 +29,6 @@ useEventListener(window, 'resize', () => {
   isMobile.value = window.innerWidth < 768
   isDesktop.value = window.innerWidth >= 1024
 })
-
-// Fetch data from PocketBase
-async function fetchData() {
-  try {
-    loading.value = true
-
-    const cachedProjects = getCachedData<PortfolioProject[]>('Portfolio_Projects')
-    const cachedHomepage = getCachedData<Homepage[]>('Homepage')
-    const cachedAbout = getCachedData<About[]>('About')
-    const cachedSettings = getCachedData<Settings[]>('Settings')
-
-    if (cachedProjects && cachedHomepage && cachedAbout && cachedSettings) {
-      projectsData.value = cachedProjects.map(convertPocketBaseProject)
-      homepageData.value = cachedHomepage[0] || null
-      aboutData.value = cachedAbout[0] || null
-      settingsData.value = cachedSettings[0] || null
-      error.value = null
-      loading.value = false
-      return
-    }
-
-    const [projectsResponse, homepageResponse, aboutResponse, settingsResponse] = await Promise.all([
-      pb.collection('Portfolio_Projects').getFullList<PortfolioProject>({ sort: 'Order' }),
-      pb.collection('Homepage').getFullList<Homepage>({ filter: 'Is_Active = true', sort: '-created' }),
-      pb.collection('About').getFullList<About>({ filter: 'Is_Active = true', sort: '-created' }),
-      pb.collection('Settings').getFullList<Settings>({ sort: '-created' }),
-    ])
-
-    setCachedData('Portfolio_Projects', projectsResponse)
-    setCachedData('Homepage', homepageResponse)
-    setCachedData('About', aboutResponse)
-    setCachedData('Settings', settingsResponse)
-
-    projectsData.value = projectsResponse.map(convertPocketBaseProject)
-    homepageData.value = homepageResponse[0] || null
-    aboutData.value = aboutResponse[0] || null
-    settingsData.value = settingsResponse[0] || null
-    error.value = null
-  }
-  catch (err) {
-    console.error('Error fetching data:', err)
-    error.value = 'Failed to load data'
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-// Set up realtime subscriptions
-function setupSubscriptions() {
-  pb.collection('Portfolio_Projects').subscribe('*', async () => {
-    const freshProjects = await pb.collection('Portfolio_Projects').getFullList<PortfolioProject>({ sort: 'Order' })
-    setCachedData('Portfolio_Projects', freshProjects)
-    projectsData.value = freshProjects.map(convertPocketBaseProject)
-  })
-
-  pb.collection('Homepage').subscribe('*', async () => {
-    const freshHomepage = await pb.collection('Homepage').getFullList<Homepage>({ filter: 'Is_Active = true', sort: '-created' })
-    setCachedData('Homepage', freshHomepage)
-    homepageData.value = freshHomepage[0] || null
-  })
-
-  pb.collection('About').subscribe('*', async () => {
-    const freshAbout = await pb.collection('About').getFullList<About>({ filter: 'Is_Active = true', sort: '-created' })
-    setCachedData('About', freshAbout)
-    aboutData.value = freshAbout[0] || null
-  })
-
-  pb.collection('Settings').subscribe('*', async () => {
-    const freshSettings = await pb.collection('Settings').getFullList<Settings>({ sort: '-created' })
-    setCachedData('Settings', freshSettings)
-    settingsData.value = freshSettings[0] || null
-  })
-}
 
 // Update favicon dynamically via useHead()
 useFaviconCache(settingsData)
@@ -273,8 +173,7 @@ watch(() => projectsData.value.length, () => {
   nextTick(() => setupMobileSwipeHint())
 })
 
-onMounted(async () => {
-  await fetchData()
+onMounted(() => {
   setupSubscriptions()
   hideAddressBar()
 
@@ -284,10 +183,6 @@ onMounted(async () => {
 onUnmounted(() => {
   if (observer)
     observer.disconnect()
-  pb.collection('Portfolio_Projects').unsubscribe()
-  pb.collection('Homepage').unsubscribe()
-  pb.collection('About').unsubscribe()
-  pb.collection('Settings').unsubscribe()
 })
 
 // Computed

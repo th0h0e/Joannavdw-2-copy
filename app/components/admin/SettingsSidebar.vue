@@ -11,11 +11,29 @@ const emit = defineEmits<{
   showToast: [message: string, type: 'success' | 'error']
 }>()
 
-const loading = ref(false)
-const aboutData = ref<About | null>(null)
-const homepageData = ref<Homepage | null>(null)
-const settingsData = ref<Settings | null>(null)
 const faviconFileInput = ref<HTMLInputElement | null>(null)
+const saving = ref(false)
+
+// Fetch all settings data in parallel when sidebar opens
+const { data: rawData, refresh, status } = useAsyncData(
+  'settings-sidebar',
+  async () => {
+    const [about, homepage, settings] = await Promise.all([
+      pb.collection('About').getFirstListItem<About>('Is_Active = true'),
+      pb.collection('Homepage').getFirstListItem<Homepage>('Is_Active = true'),
+      pb.collection('Settings').getFirstListItem<Settings>(''),
+    ])
+    return { about, homepage, settings }
+  },
+  { immediate: false },
+)
+
+const loading = computed(() => status.value === 'pending' || saving.value)
+
+// Raw record refs for use in mutations
+const aboutData = computed(() => rawData.value?.about || null)
+const homepageData = computed(() => rawData.value?.homepage || null)
+const settingsData = computed(() => rawData.value?.settings || null)
 
 // Form fields - Homepage
 const heroTitle = ref('')
@@ -35,44 +53,33 @@ const clientList = ref<string[]>([])
 const newClient = ref('')
 const contactEmail = ref('')
 
-async function fetchData() {
-  try {
-    loading.value = true
+// Populate form fields when data arrives
+watch(rawData, (data) => {
+  if (!data)
+    return
 
-    const about = await pb.collection('About').getFirstListItem<About>('Is_Active = true')
-    aboutData.value = about
-    aboutDescription.value = about.About_Description
-    expertiseDescription.value = about.Expertise_Description
-    clientList.value = about.Client_List_Json || about.Client_List || []
-    contactEmail.value = about.Contact_Email
+  aboutDescription.value = data.about.About_Description
+  expertiseDescription.value = data.about.Expertise_Description
+  clientList.value = data.about.Client_List_Json || data.about.Client_List || []
+  contactEmail.value = data.about.Contact_Email
 
-    const homepage = await pb.collection('Homepage').getFirstListItem<Homepage>('Is_Active = true')
-    homepageData.value = homepage
-    heroTitle.value = homepage.Hero_Title
+  heroTitle.value = data.homepage.Hero_Title
 
-    const settings = await pb.collection('Settings').getFirstListItem<Settings>('')
-    settingsData.value = settings
-    showTopProgressBar.value = settings.Show_Top_Progress_Bar
-    mobileFontSize.value = settings.Mobile_Font_Size
-    tabletFontSize.value = settings.Tablet_Font_Size
-    desktopFontSize.value = settings.Desktop_Font_Size
-    largeDesktopFontSize.value = settings.Large_Desktop_Font_Size
+  showTopProgressBar.value = data.settings.Show_Top_Progress_Bar
+  mobileFontSize.value = data.settings.Mobile_Font_Size
+  tabletFontSize.value = data.settings.Tablet_Font_Size
+  desktopFontSize.value = data.settings.Desktop_Font_Size
+  largeDesktopFontSize.value = data.settings.Large_Desktop_Font_Size
 
-    if (settings.favicon) {
-      faviconUrl.value = getImageUrl(settings, settings.favicon)
-    }
+  if (data.settings.favicon) {
+    faviconUrl.value = getImageUrl(data.settings, data.settings.favicon)
   }
-  catch (err) {
-    console.error('Error fetching settings:', err)
-  }
-  finally {
-    loading.value = false
-  }
-}
+})
 
+// Refresh data when sidebar opens
 watch(() => props.isOpen, (isOpen) => {
   if (isOpen)
-    fetchData()
+    refresh()
 })
 
 function handleAddClient() {
@@ -113,7 +120,7 @@ async function handleFaviconUpdate(event: Event) {
 
 async function handleSubmit(e: Event) {
   e.preventDefault()
-  loading.value = true
+  saving.value = true
 
   try {
     if (homepageData.value) {
@@ -150,7 +157,7 @@ async function handleSubmit(e: Event) {
     emit('showToast', `Failed to save settings: ${error?.message || 'Unknown error'}`, 'error')
   }
   finally {
-    loading.value = false
+    saving.value = false
   }
 }
 

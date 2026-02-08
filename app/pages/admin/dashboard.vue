@@ -8,15 +8,8 @@ definePageMeta({
 
 const { toasts, showToast } = useToast()
 
-const projects = ref<PortfolioProject[]>([])
-const loading = ref(true)
-const error = ref<string | null>(null)
 const editingProject = ref<PortfolioProject | null>(null)
 const showNewProjectForm = ref(false)
-const heroImage = ref('')
-const heroImageMobile = ref('')
-const heroTitle = ref('')
-const homepageId = ref('')
 const showSettings = ref(false)
 const showMobilePreview = ref(false)
 const isReordering = ref(false)
@@ -29,49 +22,58 @@ const heroMobileFileInput = ref<HTMLInputElement | null>(null)
 // Drag reorder state
 const draggedProjectId = ref<string | null>(null)
 
-onMounted(() => {
-  fetchProjects()
-  fetchHeroImage()
+// Fetch data with useAsyncData
+const { data: homepageRaw, refresh: refreshHomepage, error: homepageError } = useAsyncData(
+  'admin-homepage',
+  () => pb.collection('Homepage').getFirstListItem<Homepage>('Is_Active = true', { requestKey: null }),
+)
+
+const { data: rawProjects, refresh: refreshProjects, status: projectsStatus, error: projectsError } = useAsyncData(
+  'admin-projects',
+  () => pb.collection('Portfolio_Projects').getFullList<PortfolioProject>({ sort: 'Order', requestKey: null }),
+)
+
+// Local mutable copy of projects for drag reorder UI
+const projects = ref<PortfolioProject[]>([])
+watch(rawProjects, (val) => {
+  if (val)
+    projects.value = [...val]
+}, { immediate: true })
+
+// Derived state from homepage data
+const heroImage = computed(() =>
+  homepageRaw.value?.Hero_Image ? getImageUrl(homepageRaw.value, homepageRaw.value.Hero_Image) : '',
+)
+const heroImageMobile = computed(() =>
+  homepageRaw.value?.Hero_Image_Mobile ? getImageUrl(homepageRaw.value, homepageRaw.value.Hero_Image_Mobile) : '',
+)
+const homepageId = computed(() => homepageRaw.value?.id || '')
+
+// heroTitle is editable, so keep as a separate mutable ref
+const heroTitle = ref('')
+watch(homepageRaw, (val) => {
+  if (val)
+    heroTitle.value = val.Hero_Title || ''
+}, { immediate: true })
+
+const loading = computed(() => projectsStatus.value === 'pending')
+const error = computed(() => {
+  const err = projectsError.value || homepageError.value
+  return err ? 'Failed to load projects' : null
 })
 
-async function fetchHeroImage() {
-  try {
-    const homepage = await pb.collection('Homepage').getFirstListItem<Homepage>('Is_Active = true', { requestKey: null })
-    if (homepage) {
-      if (homepage.Hero_Image)
-        heroImage.value = getImageUrl(homepage, homepage.Hero_Image)
-      if (homepage.Hero_Image_Mobile)
-        heroImageMobile.value = getImageUrl(homepage, homepage.Hero_Image_Mobile)
-      heroTitle.value = homepage.Hero_Title || ''
-      homepageId.value = homepage.id
-    }
-  }
-  catch (err) {
-    console.error('Error fetching hero image:', err)
-  }
-}
-
-async function fetchProjects() {
-  try {
-    loading.value = true
-    const response = await pb.collection('Portfolio_Projects').getFullList<PortfolioProject>({ sort: 'Order', requestKey: null })
-    projects.value = response
-    error.value = null
-  }
-  catch (err: unknown) {
-    console.error('Error fetching projects:', err)
-    const typedErr = err as { status?: number }
-    if (typedErr?.status === 401 || typedErr?.status === 403) {
+// Handle auth errors from useAsyncData
+watch([projectsError, homepageError], ([pErr, hErr]) => {
+  const err = pErr || hErr
+  if (err) {
+    const status = (err as { status?: number })?.status
+      || (err as { data?: { status?: number } })?.data?.status
+    if (status === 401 || status === 403) {
       pb.authStore.clear()
       navigateTo('/admin')
-      return
     }
-    error.value = 'Failed to load projects'
   }
-  finally {
-    loading.value = false
-  }
-}
+})
 
 async function handleHeroImageUpdate(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
@@ -81,7 +83,7 @@ async function handleHeroImageUpdate(event: Event) {
     const formData = new FormData()
     formData.append('Hero_Image', file)
     await pb.collection('Homepage').update(homepageId.value, formData)
-    await fetchHeroImage()
+    await refreshHomepage()
   }
   catch (err: unknown) {
     const typedErr = err as { message?: string }
@@ -97,7 +99,7 @@ async function handleHeroImageMobileUpdate(event: Event) {
     const formData = new FormData()
     formData.append('Hero_Image_Mobile', file)
     await pb.collection('Homepage').update(homepageId.value, formData)
-    await fetchHeroImage()
+    await refreshHomepage()
   }
   catch (err: unknown) {
     const typedErr = err as { message?: string }
@@ -147,7 +149,7 @@ async function confirmDelete() {
   try {
     await pb.collection('Portfolio_Projects').delete(deleteConfirmation.value.projectId)
     deleteConfirmation.value = null
-    await fetchProjects()
+    await refreshProjects()
     showToast('Project deleted successfully', 'success')
   }
   catch (err: unknown) {
@@ -166,7 +168,7 @@ async function handleSave() {
   const isCreating = showNewProjectForm.value
   editingProject.value = null
   showNewProjectForm.value = false
-  await fetchProjects()
+  await refreshProjects()
   showToast(isCreating ? 'Project created successfully' : 'Project updated successfully', 'success')
 }
 
@@ -210,7 +212,7 @@ async function handleDragEnd() {
     await Promise.all(updatePromises)
   }
   catch (err: unknown) {
-    await fetchProjects()
+    await refreshProjects()
     const typedErr = err as { message?: string }
     showToast(`Failed to reorder projects: ${typedErr?.message || 'Unknown error'}`, 'error')
   }

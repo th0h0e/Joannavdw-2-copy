@@ -1,5 +1,5 @@
 import type { About, Homepage, PortfolioProject, Settings } from '~/plugins/pocketbase.client'
-import { pb, getCachedData, getImageUrl, setCachedData } from '~/plugins/pocketbase.client'
+import { getImageUrl, pb } from '~/plugins/pocketbase.client'
 
 export interface ConvertedProject {
   title: string
@@ -21,83 +21,46 @@ function convertPocketBaseProject(project: PortfolioProject): ConvertedProject {
 
 // eslint-disable-next-line react/no-unnecessary-use-prefix
 export function usePocketBase() {
-  const projects = ref<ConvertedProject[]>([])
-  const homepage = ref<Homepage | null>(null)
-  const about = ref<About | null>(null)
-  const settings = ref<Settings | null>(null)
-  const loading = ref(true)
-  const error = ref<string | null>(null)
+  const { data: rawProjects, refresh: refreshProjects, status: projectsStatus, error: projectsError } = useAsyncData(
+    'projects',
+    () => pb.collection('Portfolio_Projects').getFullList<PortfolioProject>({ sort: 'Order' }),
+  )
 
-  const fetchData = async () => {
-    try {
-      loading.value = true
+  const { data: rawHomepage, refresh: refreshHomepage, status: homepageStatus, error: homepageError } = useAsyncData(
+    'homepage',
+    () => pb.collection('Homepage').getFullList<Homepage>({ filter: 'Is_Active = true', sort: '-created' }),
+  )
 
-      const cachedProjects = getCachedData<PortfolioProject[]>('Portfolio_Projects')
-      const cachedHomepage = getCachedData<Homepage[]>('Homepage')
-      const cachedAbout = getCachedData<About[]>('About')
-      const cachedSettings = getCachedData<Settings[]>('Settings')
+  const { data: rawAbout, refresh: refreshAbout, status: aboutStatus, error: aboutError } = useAsyncData(
+    'about',
+    () => pb.collection('About').getFullList<About>({ filter: 'Is_Active = true', sort: '-created' }),
+  )
 
-      if (cachedProjects && cachedHomepage && cachedAbout && cachedSettings) {
-        projects.value = cachedProjects.map(convertPocketBaseProject)
-        homepage.value = cachedHomepage[0] || null
-        about.value = cachedAbout[0] || null
-        settings.value = cachedSettings[0] || null
-        error.value = null
-        loading.value = false
-        return
-      }
+  const { data: rawSettings, refresh: refreshSettings, status: settingsStatus, error: settingsError } = useAsyncData(
+    'settings',
+    () => pb.collection('Settings').getFullList<Settings>({ sort: '-created' }),
+  )
 
-      const [projectsResponse, homepageResponse, aboutResponse, settingsResponse] = await Promise.all([
-        pb.collection('Portfolio_Projects').getFullList<PortfolioProject>({ sort: 'Order' }),
-        pb.collection('Homepage').getFullList<Homepage>({ filter: 'Is_Active = true', sort: '-created' }),
-        pb.collection('About').getFullList<About>({ filter: 'Is_Active = true', sort: '-created' }),
-        pb.collection('Settings').getFullList<Settings>({ sort: '-created' }),
-      ])
+  const projects = computed(() => (rawProjects.value || []).map(convertPocketBaseProject))
+  const homepage = computed(() => rawHomepage.value?.[0] || null)
+  const about = computed(() => rawAbout.value?.[0] || null)
+  const settings = computed(() => rawSettings.value?.[0] || null)
 
-      setCachedData('Portfolio_Projects', projectsResponse)
-      setCachedData('Homepage', homepageResponse)
-      setCachedData('About', aboutResponse)
-      setCachedData('Settings', settingsResponse)
+  const loading = computed(() =>
+    projectsStatus.value === 'pending' || homepageStatus.value === 'pending'
+    || aboutStatus.value === 'pending' || settingsStatus.value === 'pending',
+  )
 
-      projects.value = projectsResponse.map(convertPocketBaseProject)
-      homepage.value = homepageResponse[0] || null
-      about.value = aboutResponse[0] || null
-      settings.value = settingsResponse[0] || null
-      error.value = null
-    }
-    catch (err) {
-      console.error('Error fetching data:', err)
-      error.value = 'Failed to load data'
-    }
-    finally {
-      loading.value = false
-    }
-  }
+  const error = computed(() => {
+    const err = projectsError.value || homepageError.value || aboutError.value || settingsError.value
+    return err ? 'Failed to load data' : null
+  })
 
   const setupSubscriptions = () => {
-    pb.collection('Portfolio_Projects').subscribe('*', async () => {
-      const fresh = await pb.collection('Portfolio_Projects').getFullList<PortfolioProject>({ sort: 'Order' })
-      setCachedData('Portfolio_Projects', fresh)
-      projects.value = fresh.map(convertPocketBaseProject)
-    })
-
-    pb.collection('Homepage').subscribe('*', async () => {
-      const fresh = await pb.collection('Homepage').getFullList<Homepage>({ filter: 'Is_Active = true', sort: '-created' })
-      setCachedData('Homepage', fresh)
-      homepage.value = fresh[0] || null
-    })
-
-    pb.collection('About').subscribe('*', async () => {
-      const fresh = await pb.collection('About').getFullList<About>({ filter: 'Is_Active = true', sort: '-created' })
-      setCachedData('About', fresh)
-      about.value = fresh[0] || null
-    })
-
-    pb.collection('Settings').subscribe('*', async () => {
-      const fresh = await pb.collection('Settings').getFullList<Settings>({ sort: '-created' })
-      setCachedData('Settings', fresh)
-      settings.value = fresh[0] || null
-    })
+    pb.collection('Portfolio_Projects').subscribe('*', () => refreshProjects())
+    pb.collection('Homepage').subscribe('*', () => refreshHomepage())
+    pb.collection('About').subscribe('*', () => refreshAbout())
+    pb.collection('Settings').subscribe('*', () => refreshSettings())
   }
 
   const cleanup = () => {
@@ -116,7 +79,6 @@ export function usePocketBase() {
     settings,
     loading,
     error,
-    fetchData,
     setupSubscriptions,
     cleanup,
   }
