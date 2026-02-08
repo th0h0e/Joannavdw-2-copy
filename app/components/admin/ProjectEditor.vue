@@ -176,7 +176,10 @@ async function handleSubmit(e: Event) {
         }
         else if (img.isExisting) {
           try {
-            const blob = await $fetch<Blob>('/api/proxy-image', { query: { url: img.url }, responseType: 'blob' })
+            // Fetch directly from PocketBase URL (no proxy needed)
+            const response = await fetch(img.url)
+            if (!response.ok) throw new Error(`HTTP ${response.status}`)
+            const blob = await response.blob()
             const file = new File([blob], img.filename, { type: blob.type })
             formData.append('Images', file)
           }

@@ -1,14 +1,14 @@
 export default defineNuxtConfig({
   // Nuxt 4 compatibility date — controls behavioral defaults
-  compatibilityDate: '2025-01-01',
+  compatibilityDate: "2025-01-01",
 
   // Global CSS (replaces import in main.ts)
-  css: ['~/assets/css/main.css'],
+  css: ["~/assets/css/main.css"],
 
   // Modules
   modules: [
-    '@vueuse/nuxt',    // Auto-imports all @vueuse/core composables
-    '@nuxt/eslint',
+    "@vueuse/nuxt", // Auto-imports all @vueuse/core composables
+    "@nuxt/eslint",
   ],
 
   // Dev server (replaces vite.config.ts server settings)
@@ -28,27 +28,29 @@ export default defineNuxtConfig({
   // Override via NUXT_PUBLIC_PB_URL and NUXT_PUBLIC_SENTRY_DSN env vars
   runtimeConfig: {
     public: {
-      pbUrl: 'https://admin.kontext.site',
-      sentryDsn: 'https://4981600ff5cc02441de606ca9943a126@o4510808141398016.ingest.de.sentry.io/4510808149983312',
+      pbUrl: "https://admin.kontext.site",
+      sentryDsn:
+        "https://4981600ff5cc02441de606ca9943a126@o4510808141398016.ingest.de.sentry.io/4510808149983312",
     },
   },
 
   // App head (replaces index.html <head>)
   app: {
     head: {
-      charset: 'utf-8',
-      viewport: 'width=device-width, initial-scale=1.0, viewport-fit=cover',
-      title: 'Joanna van der Werf - Creative Strategy',
+      charset: "utf-8",
+      viewport: "width=device-width, initial-scale=1.0, viewport-fit=cover",
+      title: "Joanna van der Werf - Creative Strategy",
       meta: [
-        { name: 'format-detection', content: 'telephone=no' },
-        { name: 'apple-mobile-web-app-capable', content: 'yes' },
-        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
-        { name: 'mobile-web-app-capable', content: 'yes' },
-        { name: 'theme-color', content: '#000000' },
+        { name: "format-detection", content: "telephone=no" },
+        { name: "apple-mobile-web-app-capable", content: "yes" },
+        {
+          name: "apple-mobile-web-app-status-bar-style",
+          content: "black-translucent",
+        },
+        { name: "mobile-web-app-capable", content: "yes" },
+        { name: "theme-color", content: "#000000" },
       ],
-      link: [
-        { rel: 'manifest', href: '/manifest.json' },
-      ],
+      link: [{ rel: "manifest", href: "/manifest.json" }],
       // Browser detection script (from index.html)
       script: [
         {
@@ -66,24 +68,18 @@ export default defineNuxtConfig({
             root.setAttribute('data-browser-safari', isSafariBrowser.toString());
             root.setAttribute('data-supports-scroll-state', supportsScrollState.toString());
           })();`,
-          type: 'text/javascript',
-          tagPosition: 'head',
+          type: "text/javascript",
+          tagPosition: "head",
         },
       ],
     },
   },
 
   // Use short component names (no path prefix for subdirectories)
-  components: [
-    { path: '~/components', pathPrefix: false },
-  ],
-
-  // SSR off — this is a client-rendered SPA
-  // PocketBase client uses localStorage, subscriptions, and DOM APIs
-  ssr: false,
+  components: [{ path: "~/components", pathPrefix: false }],
 
   // TypeScript
   typescript: {
     strict: true,
   },
-})
+});

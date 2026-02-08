@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { About, Homepage, Settings } from '~/plugins/pocketbase.client'
-import { getImageUrl, pb } from '~/plugins/pocketbase.client'
+import { pb } from '~/plugins/pocketbase.client'
 
 const props = defineProps<{
   isOpen: boolean
@@ -71,9 +71,8 @@ watch(rawData, (data) => {
   desktopFontSize.value = data.settings.Desktop_Font_Size
   largeDesktopFontSize.value = data.settings.Large_Desktop_Font_Size
 
-  if (data.settings.favicon) {
-    faviconUrl.value = getImageUrl(data.settings, data.settings.favicon)
-  }
+  // Favicon is now stored locally
+  faviconUrl.value = `/assets/favicon.ico?v=${data.settings.updated}`
 })
 
 // Refresh data when sidebar opens
@@ -95,21 +94,22 @@ function handleRemoveClient(index: number) {
 
 async function handleFaviconUpdate(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file || !settingsData.value)
+  if (!file)
     return
 
   try {
     const formData = new FormData()
-    formData.append('favicon', file)
+    formData.append('icon', file)
 
-    await pb.collection('Settings').update(settingsData.value.id, formData)
+    await $fetch('/api/favicon', {
+      method: 'PUT',
+      body: formData,
+    })
 
-    const updatedSettings = await pb.collection('Settings').getOne<Settings>(settingsData.value.id)
-    if (updatedSettings.favicon) {
-      faviconUrl.value = getImageUrl(updatedSettings, updatedSettings.favicon)
-    }
+    // Update preview URL to show the new favicon
+    faviconUrl.value = `/assets/favicon.ico?v=${Date.now()}`
 
-    emit('showToast', 'Favicon updated! Please refresh the page to see the changes.', 'success')
+    emit('showToast', 'Favicon updated successfully!', 'success')
   }
   catch (err: unknown) {
     console.error('Error updating favicon:', err)
