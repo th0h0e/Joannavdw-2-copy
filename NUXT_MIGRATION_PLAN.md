@@ -96,10 +96,8 @@ This replaces `vite.config.ts`, `tsconfig.vue.json`, `index.html` head config, a
 
 ```typescript
 export default defineNuxtConfig({
-  // Nuxt 4 uses app/ by default
-  future: {
-    compatibilityVersion: 4,
-  },
+  // Nuxt 4 compatibility date — controls behavioral defaults
+  compatibilityDate: '2025-01-01',
 
   // Global CSS (replaces import in main.ts)
   css: ['~/assets/css/main.css'],
@@ -110,12 +108,9 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
   ],
 
-  // Vite config passthrough (port, etc.)
-  vite: {
-    server: {
-      port: 5174,
-      strictPort: true,
-    },
+  // Dev server (replaces vite.config.ts server settings)
+  devServer: {
+    port: 5174,
   },
 
   // PostCSS (Tailwind)
@@ -123,6 +118,15 @@ export default defineNuxtConfig({
     plugins: {
       tailwindcss: {},
       autoprefixer: {},
+    },
+  },
+
+  // Runtime config — environment-driven values
+  // Override via NUXT_PUBLIC_PB_URL and NUXT_PUBLIC_SENTRY_DSN env vars
+  runtimeConfig: {
+    public: {
+      pbUrl: 'https://admin.kontext.site',
+      sentryDsn: 'https://4981600ff5cc02441de606ca9943a126@o4510808141398016.ingest.de.sentry.io/4510808149983312',
     },
   },
 
@@ -177,7 +181,33 @@ export default defineNuxtConfig({
 })
 ```
 
-**Why `ssr: false`:** The app relies heavily on client-only APIs — localStorage caching, PocketBase real-time subscriptions (SSE), IntersectionObserver, scroll-snap DOM manipulation, `window.innerWidth`, etc. Running as an SPA avoids hydration mismatches and keeps behavior identical to the current Vue app. SSR can be explored later as a separate optimization.
+**Key config decisions:**
+
+- **`ssr: false`:** The app relies heavily on client-only APIs — localStorage caching, PocketBase real-time subscriptions (SSE), IntersectionObserver, scroll-snap DOM manipulation, `window.innerWidth`, etc. Running as an SPA avoids hydration mismatches and keeps behavior identical to the current Vue app. SSR can be explored later as a separate optimization.
+- **`runtimeConfig.public`:** Moves the hardcoded PocketBase URL and Sentry DSN into Nuxt's runtime config system. These can be overridden via environment variables (`NUXT_PUBLIC_PB_URL`, `NUXT_PUBLIC_SENTRY_DSN`) without rebuilding. Access them in code via `useRuntimeConfig().public.pbUrl`.
+- **`compatibilityDate`:** Nuxt 4 uses a date-based versioning system instead of `compatibilityVersion`. This locks behavioral defaults to a specific date so future Nuxt updates don't silently change behavior.
+
+### 1.2.1 — CSS root element selector
+
+Nuxt uses `__nuxt` as its root element ID (not `#app`). Update `app/assets/css/main.css`:
+
+```css
+/* BEFORE */
+#app {
+  height: 100vh;
+  width: 100%;
+  background-color: #0a0a0a;
+}
+
+/* AFTER */
+#__nuxt {
+  height: 100vh;
+  width: 100%;
+  background-color: #0a0a0a;
+}
+```
+
+Alternatively, keep `#app` and set `app.rootId: 'app'` in `nuxt.config.ts` to match the existing CSS.
 
 ### 1.3 — Update `package.json` scripts
 
@@ -349,7 +379,10 @@ import PocketBase from 'pocketbase'
 // - getCachedData, setCachedData, clearCache
 // - getImageUrl, getProjectTitleStyle, getResponsiveFontSizes
 
-const pb = new PocketBase('https://admin.kontext.site')
+// Use runtimeConfig for the PocketBase URL (configured in nuxt.config.ts,
+// overridable via NUXT_PUBLIC_PB_URL env var)
+const config = useRuntimeConfig()
+const pb = new PocketBase(config.public.pbUrl as string)
 
 export default defineNuxtPlugin(() => {
   return {
@@ -364,7 +397,7 @@ export { pb }
 export { getCachedData, setCachedData, clearCache, getImageUrl, getProjectTitleStyle, getResponsiveFontSizes }
 ```
 
-> **Alternative approach:** Keep `pb` as a plain exported module (no `defineNuxtPlugin` wrapper) and import it directly where needed. This is simpler and works fine for `ssr: false` apps. The plugin wrapper is only necessary if you need the instance available via `useNuxtApp().$pb` or if you later enable SSR and need per-request isolation. For now, the simpler direct-export approach is fine — just rename the file to `.client.ts` and keep the code as-is.
+> **Alternative approach:** Keep `pb` as a plain exported module (no `defineNuxtPlugin` wrapper) and import it directly where needed. This is simpler and works fine for `ssr: false` apps. The plugin wrapper is only necessary if you need the instance available via `useNuxtApp().$pb` or if you later enable SSR and need per-request isolation. For now, the simpler direct-export approach is fine — just rename the file to `.client.ts` and keep the code as-is. If you skip the `defineNuxtPlugin` wrapper, call `useRuntimeConfig()` inside a composable or component instead (the context rule from Phase 6 applies).
 
 ### 4.2 — Sentry plugin (`app/plugins/sentry.client.ts`)
 
@@ -375,13 +408,17 @@ Extract Sentry init from the deleted `main.ts` into a Nuxt client plugin:
 import * as Sentry from '@sentry/vue'
 
 export default defineNuxtPlugin((nuxtApp) => {
+  const config = useRuntimeConfig()
+
   Sentry.init({
     app: nuxtApp.vueApp,
-    dsn: 'https://4981600ff5cc02441de606ca9943a126@o4510808141398016.ingest.de.sentry.io/4510808149983312',
+    dsn: config.public.sentryDsn as string,
     sendDefaultPii: true,
   })
 })
 ```
+
+Both the PocketBase URL and Sentry DSN now come from `runtimeConfig` (defined in `nuxt.config.ts`). Override them per-environment via `NUXT_PUBLIC_PB_URL` and `NUXT_PUBLIC_SENTRY_DSN` environment variables — no rebuild needed.
 
 ---
 
@@ -526,21 +563,23 @@ export default defineNuxtConfig({
 
 **Trade-off:** `pathPrefix: false` is simpler but risks name collisions if two subdirectories have files with the same name. The default path-prefix approach is safer and more explicit.
 
-### 6.6 — Update `@/` alias to `~/`
+### 6.6 — Path aliases: `@/` and `~/` both work
 
-Nuxt uses `~/` (or `~`) as the alias for the `app/` directory. Replace all remaining `@/` occurrences:
+In Nuxt 4, **both `@/` and `~/`** are aliased to the `app/` directory by default. This means existing `@/` imports will continue to work without changes. The Nuxt convention is `~/`, but switching is optional.
+
+The only required update is for the renamed plugin file:
 
 ```typescript
 // BEFORE
 import pb from '@/plugins/pocketbase'
-import cardBg from '@/assets/Project Card/JVDW WEB LIGHT BOX copy.svg'
 
-// AFTER
+// AFTER (file was renamed to .client.ts in Phase 4.1)
+import pb from '@/plugins/pocketbase.client'
+// or equivalently:
 import pb from '~/plugins/pocketbase.client'
-import cardBg from '~/assets/Project Card/JVDW WEB LIGHT BOX copy.svg'
 ```
 
-> **Note:** Most of these explicit imports will be removed by auto-imports anyway (Phase 6.1–6.5). The `~/` alias is only needed for imports that Nuxt does NOT auto-import: plugin files, asset files (images, SVGs, CSS), and type-only imports from `shared/types/`.
+> **Note:** Most explicit imports will be removed by auto-imports anyway (Phase 6.1–6.5). The `@/` or `~/` alias is only needed for imports that Nuxt does NOT auto-import: plugin files, asset files (images, SVGs, CSS), and type-only imports from `shared/types/`.
 
 ### 6.7 — Type imports from `shared/types/`
 
