@@ -69,9 +69,9 @@ DONE
 
 ## Phase 2 — Shared Code Imports
 
-Vue components import shared code from `src/` via the `@` alias. Verified PocketBase config, types, utils, and assets all resolve. Scoped React Vite config to avoid scanning Vue files.
+Verified that PocketBase config, types, utils, and assets all resolve when imported from `src/`. Scoped React Vite config to avoid scanning Vue files.
 
-DONE
+DONE — superseded by Phase 3.1: shared code is now duplicated into `vue/` and the `@` alias points to `vue/` instead of `src/`. Vue no longer imports from the React directory.
 
 ## Phase 3 — Decouple & Component Migration
 
@@ -136,24 +136,20 @@ Vue components live in `vue/components/` and import from `vue/config`, `vue/type
 
 Vue equivalent of React's `preventEdgeNavigation` — blocks browser back-swipe on iOS/Safari when touching near the left screen edge.
 
-In `Home.vue`, register a document-level `touchstart` listener in `onMounted`:
+In `Home.vue`, use `useEventListener` from `@vueuse/core` (auto-cleans up on unmount, no manual `removeEventListener` needed):
 
 ```typescript
-onMounted(() => {
-  const preventEdgeNavigation = (e: TouchEvent) => {
-    const touch = e.touches[0]
-    if (touch && touch.clientX < 50) {
-      const carousel = (e.target as Element)?.closest('[data-carousel]')
-      if (!carousel) {
-        e.preventDefault()
-      }
+import { useEventListener } from '@vueuse/core'
+
+useEventListener(document, 'touchstart', (e: TouchEvent) => {
+  const touch = e.touches[0]
+  if (touch && touch.clientX < 50) {
+    const carousel = (e.target as Element)?.closest('[data-carousel]')
+    if (!carousel) {
+      e.preventDefault()
     }
   }
-  document.addEventListener('touchstart', preventEdgeNavigation, { passive: false })
-  onUnmounted(() => {
-    document.removeEventListener('touchstart', preventEdgeNavigation)
-  })
-})
+}, { passive: false })
 ```
 
 ### Phase 3.4 — Migration Order
@@ -365,3 +361,34 @@ The most complex admin component. Key challenges:
 | Error tracking | `@sentry/react` | `@sentry/vue` |
 | Linting | `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh` | `eslint-plugin-vue` |
 | Drag reorder | `motion` Reorder API | `useSortable` (`@vueuse/integrations` + `sortablejs`) |
+
+## VueUse Primitives Inventory
+
+Every VueUse composable used in this migration, which package it comes from, and where it's used.
+
+### `@vueuse/core`
+
+| Composable | Purpose | Used in |
+|---|---|---|
+| `useBreakpoints` | Reactive viewport breakpoint tracking via `matchMedia`. Replaces manual `resize` listeners + `useState(isMobile)`. Tailwind preset available. | `Home.vue`, any component needing responsive logic |
+| `useIntersectionObserver` | Wraps native IntersectionObserver with auto-cleanup. `threshold: 0.5` for section visibility. | `Home.vue` (section tracking) |
+| `useScroll` | Reactive scroll position (`x`, `y`), `isScrolling`, `arrivedState`, `directions`. `x` is writable for programmatic scrolling. `throttle` option replaces debounced listeners. | `MotionCarousel.vue`, `MotionCarouselDesktop.vue` |
+| `useEventListener` | Auto-cleaning event listener. Replaces manual `addEventListener`/`removeEventListener` pairs. | `Home.vue` (edge gesture prevention) |
+| `useStorage` | Reactive localStorage with cross-tab sync, custom serializers, and TTL support. | `usePocketBase` composable (response caching) |
+| `useLocalStorage` | Shorthand for `useStorage` with localStorage. | `useFaviconCache` composable (favicon base64 caching) |
+| `useFavicon` | Reactively sets `<link rel="icon">` href. Returns writable ref. | `useFaviconCache` composable |
+| `useBase64` | Converts Blob/File to base64 string. | `useFaviconCache` composable (favicon blob → data URL) |
+| `useTimeoutFn` | Controllable timeout with `start()`/`stop()`/`isPending`. | `useToast` composable (auto-dismiss timers) |
+| `tryOnScopeDispose` | Safe cleanup hook — works inside and outside component lifecycle. | `usePocketBase` composable (PocketBase subscription cleanup) |
+
+### `@vueuse/integrations`
+
+| Composable | Purpose | Used in |
+|---|---|---|
+| `useSortable` | Wraps SortableJS for drag-and-drop list reordering. `animation: 200` for smooth transitions. CSS classes `.sortable-drag`/`.sortable-ghost` for drag styles. | `AdminDashboard.vue` (project reorder) |
+
+### `@vueuse/motion`
+
+| Composable | Purpose | Used in |
+|---|---|---|
+| `useMotion` / `v-motion` directive | Declarative enter/leave animations (scale, opacity, position). Replaces `motion/react`'s `<motion.div>`. | `Hero.vue`, `HeroMobile.vue` |
