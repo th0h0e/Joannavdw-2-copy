@@ -6,15 +6,15 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      component: () => import('../pages/Home.vue'),
+      component: async () => import('../pages/Home.vue'),
     },
     {
       path: '/admin',
-      component: () => import('../pages/admin/AdminLogin.vue'),
+      component: async () => import('../pages/admin/AdminLogin.vue'),
     },
     {
       path: '/admin/dashboard',
-      component: () => import('../pages/admin/AdminDashboard.vue'),
+      component: async () => import('../pages/admin/AdminDashboard.vue'),
       beforeEnter: () => {
         if (!pb.authStore.isValid)
           return '/admin'

@@ -31,7 +31,7 @@ export function useFaviconCache(settingsRef: Ref<Settings | null>) {
     }
 
     fetch(faviconUrl)
-      .then(response => response.blob())
+      .then(async response => response.blob())
       .then((blob) => {
         const reader = new FileReader()
         reader.onloadend = () => {

@@ -7,16 +7,16 @@
     "useDefineForClassFields": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["./vue/*"]
+    },
     "allowImportingTsExtensions": true,
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noEmit": true,
-    "skipLibCheck": true,
-    "paths": {
-      "@/*": ["./vue/*"]
-    }
+    "skipLibCheck": true
   },
   "include": ["vue"]
 }
