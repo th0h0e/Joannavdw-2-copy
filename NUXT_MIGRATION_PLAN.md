@@ -85,11 +85,6 @@ sortablejs
 npm install -D @nuxt/eslint
 ```
 
-**Remove unnecessary dev deps:**
-```bash
-npm uninstall @vitejs/plugin-vue vue-tsc
-```
-
 ### 1.2 — Create `nuxt.config.ts`
 
 This replaces `vite.config.ts`, `tsconfig.vue.json`, `index.html` head config, and CSS imports.
@@ -187,28 +182,6 @@ export default defineNuxtConfig({
 - **`runtimeConfig.public`:** Moves the hardcoded PocketBase URL and Sentry DSN into Nuxt's runtime config system. These can be overridden via environment variables (`NUXT_PUBLIC_PB_URL`, `NUXT_PUBLIC_SENTRY_DSN`) without rebuilding. Access them in code via `useRuntimeConfig().public.pbUrl`.
 - **`compatibilityDate`:** Nuxt 4 uses a date-based versioning system instead of `compatibilityVersion`. This locks behavioral defaults to a specific date so future Nuxt updates don't silently change behavior.
 
-### 1.2.1 — CSS root element selector
-
-Nuxt uses `__nuxt` as its root element ID (not `#app`). Update `app/assets/css/main.css`:
-
-```css
-/* BEFORE */
-#app {
-  height: 100vh;
-  width: 100%;
-  background-color: #0a0a0a;
-}
-
-/* AFTER */
-#__nuxt {
-  height: 100vh;
-  width: 100%;
-  background-color: #0a0a0a;
-}
-```
-
-Alternatively, keep `#app` and set `app.rootId: 'app'` in `nuxt.config.ts` to match the existing CSS.
-
 ### 1.3 — Update `package.json` scripts
 
 ```json
@@ -226,19 +199,7 @@ Alternatively, keep `#app` and set `app.rootId: 'app'` in `nuxt.config.ts` to ma
 }
 ```
 
-### 1.4 — Delete replaced files
-
-After creating `nuxt.config.ts`, delete:
-- `index.html`
-- `vite.config.ts`
-- `tsconfig.json`
-- `tsconfig.vue.json`
-- `tsconfig.node.json`
-- `vue/main.ts`
-- `vue/env.d.ts`
-- `vue/router/index.ts` (entire `vue/router/` directory)
-
-### 1.5 — Update Tailwind config
+### 1.4 — Update Tailwind config
 
 ```javascript
 // tailwind.config.js
@@ -253,7 +214,7 @@ export default {
 }
 ```
 
-### 1.6 — Install `@vueuse/nuxt`
+### 1.5 — Install `@vueuse/nuxt`
 
 ```bash
 npm install @vueuse/nuxt
@@ -287,6 +248,28 @@ app/
 ├── shared/types/
 └── utils/
 ```
+
+### 2.1 — CSS root element selector
+
+Nuxt uses `__nuxt` as its root element ID (not `#app`). Update `app/assets/css/main.css`:
+
+```css
+/* BEFORE */
+#app {
+  height: 100vh;
+  width: 100%;
+  background-color: #0a0a0a;
+}
+
+/* AFTER */
+#__nuxt {
+  height: 100vh;
+  width: 100%;
+  background-color: #0a0a0a;
+}
+```
+
+Alternatively, keep `#app` and set `app.rootId: 'app'` in `nuxt.config.ts` to match the existing CSS.
 
 ---
 
@@ -327,37 +310,6 @@ Replace `<router-view />` with Nuxt's `<NuxtPage />`:
 ```
 
 `<NuxtPage>` is Nuxt's replacement for `<router-view>`. It's auto-imported — no import statement needed.
-
-### 3.4 — Replace `useRouter` / `router.push` calls
-
-In Nuxt, use `navigateTo()` (auto-imported) or `useRouter()` (also auto-imported, no import from `vue-router` needed).
-
-**`pages/admin/index.vue` (AdminLogin):**
-```typescript
-// BEFORE
-import { useRouter } from 'vue-router'
-const router = useRouter()
-router.push('/admin/dashboard')
-
-// AFTER (option A — navigateTo)
-await navigateTo('/admin/dashboard')
-
-// AFTER (option B — useRouter, still works)
-const router = useRouter()
-router.push('/admin/dashboard')
-// No import needed — useRouter is auto-imported by Nuxt
-```
-
-**`pages/admin/dashboard.vue` (AdminDashboard) — same pattern for logout redirect:**
-```typescript
-// BEFORE
-import { useRouter } from 'vue-router'
-const router = useRouter()
-router.push('/admin')
-
-// AFTER
-await navigateTo('/admin')
-```
 
 ---
 
@@ -505,7 +457,7 @@ The `ConvertedProject` interface exported from `usePocketBase.ts` and the `Toast
 
 ### 6.3 — VueUse composables (auto-imported via `@vueuse/nuxt` module)
 
-The `@vueuse/nuxt` module (installed in Phase 1.6) registers auto-imports for all `@vueuse/core` and `@vueuse/integrations` composables.
+The `@vueuse/nuxt` module (installed in Phase 1.5) registers auto-imports for all `@vueuse/core` and `@vueuse/integrations` composables.
 
 Remove these imports:
 ```typescript
@@ -602,6 +554,37 @@ imports: {
 ```
 
 This makes all named type exports from `shared/types/*.ts` globally available without import statements.
+
+### 6.8 — Replace `useRouter` / `router.push` calls
+
+Remove `import { useRouter } from 'vue-router'` — Nuxt auto-imports `useRouter` and also provides `navigateTo()` as a simpler alternative.
+
+**`pages/admin/index.vue` (AdminLogin):**
+```typescript
+// BEFORE
+import { useRouter } from 'vue-router'
+const router = useRouter()
+router.push('/admin/dashboard')
+
+// AFTER (option A — navigateTo)
+await navigateTo('/admin/dashboard')
+
+// AFTER (option B — useRouter, still works)
+const router = useRouter()
+router.push('/admin/dashboard')
+// No import needed — useRouter is auto-imported by Nuxt
+```
+
+**`pages/admin/dashboard.vue` (AdminDashboard) — same pattern for logout redirect:**
+```typescript
+// BEFORE
+import { useRouter } from 'vue-router'
+const router = useRouter()
+router.push('/admin')
+
+// AFTER
+await navigateTo('/admin')
+```
 
 ---
 
@@ -789,15 +772,20 @@ Since EnduroWeb is already self-hosted from `/fonts/`, this is a low-priority op
 
 ## Phase 10 — Cleanup & Verification
 
-### 10.1 — Files to delete
+### 10.1 — Delete replaced files
 
-- `vue/` directory (now `app/`)
-- `index.html`
-- `vite.config.ts`
-- `tsconfig.json`, `tsconfig.vue.json`, `tsconfig.node.json`
-- `vue/main.ts`
-- `vue/env.d.ts`
-- `vue/router/` directory
+These files are superseded by Nuxt conventions and should be removed:
+
+| File | Replaced by |
+|---|---|
+| `index.html` | Nuxt generates HTML automatically |
+| `vite.config.ts` | `nuxt.config.ts` |
+| `tsconfig.json` | Nuxt generates `.nuxt/tsconfig.json` |
+| `tsconfig.vue.json` | Nuxt generates `.nuxt/tsconfig.json` |
+| `tsconfig.node.json` | Nuxt generates `.nuxt/tsconfig.json` |
+| `app/main.ts` | Nuxt handles app creation |
+| `app/env.d.ts` | Nuxt generates type declarations |
+| `app/router/` directory | Nuxt file-based routing (already deleted in Phase 3.2) |
 
 ### 10.2 — Files added to `.gitignore`
 
@@ -839,26 +827,32 @@ npm run dev           # Should start on localhost:5174
 
 ## Execution Order Summary
 
+Steps follow the phase numbers sequentially. Each step builds on the previous.
+
 | Step | Phase | What to do |
 |---|---|---|
-| 1 | 1.1 | Install `nuxt`, `@vueuse/nuxt`, `@nuxt/eslint`. Remove `vue`, `vue-router`, `@vitejs/plugin-vue`, `vue-tsc` |
-| 2 | 1.2 | Create `nuxt.config.ts` with `runtimeConfig`, `app.head`, CSS, modules |
-| 3 | 1.2.1 | Update `#app` → `#__nuxt` in CSS (or set `app.rootId: 'app'`) |
-| 4 | 1.3 | Update `package.json` scripts |
-| 5 | 1.5 | Update `tailwind.config.js` content paths |
+| 1 | 1.1 | Install `nuxt`, `@vueuse/nuxt`, `@nuxt/eslint`. Remove `vue`, `vue-router`, `@vitejs/plugin-vue`, `vite`, `vue-tsc` |
+| 2 | 1.2 | Create `nuxt.config.ts` with `runtimeConfig`, `app.head`, CSS, modules, `ssr: false` |
+| 3 | 1.3 | Update `package.json` scripts to use `nuxt dev`, `nuxt build`, etc. |
+| 4 | 1.4 | Update `tailwind.config.js` content paths (`./vue/**` → `./app/**`) |
+| 5 | 1.5 | Install `@vueuse/nuxt` |
 | 6 | 2 | Rename `vue/` → `app/` |
-| 7 | 3.1 | Rename page files for file-based routing |
-| 8 | 3.2 | Delete `app/router/` directory |
-| 9 | 3.3 | Update `app.vue` (`<router-view>` → `<NuxtPage>`) |
-| 10 | 4.1 | Rename `pocketbase.ts` → `pocketbase.client.ts`, use `useRuntimeConfig()` |
-| 11 | 4.2 | Create `plugins/sentry.client.ts` with `useRuntimeConfig()` |
-| 12 | 5 | Create `middleware/auth.ts`, add `definePageMeta` to dashboard page |
-| 13 | 6 | Remove manual imports across all files |
-| 14 | 7 | Refactor `useFaviconCache` to use `useHead()` |
-| 15 | 3.4 | Replace `import { useRouter } from 'vue-router'` with auto-imported `useRouter`/`navigateTo` |
-| 16 | 1.4 | Delete `index.html`, `vite.config.ts`, `tsconfig*.json`, `main.ts`, `env.d.ts`, `router/` |
-| 17 | 9 | Add `Lazy` prefix to popup/admin components, replace `<a>`/`<router-link>` with `<NuxtLink>` |
-| 18 | 10 | Run `nuxt prepare`, `npm run dev`, verify checklist |
+| 7 | 2.1 | Update `#app` → `#__nuxt` in `app/assets/css/main.css` (or set `app.rootId`) |
+| 8 | 3.1 | Rename page files: `Home.vue` → `index.vue`, `AdminLogin.vue` → `admin/index.vue`, `AdminDashboard.vue` → `admin/dashboard.vue` |
+| 9 | 3.2 | Delete `app/router/` directory |
+| 10 | 3.3 | Update `app.vue`: `<router-view />` → `<NuxtPage />` |
+| 11 | 4.1 | Rename `pocketbase.ts` → `pocketbase.client.ts`, add `useRuntimeConfig()` for PB URL |
+| 12 | 4.2 | Create `plugins/sentry.client.ts` with `useRuntimeConfig()` for DSN |
+| 13 | 5 | Create `middleware/auth.ts`, add `definePageMeta({ middleware: 'auth' })` to dashboard page |
+| 14 | 6.1–6.5 | Remove manual imports: Vue APIs, composables, VueUse, utils, components |
+| 15 | 6.6–6.7 | Update remaining `@/` → `~/` for plugin/asset/type imports |
+| 16 | 6.8 | Replace `import { useRouter } from 'vue-router'` with auto-imported `useRouter`/`navigateTo` |
+| 17 | 7 | Refactor `useFaviconCache` to use `useHead()`, delete duplicate favicon logic from `index.vue` |
+| 18 | 8 | (Optional) Create `layouts/default.vue` and `layouts/admin.vue` |
+| 19 | 9 | Add `Lazy` prefix to popup/admin components, replace `<a>`/`<router-link>` with `<NuxtLink>` |
+| 20 | 10.1 | Delete replaced files: `index.html`, `vite.config.ts`, `tsconfig*.json`, `app/main.ts`, `app/env.d.ts` |
+| 21 | 10.2 | Add `.nuxt/` and `.output/` to `.gitignore` |
+| 22 | 10.3 | Run `nuxt prepare`, `npm run dev`, verify against checklist |
 
 ---
 
