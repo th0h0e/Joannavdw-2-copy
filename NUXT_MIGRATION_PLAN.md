@@ -706,9 +706,90 @@ This is entirely optional — the app works without layouts.
 
 ---
 
-## Phase 9 — Cleanup & Verification
+## Phase 9 — Performance Optimizations
 
-### 9.1 — Files to delete
+These are optional but recommended improvements that leverage Nuxt's built-in performance features.
+
+### 9.1 — Lazy-load below-fold components
+
+Nuxt lets you lazy-load any component by adding the `Lazy` prefix to its name in templates. The component's JavaScript is only downloaded when it's actually rendered. This reduces the initial bundle size.
+
+**Good candidates for lazy loading** (not visible on initial page load):
+
+```vue
+<!-- In pages/index.vue — popups are hidden until user interaction -->
+<LazyProjectPopup :is-visible="showPopup" ... />
+<LazyAboutPopup :is-visible="showAboutPopup" ... />
+<LazyHamburgerMenu ... />
+
+<!-- In pages/admin/dashboard.vue — editor opens on click -->
+<LazyAdminProjectEditor ... />
+<LazyAdminSettingsSidebar ... />
+<LazyAdminProjectPopupPreview ... />
+```
+
+**Do NOT lazy-load** components visible on first paint (Hero, HeroMobile, LogoTop, LogoBottom, MotionCarousel, MotionCarouselDesktop) — lazy loading these would delay the initial render.
+
+No configuration needed — `Lazy` prefix works automatically with Nuxt's component auto-import system.
+
+### 9.2 — Replace `<a>` and `<router-link>` with `<NuxtLink>`
+
+`<NuxtLink>` is Nuxt's replacement for both `<a>` tags (external links) and `<router-link>` (internal navigation). It automatically:
+- Detects internal vs external links
+- Prefetches linked pages when the link becomes visible in the viewport
+- Handles `target="_blank"` and `rel="noopener"` for external links
+
+Search all components for `<a href=` and `<router-link` and replace with `<NuxtLink>`:
+
+```vue
+<!-- BEFORE -->
+<a href="#project-0">Project 1</a>
+<router-link to="/admin">Admin</router-link>
+
+<!-- AFTER -->
+<NuxtLink to="#project-0">Project 1</NuxtLink>
+<NuxtLink to="/admin">Admin</NuxtLink>
+```
+
+`<NuxtLink>` is auto-imported — no import statement needed.
+
+### 9.3 — Nuxt Image module (optional, future)
+
+The portfolio relies heavily on images served from PocketBase. The `@nuxt/image` module can optimize these by:
+- Serving modern formats (WebP, AVIF)
+- Generating responsive `srcset` attributes
+- Lazy-loading off-screen images
+
+This is a larger change that affects carousel components and is best done as a follow-up after the core migration is verified. To explore later:
+
+```bash
+npm install @nuxt/image
+```
+
+```typescript
+// nuxt.config.ts
+modules: ['@nuxt/image'],
+image: {
+  domains: ['admin.kontext.site'],
+},
+```
+
+Then replace `<img>` tags with `<NuxtImg>` in carousel components.
+
+### 9.4 — Nuxt Fonts module (optional, future)
+
+The app uses a custom EnduroWeb font loaded via `@font-face` in `main.css`. The `@nuxt/fonts` module can auto-optimize font loading by:
+- Self-hosting fonts and removing external network requests
+- Generating font fallback metrics to reduce layout shift
+- Applying optimal cache headers
+
+Since EnduroWeb is already self-hosted from `/fonts/`, this is a low-priority optimization. The current `@font-face` with `font-display: swap` works well.
+
+---
+
+## Phase 10 — Cleanup & Verification
+
+### 10.1 — Files to delete
 
 - `vue/` directory (now `app/`)
 - `index.html`
@@ -718,7 +799,7 @@ This is entirely optional — the app works without layouts.
 - `vue/env.d.ts`
 - `vue/router/` directory
 
-### 9.2 — Files added to `.gitignore`
+### 10.2 — Files added to `.gitignore`
 
 ```
 .nuxt/
@@ -726,7 +807,7 @@ This is entirely optional — the app works without layouts.
 node_modules/
 ```
 
-### 9.3 — Run and verify
+### 10.3 — Run and verify
 
 ```bash
 npm install
@@ -734,7 +815,7 @@ npx nuxt prepare     # Generates .nuxt/ types
 npm run dev           # Should start on localhost:5174
 ```
 
-### 9.4 — Verification checklist
+### 10.4 — Verification checklist
 
 - [ ] Portfolio page loads at `/` with scroll-snap sections
 - [ ] Hero section renders with PocketBase image
@@ -761,21 +842,23 @@ npm run dev           # Should start on localhost:5174
 | Step | Phase | What to do |
 |---|---|---|
 | 1 | 1.1 | Install `nuxt`, `@vueuse/nuxt`, `@nuxt/eslint`. Remove `vue`, `vue-router`, `@vitejs/plugin-vue`, `vue-tsc` |
-| 2 | 1.2 | Create `nuxt.config.ts` |
-| 3 | 1.3 | Update `package.json` scripts |
-| 4 | 1.5 | Update `tailwind.config.js` content paths |
-| 5 | 2 | Rename `vue/` → `app/` |
-| 6 | 3.1 | Rename page files for file-based routing |
-| 7 | 3.2 | Delete `app/router/` directory |
-| 8 | 3.3 | Update `app.vue` (`<router-view>` → `<NuxtPage>`) |
-| 9 | 4.1 | Rename `pocketbase.ts` → `pocketbase.client.ts` |
-| 10 | 4.2 | Create `plugins/sentry.client.ts` |
-| 11 | 5 | Create `middleware/auth.ts`, add `definePageMeta` to dashboard page |
-| 12 | 6 | Remove manual imports across all files, update `@/` → `~/` |
-| 13 | 7 | Refactor `useFaviconCache` to use `useHead()` |
-| 14 | 3.4 | Replace `import { useRouter } from 'vue-router'` with auto-imported `useRouter`/`navigateTo` |
-| 15 | 1.4 | Delete `index.html`, `vite.config.ts`, `tsconfig*.json`, `main.ts`, `env.d.ts`, `router/` |
-| 16 | 9 | Run `nuxt prepare`, `npm run dev`, verify checklist |
+| 2 | 1.2 | Create `nuxt.config.ts` with `runtimeConfig`, `app.head`, CSS, modules |
+| 3 | 1.2.1 | Update `#app` → `#__nuxt` in CSS (or set `app.rootId: 'app'`) |
+| 4 | 1.3 | Update `package.json` scripts |
+| 5 | 1.5 | Update `tailwind.config.js` content paths |
+| 6 | 2 | Rename `vue/` → `app/` |
+| 7 | 3.1 | Rename page files for file-based routing |
+| 8 | 3.2 | Delete `app/router/` directory |
+| 9 | 3.3 | Update `app.vue` (`<router-view>` → `<NuxtPage>`) |
+| 10 | 4.1 | Rename `pocketbase.ts` → `pocketbase.client.ts`, use `useRuntimeConfig()` |
+| 11 | 4.2 | Create `plugins/sentry.client.ts` with `useRuntimeConfig()` |
+| 12 | 5 | Create `middleware/auth.ts`, add `definePageMeta` to dashboard page |
+| 13 | 6 | Remove manual imports across all files |
+| 14 | 7 | Refactor `useFaviconCache` to use `useHead()` |
+| 15 | 3.4 | Replace `import { useRouter } from 'vue-router'` with auto-imported `useRouter`/`navigateTo` |
+| 16 | 1.4 | Delete `index.html`, `vite.config.ts`, `tsconfig*.json`, `main.ts`, `env.d.ts`, `router/` |
+| 17 | 9 | Add `Lazy` prefix to popup/admin components, replace `<a>`/`<router-link>` with `<NuxtLink>` |
+| 18 | 10 | Run `nuxt prepare`, `npm run dev`, verify checklist |
 
 ---
 
@@ -800,11 +883,14 @@ npm run dev           # Should start on localhost:5174
 
 1. **Auto-imports**: Vue APIs (`ref`, `computed`, `watch`...), composables from `composables/`, utils from `utils/`, and components from `components/` are all auto-imported. No import statements needed.
 2. **File-based routing**: `pages/index.vue` → `/`, `pages/admin/index.vue` → `/admin`, `pages/admin/dashboard.vue` → `/admin/dashboard`.
-3. **`~/` alias**: Replaces `@/`. Points to the `app/` directory.
+3. **`~/` and `@/` aliases**: Both point to the `app/` directory. `~/` is the Nuxt convention.
 4. **`.client.ts` suffix**: Plugins with `.client.ts` only run on the client side.
 5. **`definePageMeta()`**: Compiler macro for page-level config (middleware, layout). No import needed.
 6. **`defineNuxtPlugin()`**: Wrapper for plugins. Auto-imported.
 7. **`defineNuxtRouteMiddleware()`**: Wrapper for route middleware. Auto-imported.
 8. **`useHead()`**: Reactive head management. Replaces manual DOM manipulation for `<title>`, `<link>`, `<meta>`.
-9. **`navigateTo()`**: Replaces `router.push()`. Auto-imported.
-10. **`<NuxtPage />`**: Replaces `<router-view />`. Auto-imported.
+9. **`useRuntimeConfig()`**: Access environment-driven config values. Auto-imported.
+10. **`navigateTo()`**: Replaces `router.push()`. Auto-imported.
+11. **`<NuxtPage />`**: Replaces `<router-view />`. Auto-imported.
+12. **`<NuxtLink />`**: Replaces `<a>` and `<router-link>`. Smart prefetching built in. Auto-imported.
+13. **`Lazy` prefix**: Add `Lazy` to any component name to defer its JavaScript loading (e.g. `<LazyProjectPopup>`).
