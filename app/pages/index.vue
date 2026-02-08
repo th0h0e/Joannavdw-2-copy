@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { About, Homepage, PortfolioProject, Settings } from '~/plugins/pocketbase.client'
-import { pb, getCachedData, getImageUrl, setCachedData } from '~/plugins/pocketbase.client'
+import { getCachedData, getImageUrl, pb, setCachedData } from '~/plugins/pocketbase.client'
 
 // Type for converted project data used in the app
 interface ConvertedProject {

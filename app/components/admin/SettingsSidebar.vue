@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { About, Homepage, Settings } from '~/plugins/pocketbase.client'
-import { pb, getImageUrl } from '~/plugins/pocketbase.client'
+import { getImageUrl, pb } from '~/plugins/pocketbase.client'
 
 const props = defineProps<{
   isOpen: boolean

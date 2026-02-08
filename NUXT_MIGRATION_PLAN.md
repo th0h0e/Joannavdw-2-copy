@@ -205,7 +205,7 @@ export default defineNuxtConfig({
 // tailwind.config.js
 export default {
   content: [
-    './app/**/*.{vue,ts}',   // Changed from ./vue/**
+    './app/**/*.{vue,ts}', // Changed from ./vue/**
   ],
   theme: {
     extend: {},
@@ -702,12 +702,16 @@ Nuxt lets you lazy-load any component by adding the `Lazy` prefix to its name in
 ```vue
 <!-- In pages/index.vue — popups are hidden until user interaction -->
 <LazyProjectPopup :is-visible="showPopup" ... />
+
 <LazyAboutPopup :is-visible="showAboutPopup" ... />
+
 <LazyHamburgerMenu ... />
 
 <!-- In pages/admin/dashboard.vue — editor opens on click -->
 <LazyAdminProjectEditor ... />
+
 <LazyAdminSettingsSidebar ... />
+
 <LazyAdminProjectPopupPreview ... />
 ```
 
@@ -726,12 +730,22 @@ Search all components for `<a href=` and `<router-link` and replace with `<NuxtL
 
 ```vue
 <!-- BEFORE -->
-<a href="#project-0">Project 1</a>
-<router-link to="/admin">Admin</router-link>
+<a href="#project-0">
+Project 1
+</a>
+
+<router-link to="/admin">
+Admin
+</router-link>
 
 <!-- AFTER -->
-<NuxtLink to="#project-0">Project 1</NuxtLink>
-<NuxtLink to="/admin">Admin</NuxtLink>
+<NuxtLink to="#project-0">
+Project 1
+</NuxtLink>
+
+<NuxtLink to="/admin">
+Admin
+</NuxtLink>
 ```
 
 `<NuxtLink>` is auto-imported — no import statement needed.

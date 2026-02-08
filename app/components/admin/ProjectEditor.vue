@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PortfolioProject } from '~/plugins/pocketbase.client'
-import { pb, getImageUrl } from '~/plugins/pocketbase.client'
+import { getImageUrl, pb } from '~/plugins/pocketbase.client'
 
 interface ImageItem {
   id: string
