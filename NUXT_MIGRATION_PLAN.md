@@ -1,5 +1,9 @@
 # Nuxt Migration Plan — Vue to Nuxt 4
 
+## Branch Strategy
+
+**All Nuxt migration work happens exclusively on the `claude/react-to-vue-migration-EOVOp` branch.** Do not modify `master` or the Vue branch. This ensures both the React and Vue versions of the app remain intact and functional on their respective branches. The Nuxt migration is isolated to this feature branch until it is fully verified and ready to merge.
+
 ## Overview
 
 This plan converts the existing Vue 3 + Vite + Vue Router app (`vue/`) into a Nuxt 4 application. The app is a portfolio site with PocketBase backend, CSS scroll-snap navigation, and an admin dashboard.
