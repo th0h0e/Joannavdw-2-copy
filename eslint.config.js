@@ -48,6 +48,7 @@ export default antfu({
     '**/.pocketbase/**',
     '**/VUE_MIGRATION_PLAN.md',
     'src/**', // Legacy React directory (empty)
+    '**/*.ts', // Ignore TypeScript files for now (can enable later)
   ],
 
   // Disable formats you don't use
