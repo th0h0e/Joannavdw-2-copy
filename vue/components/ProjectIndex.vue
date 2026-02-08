@@ -8,6 +8,10 @@ withDefaults(defineProps<{
 }>(), {
   settingsData: null,
 })
+
+function handleLinkClick(index: number) {
+  window.location.hash = `#project-${index}`
+}
 </script>
 
 <template>
@@ -19,7 +23,7 @@ withDefaults(defineProps<{
     <ProjectNavigation
       :project-titles="projectTitles"
       :settings-data="settingsData"
-      @link-click="(index: number) => { window.location.hash = `#project-${index}` }"
+      @link-click="handleLinkClick"
     />
   </section>
 </template>

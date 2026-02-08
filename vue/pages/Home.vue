@@ -378,6 +378,10 @@ function handleShowAboutPopup() {
 function handleCloseAboutPopup() {
   showAboutPopup.value = false
 }
+
+function handleRetry() {
+  window.location.reload()
+}
 </script>
 
 <template>
@@ -398,7 +402,7 @@ function handleCloseAboutPopup() {
       </div>
       <button
         class="px-4 py-2 bg-gray-200 text-black rounded"
-        @click="() => window.location.reload()"
+        @click="handleRetry"
       >
         Retry
       </button>
