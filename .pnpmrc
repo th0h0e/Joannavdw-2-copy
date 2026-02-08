@@ -1,0 +1,18 @@
+# Security-first pnpm configuration
+
+# Disable postinstall scripts by default (prevent malicious code execution)
+ignore-scripts=true
+
+# WHITELIST: Allow only specific packages to run postinstall scripts
+# Format: @scope/package, package
+public-hoist-pattern[]=*types*
+public-hoist-pattern[]=@sentry/vue
+
+# Use frozen lockfile (prevents unexpected dependency changes)
+frozen-lockfile=false
+
+# Verify package integrity  
+verify-store-integrity=true
+
+# Strict dependency resolution
+strict-peer-dependencies=false
