@@ -52,18 +52,22 @@ app/plugins/sentry.client.ts       ←   NEW (replaces Sentry init in main.ts)
 
 ## Phase 1 — Install Nuxt & Configure
 
+### Prerequisites
+
+- **Node.js 20.x or newer** (even-numbered versions recommended)
+
 ### 1.1 — Update dependencies
 
-**Remove** (Nuxt provides these internally):
-```bash
-npm uninstall vue vue-router @vitejs/plugin-vue vite vue-tsc
-```
+Since this is an existing project (not a fresh scaffold), we install Nuxt directly as a dependency — **not** via `npm create nuxt@latest` (which is for new projects only).
 
 **Install Nuxt:**
 ```bash
-npx nuxi@latest init --force .
-# Or manually:
 npm install nuxt
+```
+
+**Remove** (Nuxt provides these internally — vue, vue-router, and vite are bundled with Nuxt):
+```bash
+npm uninstall vue vue-router @vitejs/plugin-vue vite vue-tsc
 ```
 
 **Keep** (these work with Nuxt as-is):
