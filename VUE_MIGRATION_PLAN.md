@@ -5,17 +5,13 @@
 ```
 /home/user/Joannavdw-2-copy/
 ├── src/                        # React app (untouched)
-├── vue/                        # Vue app (fully self-contained)
-│   ├── App.vue                 # Router shell (<router-view />)
+├── vue/                        # Vue app (Nuxt-inspired structure)
+│   ├── app.vue                 # Router shell (<router-view />)
 │   ├── main.ts
-│   ├── config/
-│   │   └── pocketbase.ts       # Own copy — PB client, cache, helpers
-│   ├── types/
-│   │   ├── pocketbase-types.ts # Own copy — generated PB types
-│   │   └── project.ts          # Own copy — ProjectImage interface
-│   ├── utils/
-│   │   └── sharedStyles.ts     # Own copy — Tailwind class strings
-│   ├── assets/                 # Own copy — SVGs, images
+│   ├── env.d.ts                # TypeScript/Vite declarations for .vue files
+│   ├── assets/                 # Processed assets — SVGs, images, CSS
+│   │   ├── css/
+│   │   │   └── main.css        # Global styles (Tailwind, scroll-snap, GPU accel)
 │   │   ├── logo svg/
 │   │   │   ├── Asset 7.svg
 │   │   │   └── Asset 11.svg
@@ -41,17 +37,27 @@
 │   │       ├── ProjectEditor.vue
 │   │       ├── SettingsSidebar.vue
 │   │       └── ProjectPopupPreview.vue
+│   ├── composables/
+│   │   ├── usePocketBase.ts    # Custom — PB SDK + useStorage + tryOnScopeDispose
+│   │   ├── useFaviconCache.ts  # Custom — useFavicon + useLocalStorage + fetch/blob
+│   │   └── useToast.ts         # Custom — useTimeoutFn + reactive toast array
+│   ├── layouts/                # Future layout components (placeholder)
+│   ├── middleware/              # Future route middleware (placeholder)
 │   ├── pages/
 │   │   ├── Home.vue            # Portfolio orchestrator (equivalent of React App.tsx logic)
 │   │   └── admin/
 │   │       ├── AdminLogin.vue
 │   │       └── AdminDashboard.vue
-│   ├── composables/
-│   │   ├── usePocketBase.ts    # Custom — PB SDK + useStorage + tryOnScopeDispose
-│   │   ├── useFaviconCache.ts  # Custom — useFavicon + useLocalStorage + fetch/blob
-│   │   └── useToast.ts         # Custom — useTimeoutFn + reactive toast array
-│   └── router/
-│       └── index.ts
+│   ├── plugins/
+│   │   └── pocketbase.ts       # PB client, cache, helpers
+│   ├── router/
+│   │   └── index.ts
+│   ├── shared/
+│   │   └── types/
+│   │       ├── pocketbase-types.ts # Generated PB types
+│   │       └── project.ts          # ProjectImage interface
+│   └── utils/
+│       └── sharedStyles.ts     # Tailwind class strings
 ├── index-vue.html              # Vue entry HTML
 ├── vite.config.vue.ts          # Vue-specific Vite config
 │
@@ -89,9 +95,9 @@ No Vue file should import from `src/`. Duplicate framework-agnostic code into `v
 
 | Source | Destination | Notes |
 |---|---|---|
-| `src/config/pocketbase.ts` | `vue/config/pocketbase.ts` | Verbatim — pure TS + PocketBase SDK |
-| `src/types/pocketbase-types.ts` | `vue/types/pocketbase-types.ts` | Verbatim — auto-generated types |
-| `src/types/project.ts` | `vue/types/project.ts` | Verbatim — `ProjectImage` interface |
+| `src/config/pocketbase.ts` | `vue/plugins/pocketbase.ts` | Verbatim — pure TS + PocketBase SDK |
+| `src/types/pocketbase-types.ts` | `vue/shared/types/pocketbase-types.ts` | Verbatim — auto-generated types |
+| `src/types/project.ts` | `vue/shared/types/project.ts` | Verbatim — `ProjectImage` interface |
 | `src/utils/sharedStyles.ts` | `vue/utils/sharedStyles.ts` | Verbatim — Tailwind class strings |
 | `src/assets/logo svg/` | `vue/assets/logo svg/` | 2 SVG logos |
 | `src/assets/Project Card/` | `vue/assets/Project Card/` | 1 SVG card background |
@@ -102,15 +108,16 @@ No Vue file should import from `src/`. Duplicate framework-agnostic code into `v
 - Remove `~vue` alias (redundant once `@` points to `vue/`)
 
 **Update existing Vue file imports:**
-- `vue/main.ts`: change `import '../src/index.css'` → `import './index.css'` after copying Tailwind entry CSS into `vue/`, or keep the relative import (`index.css` contains only Tailwind directives)
-- `vue/pages/Home.vue`: `@/config/pocketbase` resolves to `vue/config/pocketbase.ts` automatically
+- `vue/main.ts`: `import '@/assets/css/main.css'` for global styles
+- `vue/pages/Home.vue`: `@/plugins/pocketbase` resolves to `vue/plugins/pocketbase.ts` automatically
+- Type imports: `@/shared/types/pocketbase-types` and `@/shared/types/project`
 - Asset imports: `@/assets/logo svg/Asset 7.svg` resolves to `vue/assets/`
 
-**Maintenance:** When PocketBase schema changes, run `typegen` and copy the output to both `src/types/` and `vue/types/`.
+**Maintenance:** When PocketBase schema changes, run `typegen` and copy the output to both `src/types/` and `vue/shared/types/`.
 
 ### Phase 3.2 — Component Migration
 
-All Vue components import from `vue/config`, `vue/types`, `vue/utils`, and `vue/assets` — never from `src/`.
+All Vue components import from `vue/plugins`, `vue/shared/types`, `vue/utils`, and `vue/assets` — never from `src/`.
 
 | React | Vue | Key Notes |
 |---|---|---|
@@ -127,7 +134,7 @@ All Vue components import from `vue/config`, `vue/types`, `vue/utils`, and `vue/
 | `ProjectNavigation.tsx` | `ProjectNavigation.vue` | `onClick` callback → `@click` emit |
 | `ChevronDown.tsx` | `icons/ChevronDown.vue` | `defineProps()` |
 | `ChevronRight.tsx` | `icons/ChevronRight.vue` | Same |
-| `App.tsx` (routing shell) | `App.vue` | Done — bare `<router-view />` |
+| `App.tsx` (routing shell) | `app.vue` | Done — bare `<router-view />` |
 | `App.tsx` (portfolio logic) | `pages/Home.vue` | Orchestrator: PocketBase fetching, real-time subscriptions, popup state, section tracking, favicon caching. `useState` → `ref()`, `useEffect` → `onMounted()`/`watch()` |
 
 **Note on CarouselContext:** `CLAUDE.md` references a `CarouselContext` using React Context. This is outdated — the codebase uses **no Context API**. Carousel state (`scrollProgress`, `currentSlide`, `blurIntensity`) is computed locally inside each carousel component from scroll events. Communication uses props and callbacks. The Vue version follows the same pattern: local state via `useScroll` + `computed()`, props/emits for parent communication. No `provide`/`inject` needed.
