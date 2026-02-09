@@ -30,17 +30,12 @@ const imagesToDelete = ref<string[]>([])
 const loading = ref(false)
 const draggedIndex = ref<number | null>(null)
 const isDraggingFile = ref(false)
-const isMobile = ref(window.innerWidth < 768)
+const { isMobile } = useBreakpoints()
 
-function handleResize() {
-  isMobile.value = window.innerWidth < 768
-}
 onMounted(() => {
-  window.addEventListener('resize', handleResize)
   document.body.style.overflow = 'hidden'
 })
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
   document.body.style.overflow = ''
 })
 
@@ -199,24 +194,33 @@ async function handleSubmit(e: Event) {
     }
 
     if (props.project) {
-      await pb.collection('Portfolio_Projects').update(props.project.id, formData)
+      await $fetch(`/api/projects/${props.project.id}`, {
+        method: 'PUT',
+        body: formData,
+        headers: { Authorization: pb.authStore.token },
+      })
     }
     else {
-      await pb.collection('Portfolio_Projects').create(formData)
+      await $fetch('/api/projects', {
+        method: 'POST',
+        body: formData,
+        headers: { Authorization: pb.authStore.token },
+      })
     }
 
     emit('save')
   }
   catch (err: unknown) {
     console.error('Error saving project:', err)
-    const error = err as { status?: number, message?: string }
-    if (error?.status === 401 || error?.status === 403) {
+    const error = err as { statusCode?: number, data?: { statusCode?: number, message?: string }, message?: string }
+    const status = error?.statusCode || error?.data?.statusCode
+    if (status === 401 || status === 403) {
       emit('showToast', 'Your session has expired. Please login again.', 'error')
       pb.authStore.clear()
       window.location.href = '/admin'
       return
     }
-    emit('showToast', `Failed to save project: ${error?.message || 'Unknown error'}`, 'error')
+    emit('showToast', `Failed to save project: ${error?.data?.message || error?.message || 'Unknown error'}`, 'error')
   }
   finally {
     loading.value = false

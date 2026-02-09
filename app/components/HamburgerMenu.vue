@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<{
 })
 
 const isOpen = ref(false)
-const innerWidth = ref(window.innerWidth)
+const { isTabletOrAbove } = useBreakpoints()
 
 function toggleMenu() {
   if (props.isPopupVisible)
@@ -57,8 +57,8 @@ function handleLinkClick(index: number) {
         mixBlendMode: isOpen ? 'normal' : 'exclusion',
         transform: `rotate(${isOpen ? 45 : 0}deg)`,
         backgroundColor: isOpen ? '#000000' : '#ffffff',
-        width: isOpen ? '18px' : (innerWidth >= 768 ? '18px' : '17.32px'),
-        height: isOpen ? '18px' : (innerWidth >= 768 ? '18px' : '17.32px'),
+        width: isOpen ? '18px' : (isTabletOrAbove ? '18px' : '17.32px'),
+        height: isOpen ? '18px' : (isTabletOrAbove ? '18px' : '17.32px'),
         transition: 'transform 0.3s, background-color 0.3s, width 0.3s, height 0.3s',
       }"
     />

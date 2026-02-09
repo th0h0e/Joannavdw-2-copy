@@ -20,15 +20,8 @@ const canOpenAboutPopup = ref(true)
 // Mobile swipe hint state
 const hasShownMobileHint = ref(false)
 
-// State for responsive behavior
-const isMobile = ref(window.innerWidth < 768)
-const isDesktop = ref(window.innerWidth >= 1024)
-
-// Update responsive states on resize
-useEventListener(window, 'resize', () => {
-  isMobile.value = window.innerWidth < 768
-  isDesktop.value = window.innerWidth >= 1024
-})
+// State for responsive behavior (SSR-compatible)
+const { isMobile, isDesktop } = useBreakpoints()
 
 // Update favicon dynamically via useHead()
 useFaviconCache(settingsData)
@@ -128,7 +121,7 @@ function hideAddressBar() {
 
 // Mobile swipe hint
 function setupMobileSwipeHint() {
-  if (window.innerWidth >= 1024 || hasShownMobileHint.value || projectsData.value.length === 0)
+  if (isDesktop.value || hasShownMobileHint.value || projectsData.value.length === 0)
     return
 
   const hintObserver = new IntersectionObserver(

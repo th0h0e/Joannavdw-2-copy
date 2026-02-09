@@ -54,10 +54,12 @@ onMounted(() => {
   })
 })
 
+const { isTabletOrAbove } = useBreakpoints()
+
 const showTitle = computed(() => !props.isAboutPopupVisible)
 const titleDelay = computed(() => hasAnimatedIn.value ? '0s' : '1.2s')
 const sectionHeight = computed(() => props.isMobile !== false ? '100lvh' : '100vh')
-const chevronSize = computed(() => window.innerWidth >= 768 ? 28 : 24)
+const chevronSize = computed(() => isTabletOrAbove.value ? 28 : 24)
 </script>
 
 <template>

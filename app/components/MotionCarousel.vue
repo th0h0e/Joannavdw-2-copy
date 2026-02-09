@@ -172,9 +172,11 @@ function handleTitleClick() {
   }
 }
 
+const { isTabletOrAbove } = useBreakpoints()
+
 const titleText = computed(() => isOnBlurSlide.value ? 'NEXT PROJECT' : props.projectTitle)
 const titleHidden = computed(() => props.isPopupVisible || props.isAboutPopupVisible)
-const chevronSize = computed(() => window.innerWidth >= 768 ? 28 : 24)
+const chevronSize = computed(() => isTabletOrAbove.value ? 28 : 24)
 
 const showBottomBar = computed(() => currentSlide.value > 0 && currentSlide.value <= props.images.length)
 const showTopBar = computed(() => props.showTopProgressBar && props.images.length > 1 && currentSlide.value > 0 && currentSlide.value <= props.images.length)
