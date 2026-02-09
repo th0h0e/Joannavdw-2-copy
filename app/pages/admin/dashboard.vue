@@ -82,12 +82,16 @@ async function handleHeroImageUpdate(event: Event) {
   try {
     const formData = new FormData()
     formData.append('Hero_Image', file)
-    await pb.collection('Homepage').update(homepageId.value, formData)
+    await $fetch(`/api/homepage/${homepageId.value}`, {
+      method: 'PUT',
+      body: formData,
+      headers: { Authorization: pb.authStore.token },
+    })
     await refreshHomepage()
   }
   catch (err: unknown) {
-    const typedErr = err as { message?: string }
-    showToast(`Failed to update hero image: ${typedErr?.message || 'Unknown error'}`, 'error')
+    const typedErr = err as { data?: { message?: string }, message?: string }
+    showToast(`Failed to update hero image: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
   }
 }
 
@@ -98,12 +102,16 @@ async function handleHeroImageMobileUpdate(event: Event) {
   try {
     const formData = new FormData()
     formData.append('Hero_Image_Mobile', file)
-    await pb.collection('Homepage').update(homepageId.value, formData)
+    await $fetch(`/api/homepage/${homepageId.value}`, {
+      method: 'PUT',
+      body: formData,
+      headers: { Authorization: pb.authStore.token },
+    })
     await refreshHomepage()
   }
   catch (err: unknown) {
-    const typedErr = err as { message?: string }
-    showToast(`Failed to update mobile hero image: ${typedErr?.message || 'Unknown error'}`, 'error')
+    const typedErr = err as { data?: { message?: string }, message?: string }
+    showToast(`Failed to update mobile hero image: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
   }
 }
 
@@ -123,13 +131,17 @@ async function handleTitleSave() {
     return
   }
   try {
-    await pb.collection('Homepage').update(homepageId.value, { Hero_Title: tempTitle.value.trim() })
+    await $fetch(`/api/homepage/${homepageId.value}`, {
+      method: 'PUT',
+      body: { Hero_Title: tempTitle.value.trim() },
+      headers: { Authorization: pb.authStore.token },
+    })
     heroTitle.value = tempTitle.value.trim()
     isEditingTitle.value = false
   }
   catch (err: unknown) {
-    const typedErr = err as { message?: string }
-    showToast(`Failed to update hero title: ${typedErr?.message || 'Unknown error'}`, 'error')
+    const typedErr = err as { data?: { message?: string }, message?: string }
+    showToast(`Failed to update hero title: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
     isEditingTitle.value = false
   }
 }
@@ -147,19 +159,23 @@ async function confirmDelete() {
   if (!deleteConfirmation.value)
     return
   try {
-    await pb.collection('Portfolio_Projects').delete(deleteConfirmation.value.projectId)
+    await $fetch(`/api/projects/${deleteConfirmation.value.projectId}`, {
+      method: 'DELETE',
+      headers: { Authorization: pb.authStore.token },
+    })
     deleteConfirmation.value = null
     await refreshProjects()
     showToast('Project deleted successfully', 'success')
   }
   catch (err: unknown) {
-    const typedErr = err as { status?: number, message?: string }
-    if (typedErr?.status === 401 || typedErr?.status === 403) {
+    const typedErr = err as { statusCode?: number, data?: { statusCode?: number, message?: string }, message?: string }
+    const status = typedErr?.statusCode || typedErr?.data?.statusCode
+    if (status === 401 || status === 403) {
       pb.authStore.clear()
       navigateTo('/admin')
       return
     }
-    showToast(`Failed to delete project: ${typedErr?.message || 'Unknown error'}`, 'error')
+    showToast(`Failed to delete project: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
     deleteConfirmation.value = null
   }
 }
@@ -206,15 +222,21 @@ async function handleDragEnd() {
   draggedProjectId.value = null
 
   try {
-    const updatePromises = projects.value.map((project, index) =>
-      pb.collection('Portfolio_Projects').update(project.id, { Order: index + 1 }, { requestKey: null }),
-    )
-    await Promise.all(updatePromises)
+    await $fetch('/api/projects/reorder', {
+      method: 'PUT',
+      body: {
+        items: projects.value.map((project, index) => ({
+          id: project.id,
+          order: index + 1,
+        })),
+      },
+      headers: { Authorization: pb.authStore.token },
+    })
   }
   catch (err: unknown) {
     await refreshProjects()
-    const typedErr = err as { message?: string }
-    showToast(`Failed to reorder projects: ${typedErr?.message || 'Unknown error'}`, 'error')
+    const typedErr = err as { data?: { message?: string }, message?: string }
+    showToast(`Failed to reorder projects: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
   }
   finally {
     isReordering.value = false

@@ -7,12 +7,15 @@ import type {
 } from '../shared/types/pocketbase-types'
 import PocketBase from 'pocketbase'
 
-// Use runtimeConfig for the PocketBase URL (configured in nuxt.config.ts,
-// overridable via NUXT_PUBLIC_PB_URL env var)
-const config = useRuntimeConfig()
-const pb = new PocketBase(config.public.pbUrl as string)
+// Initialized inside defineNuxtPlugin where useRuntimeConfig() is available.
+// The named export below gives all importers a live binding that resolves
+// after the plugin runs (before any component setup or composable executes).
+let pb!: PocketBase
 
 export default defineNuxtPlugin(() => {
+  const config = useRuntimeConfig()
+  pb = new PocketBase(config.public.pbUrl as string)
+
   return {
     provide: {
       pb,

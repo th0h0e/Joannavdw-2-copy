@@ -123,28 +123,40 @@ async function handleSubmit(e: Event) {
   saving.value = true
 
   try {
+    const authHeaders = { Authorization: pb.authStore.token }
+
     if (homepageData.value) {
-      await pb.collection('Homepage').update(homepageData.value.id, {
-        Hero_Title: heroTitle.value,
+      await $fetch(`/api/homepage/${homepageData.value.id}`, {
+        method: 'PUT',
+        body: { Hero_Title: heroTitle.value },
+        headers: authHeaders,
       })
     }
 
     if (aboutData.value) {
-      await pb.collection('About').update(aboutData.value.id, {
-        About_Description: aboutDescription.value,
-        Expertise_Description: expertiseDescription.value,
-        Client_List_Json: clientList.value,
-        Contact_Email: contactEmail.value,
+      await $fetch(`/api/about/${aboutData.value.id}`, {
+        method: 'PUT',
+        body: {
+          About_Description: aboutDescription.value,
+          Expertise_Description: expertiseDescription.value,
+          Client_List_Json: clientList.value,
+          Contact_Email: contactEmail.value,
+        },
+        headers: authHeaders,
       })
     }
 
     if (settingsData.value) {
-      await pb.collection('Settings').update(settingsData.value.id, {
-        Show_Top_Progress_Bar: showTopProgressBar.value,
-        Mobile_Font_Size: mobileFontSize.value,
-        Tablet_Font_Size: tabletFontSize.value,
-        Desktop_Font_Size: desktopFontSize.value,
-        Large_Desktop_Font_Size: largeDesktopFontSize.value,
+      await $fetch(`/api/settings/${settingsData.value.id}`, {
+        method: 'PUT',
+        body: {
+          Show_Top_Progress_Bar: showTopProgressBar.value,
+          Mobile_Font_Size: mobileFontSize.value,
+          Tablet_Font_Size: tabletFontSize.value,
+          Desktop_Font_Size: desktopFontSize.value,
+          Large_Desktop_Font_Size: largeDesktopFontSize.value,
+        },
+        headers: authHeaders,
       })
     }
 
@@ -153,8 +165,8 @@ async function handleSubmit(e: Event) {
   }
   catch (err: unknown) {
     console.error('Error saving settings:', err)
-    const error = err as { message?: string }
-    emit('showToast', `Failed to save settings: ${error?.message || 'Unknown error'}`, 'error')
+    const error = err as { data?: { message?: string }, message?: string }
+    emit('showToast', `Failed to save settings: ${error?.data?.message || error?.message || 'Unknown error'}`, 'error')
   }
   finally {
     saving.value = false

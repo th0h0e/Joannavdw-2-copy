@@ -11,11 +11,6 @@ export default defineNuxtConfig({
     "@nuxt/eslint",
   ],
 
-  // Dev server (replaces vite.config.ts server settings)
-  devServer: {
-    port: 5174,
-  },
-
   // PostCSS (Tailwind)
   postcss: {
     plugins: {
@@ -25,8 +20,9 @@ export default defineNuxtConfig({
   },
 
   // Runtime config — environment-driven values
-  // Override via NUXT_PUBLIC_PB_URL and NUXT_PUBLIC_SENTRY_DSN env vars
+  // Override via NUXT_PB_URL (server-only) and NUXT_PUBLIC_SENTRY_DSN env vars
   runtimeConfig: {
+    pbUrl: "https://admin.kontext.site",
     public: {
       pbUrl: "https://admin.kontext.site",
       sentryDsn:
