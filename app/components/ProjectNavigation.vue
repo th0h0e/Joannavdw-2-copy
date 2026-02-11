@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{
+const { projectTitles } = defineProps<{
   projectTitles: string[]
 }>()
 
