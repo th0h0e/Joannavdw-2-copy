@@ -1,15 +1,22 @@
 export default defineNuxtConfig({
   // Nuxt 4 compatibility date — controls behavioral defaults
-  compatibilityDate: "2025-01-01",
-
-  // Global CSS (replaces import in main.ts)
-  css: ["~/assets/css/main.css"],
+  compatibilityDate: '2025-01-01',
 
   // Modules
   modules: [
-    "@vueuse/nuxt", // Auto-imports all @vueuse/core composables
-    "@nuxt/eslint",
+    '@vueuse/nuxt', // Auto-imports all @vueuse/core composables
+    '@nuxt/eslint',
   ],
+
+  // ESLint — standalone: false so antfu/eslint-config handles all rules
+  eslint: {
+    config: {
+      standalone: false,
+    },
+  },
+
+  // Global CSS (replaces import in main.ts)
+  css: ['~/assets/css/main.css'],
 
   // PostCSS (Tailwind)
   postcss: {
@@ -22,11 +29,11 @@ export default defineNuxtConfig({
   // Runtime config — environment-driven values
   // Override via NUXT_PB_URL (server-only) and NUXT_PUBLIC_SENTRY_DSN env vars
   runtimeConfig: {
-    pbUrl: "https://admin.kontext.site",
+    pbUrl: 'https://admin.kontext.site',
     public: {
-      pbUrl: "https://admin.kontext.site",
+      pbUrl: 'https://admin.kontext.site',
       sentryDsn:
-        "https://4981600ff5cc02441de606ca9943a126@o4510808141398016.ingest.de.sentry.io/4510808149983312",
+        'https://4981600ff5cc02441de606ca9943a126@o4510808141398016.ingest.de.sentry.io/4510808149983312',
     },
   },
 
@@ -34,4 +41,4 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
   },
-});
+})
