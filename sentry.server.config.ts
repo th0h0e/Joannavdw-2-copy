@@ -1,8 +1,11 @@
-import dotenv from 'dotenv'
 import * as Sentry from '@sentry/nuxt'
+import dotenv from 'dotenv'
+import { fileURLToPath } from 'node:url'
+import { dirname, join } from 'node:path'
 
-// Load environment variables from .env file
-dotenv.config()
+// Load environment variables from .env file in project root
+const __dirname = dirname(fileURLToPath(import.meta.url))
+dotenv.config({ path: join(__dirname, '.env') })
 
 // Only run `init` when SENTRY_DSN is available
 if (process.env.SENTRY_DSN) {
