@@ -4,6 +4,7 @@ import withNuxt from './.nuxt/eslint.config.mjs'
 
 export default withNuxt(
   antfu({
+    react: false,
     typescript: true,
     vue: {
       a11y: true,
@@ -41,5 +42,6 @@ export default withNuxt(
     // Disable formats you don't use
     jsonc: false,
     yaml: false,
+    markdown: false,
   }),
 )
