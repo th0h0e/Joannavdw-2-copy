@@ -4,12 +4,19 @@ import withNuxt from './.nuxt/eslint.config.mjs'
 
 export default withNuxt(
   antfu({
-    // Vue configuration
+    typescript: true,
     vue: {
+      a11y: true,
       overrides: {
         'vue/multi-word-component-names': 'off',
         'vue/max-attributes-per-line': 'off',
       },
+    },
+
+    // Formatters for CSS, HTML, etc.
+    formatters: {
+      css: true,
+      html: true,
     },
 
     // Stylistic preferences
