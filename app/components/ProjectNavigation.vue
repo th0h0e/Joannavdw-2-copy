@@ -1,41 +1,38 @@
 <script setup lang="ts">
-import type { Settings } from '~/plugins/pocketbase.client'
-import { getResponsiveFontSizes } from '~/plugins/pocketbase.client'
-
-const props = withDefaults(defineProps<{
+const props = defineProps<{
   projectTitles: string[]
-  settingsData?: Settings | null
-}>(), {
-  settingsData: null,
-})
+}>()
 
 const emit = defineEmits<{
   linkClick: [index: number]
 }>()
 
-const fontSizes = computed(() => getResponsiveFontSizes(props.settingsData))
+const fontSizes = {
+  mobile: 1.4,
+  tablet: 2.5,
+  desktop: 2.25,
+  largeDesktop: 3,
+}
 
-// Dynamic style injection for responsive font sizes
-const styleEl = document.createElement('style')
-document.head.appendChild(styleEl)
-watchEffect(() => {
-  styleEl.textContent = `
-    .project-navigation__link {
-      font-size: ${fontSizes.value.mobile}rem;
-    }
-    @media (min-width: 768px) {
-      .project-navigation__link { font-size: ${fontSizes.value.tablet}rem; }
-    }
-    @media (min-width: 1024px) {
-      .project-navigation__link { font-size: ${fontSizes.value.desktop}rem; }
-    }
-    @media (min-width: 1280px) {
-      .project-navigation__link { font-size: ${fontSizes.value.largeDesktop}rem; }
-    }
-  `
-})
-onBeforeUnmount(() => {
-  styleEl.remove()
+useHead({
+  style: [
+    {
+      innerHTML: `
+        .project-navigation__link {
+          font-size: ${fontSizes.mobile}rem;
+        }
+        @media (min-width: 768px) {
+          .project-navigation__link { font-size: ${fontSizes.tablet}rem; }
+        }
+        @media (min-width: 1024px) {
+          .project-navigation__link { font-size: ${fontSizes.desktop}rem; }
+        }
+        @media (min-width: 1280px) {
+          .project-navigation__link { font-size: ${fontSizes.largeDesktop}rem; }
+        }
+      `,
+    },
+  ],
 })
 
 function handleClick(e: MouseEvent, index: number) {

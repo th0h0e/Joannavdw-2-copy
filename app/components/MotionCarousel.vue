@@ -1,18 +1,14 @@
 <script setup lang="ts">
-import type { Settings } from '~/plugins/pocketbase.client'
 import type { ProjectImage } from '~/shared/types/project'
-import { getResponsiveFontSizes } from '~/plugins/pocketbase.client'
 
 const props = withDefaults(defineProps<{
   images: ProjectImage[]
   projectTitle: string
-  settingsData?: Settings | null
   totalSlides: number
   showTopProgressBar?: boolean
   isPopupVisible?: boolean
   isAboutPopupVisible?: boolean
 }>(), {
-  settingsData: null,
   showTopProgressBar: true,
   isPopupVisible: false,
   isAboutPopupVisible: false,
@@ -28,72 +24,75 @@ const currentSlide = ref(0)
 const isOnBlurSlide = ref(false)
 const blurIntensity = ref(0)
 
-const fontSizes = computed(() => getResponsiveFontSizes(props.settingsData))
+const fontSizes = {
+  mobile: 1.4,
+  tablet: 2.5,
+  desktop: 2.25,
+  largeDesktop: 3,
+}
 const lastImage = computed(() => props.images[props.images.length - 1])
 
-// Dynamic style injection for carousel and responsive font sizes
-const styleEl = document.createElement('style')
-document.head.appendChild(styleEl)
-watchEffect(() => {
-  styleEl.textContent = `
-    .motion-carousel {
-      position: relative;
-      height: 100%;
-      width: 100%;
-      background-size: cover;
-      background-position: center;
-      overflow-x: auto;
-      overscroll-behavior-x: contain;
-      scroll-snap-type: x mandatory;
-      scroll-behavior: smooth;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-    }
-    .motion-carousel::-webkit-scrollbar { display: none; }
-    .motion-carousel__background {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background-size: cover; background-position: center; z-index: 5;
-    }
-    .motion-carousel__container {
-      position: relative; height: 100%; width: 100%; display: flex; z-index: 10;
-    }
-    .motion-carousel__slide {
-      position: relative; height: 100%; width: 100%; flex-shrink: 0;
-      min-width: 100%; scroll-snap-align: center; scroll-snap-stop: always;
-    }
-    .motion-carousel__slide--image {
-      background-size: cover; background-position: center; background-color: black;
-    }
-    .motion-carousel__slide--transparent {
-      background: transparent; z-index: 15; opacity: 0;
-      background-size: cover; background-position: center; background-repeat: no-repeat;
-    }
-    .motion-carousel__slide--blur {
-      background: transparent; z-index: 15;
-    }
-    .motion-carousel__slide--blur > .blur-overlay {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 1; pointer-events: none;
-    }
-    .motion-carousel__slide--blur > .blur-overlay > .black-blur-div {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
-    }
-    .motion-project-title {
-      font-size: ${fontSizes.value.mobile}rem;
-    }
-    @media (min-width: 768px) {
-      .motion-project-title { font-size: ${fontSizes.value.tablet}rem; }
-    }
-    @media (min-width: 1024px) {
-      .motion-project-title { font-size: ${fontSizes.value.desktop}rem; }
-    }
-    @media (min-width: 1280px) {
-      .motion-project-title { font-size: ${fontSizes.value.largeDesktop}rem; }
-    }
-  `
-})
-onBeforeUnmount(() => {
-  styleEl.remove()
+useHead({
+  style: [
+    {
+      innerHTML: `
+        .motion-carousel {
+          position: relative;
+          height: 100%;
+          width: 100%;
+          background-size: cover;
+          background-position: center;
+          overflow-x: auto;
+          overscroll-behavior-x: contain;
+          scroll-snap-type: x mandatory;
+          scroll-behavior: smooth;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .motion-carousel::-webkit-scrollbar { display: none; }
+        .motion-carousel__background {
+          position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+          background-size: cover; background-position: center; z-index: 5;
+        }
+        .motion-carousel__container {
+          position: relative; height: 100%; width: 100%; display: flex; z-index: 10;
+        }
+        .motion-carousel__slide {
+          position: relative; height: 100%; width: 100%; flex-shrink: 0;
+          min-width: 100%; scroll-snap-align: center; scroll-snap-stop: always;
+        }
+        .motion-carousel__slide--image {
+          background-size: cover; background-position: center; background-color: black;
+        }
+        .motion-carousel__slide--transparent {
+          background: transparent; z-index: 15; opacity: 0;
+          background-size: cover; background-position: center; background-repeat: no-repeat;
+        }
+        .motion-carousel__slide--blur {
+          background: transparent; z-index: 15;
+        }
+        .motion-carousel__slide--blur > .blur-overlay {
+          position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+          z-index: 1; pointer-events: none;
+        }
+        .motion-carousel__slide--blur > .blur-overlay > .black-blur-div {
+          position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
+        }
+        .motion-project-title {
+          font-size: ${fontSizes.mobile}rem;
+        }
+        @media (min-width: 768px) {
+          .motion-project-title { font-size: ${fontSizes.tablet}rem; }
+        }
+        @media (min-width: 1024px) {
+          .motion-project-title { font-size: ${fontSizes.desktop}rem; }
+        }
+        @media (min-width: 1280px) {
+          .motion-project-title { font-size: ${fontSizes.largeDesktop}rem; }
+        }
+      `,
+    },
+  ],
 })
 
 function handleScroll() {

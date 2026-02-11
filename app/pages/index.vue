@@ -1,8 +1,42 @@
 <script setup lang="ts">
-import { getImageUrl } from '~/plugins/pocketbase.client'
+definePageMeta({ layout: 'default' })
 
-// Data fetching via composable (useAsyncData + realtime subscriptions)
-const { projects: projectsData, homepage: homepageData, about: aboutData, settings: settingsData, loading, error, setupSubscriptions } = usePocketBase()
+// Data fetching via useFetch
+const [{ data: aboutRes }, { data: homepageRes }, { data: portfolioRes }, { data: settingsRes }] = await Promise.all([
+  useFetch('https://admin.kontext.site/api/collections/About/records'),
+  useFetch('https://admin.kontext.site/api/collections/Homepage/records'),
+  useFetch('https://admin.kontext.site/api/collections/Portfolio_Projects/records'),
+  useFetch('https://admin.kontext.site/api/collections/Settings/records'),
+])
+
+// Build PocketBase file URL
+function getImageUrl(collectionId: string, recordId: string, filename: string) {
+  return `https://admin.kontext.site/api/files/${collectionId}/${recordId}/${filename}`
+}
+
+// Single-record collections — take first active item
+const aboutData = computed(() => aboutRes.value?.items?.find(i => i.Is_Active) ?? null)
+const homepageData = computed(() => homepageRes.value?.items?.find(i => i.Is_Active) ?? null)
+const settingsData = computed(() => settingsRes.value?.items?.[0] ?? null)
+
+// Transform portfolio projects
+const projectsData = computed(() => {
+  const items = portfolioRes.value?.items ?? []
+  return items
+    .sort((a, b) => a.Order - b.Order)
+    .map(project => ({
+      title: project.Title,
+      description: project.Description,
+      responsibility: project.Responsibility_json,
+      images: project.Images.map(filename => ({
+        src: getImageUrl(project.collectionId, project.id, filename),
+      })),
+    }))
+})
+
+// Loading & error states
+const loading = computed(() => !aboutRes.value && !homepageRes.value && !portfolioRes.value && !settingsRes.value)
+const error = ref<string | null>(null)
 
 // State for tracking current section
 const currentSectionIndex = ref(0)
@@ -25,6 +59,9 @@ const { isMobile, isDesktop } = useBreakpoints()
 
 // Update favicon dynamically via useHead()
 useFaviconCache(settingsData)
+
+// Computed
+const projectTitles = computed(() => projectsData.value.map(p => p.title))
 
 // Reset inactive project carousels
 function resetInactiveCarousels(currentSectionId: string) {
@@ -167,9 +204,7 @@ watch(() => projectsData.value.length, () => {
 })
 
 onMounted(() => {
-  setupSubscriptions()
   hideAddressBar()
-
   window.addEventListener('orientationchange', () => setTimeout(hideAddressBar, 100))
 })
 
@@ -177,9 +212,6 @@ onUnmounted(() => {
   if (observer)
     observer.disconnect()
 })
-
-// Computed
-const projectTitles = computed(() => projectsData.value.map(p => p.title))
 
 // Popup handlers
 function handleShowPopup(projectTitle: string) {
@@ -211,7 +243,7 @@ function handleCloseAboutPopup() {
 }
 
 function handleRetry() {
-  window.location.reload()
+  refreshNuxtData()
 }
 </script>
 
@@ -262,7 +294,6 @@ function handleRetry() {
     <LazyHamburgerMenu
       :project-titles="projectTitles"
       :is-popup-visible="showPopup || showAboutPopup"
-      :settings-data="settingsData"
     />
 
     <!-- Desktop Main Container -->
@@ -277,10 +308,9 @@ function handleRetry() {
     >
       <!-- Desktop Hero Section -->
       <Hero
-        :hero-image="homepageData ? getImageUrl(homepageData, homepageData.Hero_Image) : ''"
+        :hero-image="homepageData ? getImageUrl(homepageData.collectionId, homepageData.id, homepageData.Hero_Image) : ''"
         :hero-title="homepageData?.Hero_Title || 'Creative Strategy and Communication'"
         :is-about-popup-visible="showAboutPopup"
-        :settings-data="settingsData"
       />
 
       <!-- Desktop Project Sections -->
@@ -294,7 +324,6 @@ function handleRetry() {
         <MotionCarouselDesktop
           :images="project.images"
           :project-title="project.title"
-          :settings-data="settingsData"
           :total-slides="project.images.length + 1"
           :is-popup-visible="showPopup"
           :is-about-popup-visible="showAboutPopup"
@@ -303,7 +332,7 @@ function handleRetry() {
       </section>
 
       <!-- Desktop Project Index -->
-      <ProjectIndex :project-titles="projectTitles" :settings-data="settingsData" />
+      <ProjectIndex :project-titles="projectTitles" />
     </main>
 
     <!-- Mobile Main Container -->
@@ -318,10 +347,9 @@ function handleRetry() {
     >
       <!-- Mobile Hero Section -->
       <HeroMobile
-        :hero-image="homepageData ? getImageUrl(homepageData, homepageData.Hero_Image_Mobile || homepageData.Hero_Image) : ''"
+        :hero-image="homepageData ? getImageUrl(homepageData.collectionId, homepageData.id, homepageData.Hero_Image) : ''"
         :hero-title="homepageData?.Hero_Title || 'Creative Strategy and Communication'"
         :is-about-popup-visible="showAboutPopup"
-        :settings-data="settingsData"
         :is-mobile="isMobile"
       />
 
@@ -336,9 +364,8 @@ function handleRetry() {
         <MotionCarousel
           :images="project.images"
           :project-title="project.title"
-          :settings-data="settingsData"
           :total-slides="project.images.length + 2"
-          :show-top-progress-bar="settingsData?.Show_Top_Progress_Bar ?? true"
+          :show-top-progress-bar="true"
           :is-popup-visible="showPopup"
           :is-about-popup-visible="showAboutPopup"
           @show-popup="handleShowPopup"
@@ -346,7 +373,7 @@ function handleRetry() {
       </section>
 
       <!-- Mobile Project Index -->
-      <ProjectIndex :project-titles="projectTitles" :settings-data="settingsData" />
+      <ProjectIndex :project-titles="projectTitles" />
     </main>
 
     <!-- Global Popup -->

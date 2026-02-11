@@ -1,12 +1,7 @@
 <script setup lang="ts">
-import type { Settings } from '~/plugins/pocketbase.client'
-
-withDefaults(defineProps<{
+defineProps<{
   projectTitles: string[]
-  settingsData?: Settings | null
-}>(), {
-  settingsData: null,
-})
+}>()
 
 function handleLinkClick(index: number) {
   window.location.hash = `#project-${index}`
@@ -21,7 +16,6 @@ function handleLinkClick(index: number) {
   >
     <ProjectNavigation
       :project-titles="projectTitles"
-      :settings-data="settingsData"
       @link-click="handleLinkClick"
     />
   </section>

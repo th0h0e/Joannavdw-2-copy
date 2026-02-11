@@ -1,46 +1,46 @@
 <script setup lang="ts">
-import type { Settings } from '~/plugins/pocketbase.client'
-import { getResponsiveFontSizes } from '~/plugins/pocketbase.client'
 
 const props = defineProps<{
   heroImage: string
   heroTitle: string
   isAboutPopupVisible: boolean
-  settingsData: Settings | null
 }>()
 
-const fontSizes = computed(() => getResponsiveFontSizes(props.settingsData))
+const fontSizes = {
+  mobile: 1.4,
+  tablet: 2.5,
+  desktop: 2.25,
+  largeDesktop: 3,
+}
 const hasAnimatedIn = ref(false)
 const hasTriggered = ref(false)
 const imageScaled = ref(false)
 
-// Dynamic style injection for responsive font sizes
-const styleEl = document.createElement('style')
-document.head.appendChild(styleEl)
-watchEffect(() => {
-  styleEl.textContent = `
-    .hero-title {
-      font-size: ${fontSizes.value.mobile}rem;
-    }
-    @media (min-width: 768px) {
-      .hero-title {
-        font-size: ${fontSizes.value.tablet}rem;
-      }
-    }
-    @media (min-width: 1024px) {
-      .hero-title {
-        font-size: ${fontSizes.value.desktop}rem;
-      }
-    }
-    @media (min-width: 1280px) {
-      .hero-title {
-        font-size: ${fontSizes.value.largeDesktop}rem;
-      }
-    }
-  `
-})
-onBeforeUnmount(() => {
-  styleEl.remove()
+useHead({
+  style: [
+    {
+      innerHTML: `
+        .hero-title {
+          font-size: ${fontSizes.mobile}rem;
+        }
+        @media (min-width: 768px) {
+          .hero-title {
+            font-size: ${fontSizes.tablet}rem;
+          }
+        }
+        @media (min-width: 1024px) {
+          .hero-title {
+            font-size: ${fontSizes.desktop}rem;
+          }
+        }
+        @media (min-width: 1280px) {
+          .hero-title {
+            font-size: ${fontSizes.largeDesktop}rem;
+          }
+        }
+      `,
+    },
+  ],
 })
 
 onMounted(() => {
@@ -121,7 +121,11 @@ const chevronSize = computed(() => isTabletOrAbove.value ? 28 : 24)
 
 <style scoped>
 @keyframes fadeInTitle {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 </style>

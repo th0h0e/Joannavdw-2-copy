@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import type { Settings } from '~/plugins/pocketbase.client'
-
 const props = withDefaults(defineProps<{
   projectTitles: string[]
   isPopupVisible?: boolean
-  settingsData?: Settings | null
 }>(), {
   isPopupVisible: false,
-  settingsData: null,
 })
 
 const isOpen = ref(false)
@@ -84,7 +80,6 @@ function handleLinkClick(index: number) {
         <div class="w-full flex items-center justify-center">
           <ProjectNavigation
             :project-titles="projectTitles"
-            :settings-data="settingsData"
             @link-click="handleLinkClick"
           />
         </div>
@@ -105,7 +100,9 @@ function handleLinkClick(index: number) {
 
 .menu-content-enter-active,
 .menu-content-leave-active {
-  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  transition:
+    opacity 0.3s ease-out,
+    transform 0.3s ease-out;
 }
 .menu-content-enter-from,
 .menu-content-leave-to {

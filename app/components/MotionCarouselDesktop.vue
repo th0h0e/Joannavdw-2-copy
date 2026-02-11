@@ -1,17 +1,13 @@
 <script setup lang="ts">
-import type { Settings } from '~/plugins/pocketbase.client'
 import type { ProjectImage } from '~/shared/types/project'
-import { getResponsiveFontSizes } from '~/plugins/pocketbase.client'
 
 const props = withDefaults(defineProps<{
   images: ProjectImage[]
   projectTitle: string
-  settingsData?: Settings | null
   totalSlides: number
   isPopupVisible?: boolean
   isAboutPopupVisible?: boolean
 }>(), {
-  settingsData: null,
   isPopupVisible: false,
   isAboutPopupVisible: false,
 })
@@ -25,50 +21,53 @@ const scrollProgress = ref(0)
 const currentSlide = ref(0)
 const isOnBlurSlide = ref(false)
 
-const fontSizes = computed(() => getResponsiveFontSizes(props.settingsData))
+const fontSizes = {
+  mobile: 1.4,
+  tablet: 2.5,
+  desktop: 2.25,
+  largeDesktop: 3,
+}
 const lastImage = computed(() => props.images[props.images.length - 1])
 
-// Dynamic style injection for carousel and responsive font sizes
-const styleEl = document.createElement('style')
-document.head.appendChild(styleEl)
-watchEffect(() => {
-  styleEl.textContent = `
-    .motion-carousel-desktop {
-      position: relative; height: 100%; width: 100%;
-      background-size: cover; background-position: center;
-      overflow-x: auto; overscroll-behavior-x: contain;
-      scroll-snap-type: x mandatory; scroll-behavior: smooth;
-      scrollbar-width: none; -ms-overflow-style: none;
-      scroll-snap-align: none;
-    }
-    .motion-carousel-desktop::-webkit-scrollbar { display: none; }
-    .motion-carousel-desktop__background {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background-size: cover; background-position: center; z-index: 5;
-    }
-    .motion-carousel-desktop__container {
-      position: relative; height: 100%; width: 100%; display: flex; z-index: 10;
-    }
-    .motion-carousel-desktop__slide {
-      position: relative; height: 100%; flex-shrink: 0;
-      min-width: 50vw; width: 50vw;
-      scroll-snap-align: center; scroll-snap-stop: always;
-      background-size: cover; background-position: center; background-color: black;
-    }
-    .motion-carousel-desktop__slide--blur {
-      min-width: 100vw !important; width: 100vw !important;
-      background: transparent; z-index: 15;
-    }
-    .motion-project-title-desktop {
-      font-size: ${fontSizes.value.desktop}rem;
-    }
-    @media (min-width: 1280px) {
-      .motion-project-title-desktop { font-size: ${fontSizes.value.largeDesktop}rem; }
-    }
-  `
-})
-onBeforeUnmount(() => {
-  styleEl.remove()
+useHead({
+  style: [
+    {
+      innerHTML: `
+        .motion-carousel-desktop {
+          position: relative; height: 100%; width: 100%;
+          background-size: cover; background-position: center;
+          overflow-x: auto; overscroll-behavior-x: contain;
+          scroll-snap-type: x mandatory; scroll-behavior: smooth;
+          scrollbar-width: none; -ms-overflow-style: none;
+          scroll-snap-align: none;
+        }
+        .motion-carousel-desktop::-webkit-scrollbar { display: none; }
+        .motion-carousel-desktop__background {
+          position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+          background-size: cover; background-position: center; z-index: 5;
+        }
+        .motion-carousel-desktop__container {
+          position: relative; height: 100%; width: 100%; display: flex; z-index: 10;
+        }
+        .motion-carousel-desktop__slide {
+          position: relative; height: 100%; flex-shrink: 0;
+          min-width: 50vw; width: 50vw;
+          scroll-snap-align: center; scroll-snap-stop: always;
+          background-size: cover; background-position: center; background-color: black;
+        }
+        .motion-carousel-desktop__slide--blur {
+          min-width: 100vw !important; width: 100vw !important;
+          background: transparent; z-index: 15;
+        }
+        .motion-project-title-desktop {
+          font-size: ${fontSizes.desktop}rem;
+        }
+        @media (min-width: 1280px) {
+          .motion-project-title-desktop { font-size: ${fontSizes.largeDesktop}rem; }
+        }
+      `,
+    },
+  ],
 })
 
 function handleScroll() {
