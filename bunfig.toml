@@ -1,3 +1,6 @@
 [install]
 # Use isolated installs for better security and dependency isolation
 linker = "isolated"
+
+# Target macOS arm64 (Apple Silicon) only
+target = "darwin-arm64"

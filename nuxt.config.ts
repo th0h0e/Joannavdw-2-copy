@@ -3,10 +3,12 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
 
   // Modules
-  modules: [
-    '@vueuse/nuxt', // Auto-imports all @vueuse/core composables
-    '@nuxt/eslint',
-  ],
+  modules: [// Auto-imports all @vueuse/core composables
+  '@vueuse/nuxt', '@nuxt/eslint', '@sentry/nuxt', '@nuxtjs/device', '@nuxt/a11y', '@nuxt/hints', 'nuxt-ssr-api-logger', '@nuxt/image', '@nuxt/ui'],
+
+  devtools: {
+    enabled: true,
+  },
 
   // ESLint — standalone: false so antfu/eslint-config handles all rules
   eslint: {
@@ -18,7 +20,6 @@ export default defineNuxtConfig({
   // Global CSS (replaces import in main.ts)
   css: ['~/assets/css/main.css'],
 
-  // PostCSS (Tailwind)
   postcss: {
     plugins: {
       tailwindcss: {},
@@ -32,12 +33,12 @@ export default defineNuxtConfig({
     pbUrl: 'https://admin.kontext.site',
     public: {
       pbUrl: 'https://admin.kontext.site',
-      sentryDsn:
-        'https://4981600ff5cc02441de606ca9943a126@o4510808141398016.ingest.de.sentry.io/4510808149983312',
+      sentry: {
+        dsn: 'https://4981600ff5cc02441de606ca9943a126@o4510808141398016.ingest.de.sentry.io/4510808149983312',
+      },
     },
   },
 
-  // TypeScript
   typescript: {
     strict: true,
   },
