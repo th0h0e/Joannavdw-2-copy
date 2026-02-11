@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path'
 
 // Load environment variables from .env file in project root
 const __dirname = dirname(fileURLToPath(import.meta.url))
-dotenv.config({ path: join(__dirname, '.env') })
+dotenv.config({ path: join(__dirname, '.env'), debug: true })
 
 // Only run `init` when SENTRY_DSN is available
 if (process.env.SENTRY_DSN) {
