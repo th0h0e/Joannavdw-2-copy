@@ -141,8 +141,8 @@ function setupMobileSwipeHint() {
             if (slides.length < 2)
               return
 
-            const firstSlide = slides[0]
-            const secondSlide = slides[1]
+            const firstSlide = slides[0] as HTMLElement
+            const secondSlide = slides[1] as HTMLElement
 
             secondSlide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
             setTimeout(() => {
@@ -241,7 +241,7 @@ function handleRetry() {
   </div>
 
   <!-- Main content -->
-  <template v-else>
+  <div v-else class="contents">
     <!-- Fixed Logo Containers -->
     <LogoTop
       :is-hero="currentSectionIndex === 0"
@@ -364,5 +364,5 @@ function handleRetry() {
       :about-data="aboutData"
       @close="handleCloseAboutPopup"
     />
-  </template>
+  </div>
 </template>

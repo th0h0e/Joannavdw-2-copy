@@ -6,7 +6,7 @@ definePageMeta({
   middleware: 'auth',
 })
 
-const { toasts, showToast } = useToast()
+const { toasts, showToast } = useAppToast()
 
 const editingProject = ref<PortfolioProject | null>(null)
 const showNewProjectForm = ref(false)
