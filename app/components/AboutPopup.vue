@@ -151,7 +151,9 @@ function handleContact(aboutData: About | null) {
 
 .popup-enter-active,
 .popup-leave-active {
-  transition: --scale 0.3s ease-out, opacity 0.3s ease-out;
+  transition:
+    --scale 0.3s ease-out,
+    opacity 0.3s ease-out;
 }
 .popup-enter-from,
 .popup-leave-to {

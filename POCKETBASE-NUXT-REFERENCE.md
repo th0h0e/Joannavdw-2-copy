@@ -49,8 +49,8 @@ import PocketBase from 'pocketbase'
 
 const pb = new PocketBase(process.env.POCKETBASE_URL)
 
-export default defineEventHandler(async () => {            // ← h3: defines the route handler
-  return await pb.collection('Portfolio_Projects').getFullList({ sort: 'Order' })  // ← PocketBase: fetches data
+export default defineEventHandler(async () => { // ← h3: defines the route handler
+  return await pb.collection('Portfolio_Projects').getFullList({ sort: 'Order' }) // ← PocketBase: fetches data
 })
 ```
 
@@ -85,8 +85,8 @@ const { data: featured } = await useAsyncData('featured-project', () =>
 
 ```ts
 // server/api/projects/featured.get.ts
-export default defineEventHandler(async () => {            // ← h3
-  return await pb.collection('Portfolio_Projects').getFirstListItem('featured = true')  // ← PocketBase
+export default defineEventHandler(async () => { // ← h3
+  return await pb.collection('Portfolio_Projects').getFirstListItem('featured = true') // ← PocketBase
 })
 ```
 
@@ -117,9 +117,9 @@ const { data: project } = await useAsyncData(`project-${id}`, () =>
 
 ```ts
 // server/api/projects/[id].get.ts
-export default defineEventHandler(async (event) => {       // ← h3: defines handler, receives event
-  const id = getRouterParam(event, 'id')                   // ← h3: extracts route param from URL
-  return await pb.collection('Portfolio_Projects').getOne(id!)  // ← PocketBase: fetches single record
+export default defineEventHandler(async (event) => { // ← h3: defines handler, receives event
+  const id = getRouterParam(event, 'id') // ← h3: extracts route param from URL
+  return await pb.collection('Portfolio_Projects').getOne(id!) // ← PocketBase: fetches single record
 })
 ```
 
@@ -146,8 +146,7 @@ interface PortfolioProject {
 
 // In a component
 const { data: projects } = await useAsyncData('projects', () =>
-  pb.collection('Portfolio_Projects').getFullList<PortfolioProject>({ sort: 'Order' })
-)
+  pb.collection('Portfolio_Projects').getFullList<PortfolioProject>({ sort: 'Order' }))
 ```
 
 -----
@@ -178,9 +177,9 @@ async function createProject(formData: Record<string, any>) {
 
 ```ts
 // server/api/projects.post.ts
-export default defineEventHandler(async (event) => {       // ← h3: defines handler
-  const body = await readBody(event)                       // ← h3: parses the POST request body
-  return await pb.collection('Portfolio_Projects').create(body)  // ← PocketBase: creates record
+export default defineEventHandler(async (event) => { // ← h3: defines handler
+  const body = await readBody(event) // ← h3: parses the POST request body
+  return await pb.collection('Portfolio_Projects').create(body) // ← PocketBase: creates record
 })
 ```
 
@@ -214,10 +213,10 @@ async function updateProject(id: string, formData: Record<string, any>) {
 
 ```ts
 // server/api/projects/[id].put.ts
-export default defineEventHandler(async (event) => {       // ← h3: defines handler
-  const id = getRouterParam(event, 'id')                   // ← h3: extracts route param
-  const body = await readBody(event)                       // ← h3: parses the PUT request body
-  return await pb.collection('Portfolio_Projects').update(id!, body)  // ← PocketBase: updates record
+export default defineEventHandler(async (event) => { // ← h3: defines handler
+  const id = getRouterParam(event, 'id') // ← h3: extracts route param
+  const body = await readBody(event) // ← h3: parses the PUT request body
+  return await pb.collection('Portfolio_Projects').update(id!, body) // ← PocketBase: updates record
 })
 ```
 
@@ -249,9 +248,9 @@ async function deleteProject(id: string) {
 
 ```ts
 // server/api/projects/[id].delete.ts
-export default defineEventHandler(async (event) => {       // ← h3: defines handler
-  const id = getRouterParam(event, 'id')                   // ← h3: extracts route param
-  return await pb.collection('Portfolio_Projects').delete(id!)  // ← PocketBase: deletes record
+export default defineEventHandler(async (event) => { // ← h3: defines handler
+  const id = getRouterParam(event, 'id') // ← h3: extracts route param
+  return await pb.collection('Portfolio_Projects').delete(id!) // ← PocketBase: deletes record
 })
 ```
 

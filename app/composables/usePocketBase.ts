@@ -19,7 +19,6 @@ function convertPocketBaseProject(project: PortfolioProject): ConvertedProject {
   }
 }
 
-// eslint-disable-next-line react/no-unnecessary-use-prefix
 export function usePocketBase() {
   const { data: rawProjects, refresh: refreshProjects, status: projectsStatus, error: projectsError } = useAsyncData(
     'projects',

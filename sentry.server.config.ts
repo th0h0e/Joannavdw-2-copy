@@ -1,7 +1,7 @@
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import * as Sentry from '@sentry/nuxt'
 import dotenv from 'dotenv'
-import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
 
 // Load environment variables from .env file in project root
 const __dirname = dirname(fileURLToPath(import.meta.url))

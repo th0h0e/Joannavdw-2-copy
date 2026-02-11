@@ -18,7 +18,8 @@ export function useFaviconCache(settingsRef: Ref<Settings | null>) {
 
   // Update favicon URL with cache-busting timestamp when settings change
   watch(settingsRef, (settings) => {
-    if (!settings) return
+    if (!settings)
+      return
     faviconHref.value = `/assets/favicon.ico?v=${settings.updated}`
   }, { immediate: true })
 }

@@ -173,7 +173,8 @@ async function handleSubmit(e: Event) {
           try {
             // Fetch directly from PocketBase URL (no proxy needed)
             const response = await fetch(img.url)
-            if (!response.ok) throw new Error(`HTTP ${response.status}`)
+            if (!response.ok)
+              throw new Error(`HTTP ${response.status}`)
             const blob = await response.blob()
             const file = new File([blob], img.filename, { type: blob.type })
             formData.append('Images', file)

@@ -99,7 +99,7 @@ export default defineNuxtConfig({
 
   // Modules
   modules: [
-    '@vueuse/nuxt',    // Auto-imports all @vueuse/core composables
+    '@vueuse/nuxt', // Auto-imports all @vueuse/core composables
     '@nuxt/eslint',
   ],
 
@@ -346,7 +346,7 @@ export default defineNuxtPlugin(() => {
 
 // Continue to export pb as default AND named helpers for direct imports
 export { pb }
-export { getCachedData, setCachedData, clearCache, getImageUrl, getProjectTitleStyle, getResponsiveFontSizes }
+export { clearCache, getCachedData, getImageUrl, getProjectTitleStyle, getResponsiveFontSizes, setCachedData }
 ```
 
 > **Alternative approach:** Keep `pb` as a plain exported module (no `defineNuxtPlugin` wrapper) and import it directly where needed. This is simpler and works fine for `ssr: false` apps. The plugin wrapper is only necessary if you need the instance available via `useNuxtApp().$pb` or if you later enable SSR and need per-request isolation. For now, the simpler direct-export approach is fine — just rename the file to `.client.ts` and keep the code as-is. If you skip the `defineNuxtPlugin` wrapper, call `useRuntimeConfig()` inside a composable or component instead (the context rule from Phase 6 applies).
@@ -425,16 +425,16 @@ Nuxt auto-imports from five sources. Only what you actually use ends up in your 
 
 **Explicit imports fallback:** If you ever need to be explicit (e.g. for clarity or to resolve naming conflicts), you can import from the `#imports` alias:
 ```typescript
-import { ref, computed } from '#imports'
+import { computed, ref } from '#imports'
 ```
 
 ### 6.1 — Vue core APIs (auto-imported everywhere)
 
 Remove these imports from **all** `.vue` files:
 ```typescript
-// DELETE these lines wherever they appear:
-import { ref, computed, watch, onMounted, onUnmounted, nextTick, reactive } from 'vue'
 import type { Ref } from 'vue'
+// DELETE these lines wherever they appear:
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 ```
 
 Vue types like `Ref` are also auto-imported. If you ever need to be explicit, use `import type { Ref } from '#imports'`.
@@ -445,9 +445,9 @@ Nuxt scans `app/composables/` and auto-imports all named exports. Only top-level
 
 Remove these imports:
 ```typescript
+import { useFaviconCache } from '@/composables/useFaviconCache'
 // DELETE:
 import { usePocketBase } from '@/composables/usePocketBase'
-import { useFaviconCache } from '@/composables/useFaviconCache'
 import { useToast } from '@/composables/useToast'
 ```
 
@@ -462,7 +462,7 @@ The `@vueuse/nuxt` module (installed in Phase 1.5) registers auto-imports for al
 Remove these imports:
 ```typescript
 // DELETE:
-import { useEventListener, useBreakpoints, useIntersectionObserver, useScroll } from '@vueuse/core'
+import { useBreakpoints, useEventListener, useIntersectionObserver, useScroll } from '@vueuse/core'
 import { useSortable } from '@vueuse/integrations'
 ```
 
@@ -480,18 +480,18 @@ import { someStyle } from '@/utils/sharedStyles'
 
 Remove **all** component imports from `<script setup>`:
 ```typescript
+import AboutPopup from '@/components/AboutPopup.vue'
+import HamburgerMenu from '@/components/HamburgerMenu.vue'
 // DELETE all of these:
 import Hero from '@/components/Hero.vue'
 import HeroMobile from '@/components/HeroMobile.vue'
+import LogoBottom from '@/components/LogoBottom.vue'
+import LogoTop from '@/components/LogoTop.vue'
 import MotionCarousel from '@/components/MotionCarousel.vue'
 import MotionCarouselDesktop from '@/components/MotionCarouselDesktop.vue'
-import ProjectPopup from '@/components/ProjectPopup.vue'
-import AboutPopup from '@/components/AboutPopup.vue'
-import LogoTop from '@/components/LogoTop.vue'
-import LogoBottom from '@/components/LogoBottom.vue'
-import HamburgerMenu from '@/components/HamburgerMenu.vue'
 import ProjectIndex from '@/components/ProjectIndex.vue'
 import ProjectNavigation from '@/components/ProjectNavigation.vue'
+import ProjectPopup from '@/components/ProjectPopup.vue'
 // etc.
 ```
 
@@ -563,6 +563,7 @@ Remove `import { useRouter } from 'vue-router'` — Nuxt auto-imports `useRouter
 ```typescript
 // BEFORE
 import { useRouter } from 'vue-router'
+
 const router = useRouter()
 router.push('/admin/dashboard')
 
@@ -579,6 +580,7 @@ router.push('/admin/dashboard')
 ```typescript
 // BEFORE
 import { useRouter } from 'vue-router'
+
 const router = useRouter()
 router.push('/admin')
 
@@ -607,7 +609,8 @@ export function useFaviconCache(settingsRef: Ref<Settings | null>) {
   })
 
   watch(settingsRef, (settings) => {
-    if (!settings || !settings.favicon) return
+    if (!settings || !settings.favicon)
+      return
 
     const faviconUrl = getImageUrl(settings, settings.favicon)
     const cacheKey = 'favicon_cache'
@@ -629,7 +632,8 @@ export function useFaviconCache(settingsRef: Ref<Settings | null>) {
           try {
             localStorage.setItem(cacheKey, dataUrl)
             localStorage.setItem(versionKey, settings.updated)
-          } catch (e) {
+          }
+          catch (e) {
             console.warn('Failed to cache favicon:', e)
           }
           faviconHref.value = dataUrl

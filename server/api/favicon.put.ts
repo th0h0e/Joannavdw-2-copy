@@ -1,12 +1,12 @@
+import { join } from 'node:path'
 import { createStorage } from 'unstorage'
 import fsDriver from 'unstorage/drivers/fs'
-import { join } from 'node:path'
 
 // Create storage instance inline
 const assetStorage = createStorage({
   driver: fsDriver({
-    base: join(process.cwd(), 'public', 'assets')
-  })
+    base: join(process.cwd(), 'public', 'assets'),
+  }),
 })
 
 /**
@@ -35,12 +35,13 @@ export default defineEventHandler(async (event) => {
     return {
       success: true,
       message: 'Favicon updated successfully',
-      url: '/assets/favicon.ico'
+      url: '/assets/favicon.ico',
     }
-  } catch (error) {
+  }
+  catch (error) {
     throw createError({
       statusCode: 500,
-      message: `Failed to update favicon: ${error}`
+      message: `Failed to update favicon: ${error}`,
     })
   }
 })

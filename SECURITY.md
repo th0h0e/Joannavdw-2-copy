@@ -94,4 +94,3 @@ Currently allowed to run scripts:
 - `nuxt` - Required for development framework
 
 To whitelist new packages, add to `.pnpmfile.cjs` ALLOWED_SCRIPTS object.
-
