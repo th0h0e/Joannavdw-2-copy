@@ -7,33 +7,7 @@ const emit = defineEmits<{
   linkClick: [index: number]
 }>()
 
-const fontSizes = {
-  mobile: 1.4,
-  tablet: 2.5,
-  desktop: 2.25,
-  largeDesktop: 3,
-}
-
-useHead({
-  style: [
-    {
-      innerHTML: `
-        .project-navigation__link {
-          font-size: ${fontSizes.mobile}rem;
-        }
-        @media (min-width: 768px) {
-          .project-navigation__link { font-size: ${fontSizes.tablet}rem; }
-        }
-        @media (min-width: 1024px) {
-          .project-navigation__link { font-size: ${fontSizes.desktop}rem; }
-        }
-        @media (min-width: 1280px) {
-          .project-navigation__link { font-size: ${fontSizes.largeDesktop}rem; }
-        }
-      `,
-    },
-  ],
-})
+const fontSizes = useFontSizes()
 
 function handleClick(e: MouseEvent, index: number) {
   // If there are listeners for linkClick, prevent default and emit
@@ -49,10 +23,6 @@ function handleClick(e: MouseEvent, index: number) {
         <a
           :href="`#project-${index}`"
           :class="`${navigationLinkClasses} project-navigation__link`"
-          :style="{
-            fontFamily: 'EnduroWeb, sans-serif',
-            letterSpacing: '0.03em',
-          }"
           @click="handleClick($event, index)"
         >
           {{ title }}
@@ -61,3 +31,29 @@ function handleClick(e: MouseEvent, index: number) {
     </ul>
   </div>
 </template>
+
+<style scoped>
+.project-navigation__link {
+  font-family: 'EnduroWeb, sans-serif';
+  letter-spacing: 0.03em;
+  font-size: v-bind('fontSizes.mobile + "rem"');
+}
+
+@media (min-width: 768px) {
+  .project-navigation__link {
+    font-size: v-bind('fontSizes.tablet + "rem"');
+  }
+}
+
+@media (min-width: 1024px) {
+  .project-navigation__link {
+    font-size: v-bind('fontSizes.desktop + "rem"');
+  }
+}
+
+@media (min-width: 1280px) {
+  .project-navigation__link {
+    font-size: v-bind('fontSizes.largeDesktop + "rem"');
+  }
+}
+</style>
