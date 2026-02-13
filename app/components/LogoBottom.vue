@@ -5,13 +5,13 @@ const props = defineProps<{
   isHero: boolean
   showAboutPopup: boolean
   showPopup: boolean
-  isMobile: boolean
 }>()
 
 const emit = defineEmits<{
   click: []
 }>()
 
+const { isMobile } = useDevice()
 const hasAnimated = ref(false)
 
 onMounted(() => {
@@ -20,10 +20,10 @@ onMounted(() => {
   })
 })
 
-const containerWidth = computed(() => props.isMobile ? '160px' : '200px')
-const containerHeight = computed(() => props.isMobile ? '60px' : '80px')
+const containerWidth = computed(() => isMobile ? '160px' : '200px')
+const containerHeight = computed(() => isMobile ? '60px' : '80px')
 
-const isHidden = computed(() => props.showAboutPopup || (props.showPopup && props.isMobile))
+const isHidden = computed(() => props.showAboutPopup || (props.showPopup && isMobile))
 
 const topPosition = computed(() => {
   if (!hasAnimated.value && props.isHero)

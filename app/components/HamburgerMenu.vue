@@ -7,7 +7,6 @@ const props = withDefaults(defineProps<{
 })
 
 const isOpen = ref(false)
-useBreakpoints()
 
 function toggleMenu() {
   if (props.isPopupVisible)

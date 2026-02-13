@@ -33,7 +33,7 @@ const imagesToDelete = ref<string[]>([])
 const loading = ref(false)
 const draggedIndex = ref<number | null>(null)
 const isDraggingFile = ref(false)
-const { isMobile } = useBreakpoints()
+const { isMobile } = useDevice()
 
 onMounted(() => {
   document.body.style.overflow = 'hidden'

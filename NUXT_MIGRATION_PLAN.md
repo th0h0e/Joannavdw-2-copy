@@ -447,7 +447,6 @@ Remove these imports:
 ```typescript
 import { useFaviconCache } from '@/composables/useFaviconCache'
 // DELETE:
-import { usePocketBase } from '@/composables/usePocketBase'
 import { useToast } from '@/composables/useToast'
 ```
 

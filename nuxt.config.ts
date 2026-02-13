@@ -2,6 +2,12 @@ export default defineNuxtConfig({
   // Nuxt 4 compatibility date — controls behavioral defaults
   compatibilityDate: '2025-01-01',
 
+  app: {
+    head: {
+      link: [{ rel: 'icon', type: 'image/x-icon', href: '/assets/favicon.ico' }],
+    },
+  },
+
   // Source maps for Sentry integration
   sourcemap: {
     client: 'hidden',

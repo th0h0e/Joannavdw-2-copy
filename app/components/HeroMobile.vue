@@ -3,7 +3,6 @@ const props = defineProps<{
   heroImage: string
   heroTitle: string
   isAboutPopupVisible: boolean
-  isMobile?: boolean
 }>()
 
 const hasAnimatedIn = ref(false)
@@ -20,18 +19,18 @@ onMounted(() => {
   })
 })
 
-const { isTabletOrAbove } = useBreakpoints()
+const { isDesktopOrTablet, isMobile } = useDevice()
 
 const showTitle = computed(() => !props.isAboutPopupVisible)
 const titleDelay = computed(() => hasAnimatedIn.value ? '0s' : '1.2s')
-const chevronSize = computed(() => isTabletOrAbove.value ? 28 : 24)
+const chevronSize = computed(() => isDesktopOrTablet ? 28 : 24)
 </script>
 
 <template>
   <section
     id="hero-section"
     class="hero-section relative w-full snap-center bg-white flex items-center justify-center overflow-hidden"
-    :class="{ 'hero-section--mobile': isMobile !== false }"
+    :class="{ 'hero-section--mobile': isMobile }"
   >
     <!-- Hero Background Image -->
     <div
