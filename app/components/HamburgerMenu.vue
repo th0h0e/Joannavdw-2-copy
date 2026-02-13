@@ -65,9 +65,15 @@ function handleLinkClick(index: number) {
     <Transition name="menu-backdrop">
       <div
         v-if="isOpen"
-        class="fixed inset-0 bg-white z-[9998]"
+        class="fixed inset-0 bg-white z-[9998] cursor-pointer"
+        role="button"
+        tabindex="0"
+        aria-label="Close menu"
         :style="{ height: '100lvh' }"
         @click="closeMenu"
+        @keydown.enter="closeMenu"
+        @keydown.space.prevent="closeMenu"
+        @keydown.esc="closeMenu"
       />
     </Transition>
 
