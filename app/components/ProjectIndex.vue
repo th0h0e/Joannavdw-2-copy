@@ -11,8 +11,7 @@ function handleLinkClick(index: number) {
 <template>
   <section
     id="project-index"
-    class="w-full snap-center bg-white flex items-center justify-center"
-    style="height: 100lvh"
+    class="project-index w-full snap-center bg-white flex items-center justify-center"
   >
     <ProjectNavigation
       :project-titles="projectTitles"
@@ -20,3 +19,9 @@ function handleLinkClick(index: number) {
     />
   </section>
 </template>
+
+<style scoped>
+.project-index {
+  height: 100lvh;
+}
+</style>

@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './fonts.css';
+
 /* Custom Font - EnduroWeb */
 @font-face {
   font-family: 'EnduroWeb';
@@ -163,7 +165,11 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: top 1.2s ease-out, opacity 0.3s ease-out, width 0.3s ease-out, height 0.3s ease-out;
+  transition:
+    top 1.2s ease-out,
+    opacity 0.3s ease-out,
+    width 0.3s ease-out,
+    height 0.3s ease-out;
 }
 
 .logo-image {

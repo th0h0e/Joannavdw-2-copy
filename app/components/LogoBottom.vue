@@ -35,11 +35,10 @@ const topPosition = computed(() => {
 <template>
   <div
     class="logo-container"
+    :class="{ 'logo-container--hidden': isHidden }"
     :style="{
       width: containerWidth,
       height: containerHeight,
-      opacity: isHidden ? 0 : 1,
-      pointerEvents: isHidden ? 'none' : 'auto',
       top: topPosition,
     }"
     @click="emit('click')"
@@ -53,7 +52,23 @@ const topPosition = computed(() => {
 </template>
 
 <style scoped>
-/* Component-specific logo sizing */
+.logo-container {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  cursor: pointer;
+  mix-blend-mode: exclusion;
+  transition: top 0.7s ease-out, opacity 0.3s ease-out;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.logo-container--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .logo-image {
   max-width: 100%;
   max-height: 83.33%;

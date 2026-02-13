@@ -7,8 +7,6 @@ const emit = defineEmits<{
   linkClick: [index: number]
 }>()
 
-const fontSizes = useFontSizes()
-
 function handleClick(e: MouseEvent, index: number) {
   // If there are listeners for linkClick, prevent default and emit
   e.preventDefault()
@@ -22,7 +20,7 @@ function handleClick(e: MouseEvent, index: number) {
       <li v-for="(title, index) in projectTitles" :key="`${title}-${index}`">
         <a
           :href="`#project-${index}`"
-          :class="`${navigationLinkClasses} project-navigation__link`"
+          :class="`${navigationLinkClasses} title-font`"
           @click="handleClick($event, index)"
         >
           {{ title }}
@@ -32,28 +30,3 @@ function handleClick(e: MouseEvent, index: number) {
   </div>
 </template>
 
-<style scoped>
-.project-navigation__link {
-  font-family: 'EnduroWeb, sans-serif';
-  letter-spacing: 0.03em;
-  font-size: v-bind('fontSizes.mobile + "rem"');
-}
-
-@media (min-width: 768px) {
-  .project-navigation__link {
-    font-size: v-bind('fontSizes.tablet + "rem"');
-  }
-}
-
-@media (min-width: 1024px) {
-  .project-navigation__link {
-    font-size: v-bind('fontSizes.desktop + "rem"');
-  }
-}
-
-@media (min-width: 1280px) {
-  .project-navigation__link {
-    font-size: v-bind('fontSizes.largeDesktop + "rem"');
-  }
-}
-</style>

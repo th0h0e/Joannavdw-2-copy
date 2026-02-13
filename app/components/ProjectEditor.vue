@@ -240,8 +240,7 @@ async function handleSubmit(e: Event) {
     <!-- Project Popup Preview (only when editing on desktop) -->
     <div
       v-if="project && !isMobile"
-      class="absolute top-1/2"
-      :style="{ left: '25%', transform: 'translate(-50%, -50%)', zIndex: 45, pointerEvents: 'none' }"
+      class="project-editor__preview absolute top-1/2"
     >
       <LazyProjectPopupPreview
         :project-title="title"
@@ -252,8 +251,7 @@ async function handleSubmit(e: Event) {
 
     <!-- Sidebar -->
     <div
-      class="fixed right-0 top-0 w-3/4 md:w-2/3 lg:w-1/2 bg-black/85 backdrop-blur-xl border-l border-neutral-700/60 shadow-2xl z-50 flex flex-col"
-      :style="{ fontFamily: 'EnduroWeb, sans-serif', height: '100vh' }"
+      class="project-editor__sidebar fixed right-0 top-0 w-3/4 md:w-2/3 lg:w-1/2 bg-black/85 backdrop-blur-xl border-l border-neutral-700/60 shadow-2xl z-50 flex flex-col"
     >
       <form class="flex flex-col h-full" @submit="handleSubmit">
         <!-- Sticky Header -->
@@ -460,3 +458,17 @@ async function handleSubmit(e: Event) {
     </div>
   </Teleport>
 </template>
+
+<style scoped>
+.project-editor__preview {
+  left: 25%;
+  transform: translate(-50%, -50%);
+  z-index: 45;
+  pointer-events: none;
+}
+
+.project-editor__sidebar {
+  font-family: 'EnduroWeb, sans-serif';
+  height: 100vh;
+}
+</style>

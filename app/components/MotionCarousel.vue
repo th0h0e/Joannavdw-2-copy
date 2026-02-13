@@ -24,12 +24,6 @@ const currentSlide = ref(0)
 const isOnBlurSlide = ref(false)
 const blurIntensity = ref(0)
 
-const fontSizes = {
-  mobile: 1.4,
-  tablet: 2.5,
-  desktop: 2.25,
-  largeDesktop: 3,
-}
 const lastImage = computed(() => props.images[props.images.length - 1])
 
 function handleScroll() {
@@ -149,12 +143,11 @@ const showTopBar = computed(() => props.showTopProgressBar && props.images.lengt
       />
 
       <!-- Blur slide -->
-      <div
+      <button
         class="motion-carousel__slide motion-carousel__slide--blur"
-        role="group"
-        aria-label="Next section"
-        style="cursor: pointer"
+        aria-label="Go to next project"
         @click="scrollToNextSection"
+        @keydown.down.prevent="scrollToNextSection"
       >
         <div class="blur-overlay">
           <div
@@ -184,42 +177,29 @@ const showTopBar = computed(() => props.showTopProgressBar && props.images.lengt
             </div>
           </div>
         </div>
-      </div>
+      </button>
     </div>
   </div>
 
   <!-- Project Title - Centered overlay -->
   <div
-    :class="`absolute top-1/2 left-1/2 z-[200] text-center w-full ${projectTitleContainerClasses}`"
-    :style="{ transform: 'translate(-50%, -50%)', pointerEvents: 'none' }"
+    :class="`project-title-container absolute top-1/2 left-1/2 z-[200] text-center w-full ${projectTitleContainerClasses}`"
   >
-    <h1
-      :class="`text-white ${projectTitleClasses} motion-project-title`"
-      :style="{
-        fontFamily: 'EnduroWeb, sans-serif',
-        letterSpacing: '0.03em',
-        pointerEvents: 'auto',
-        cursor: 'pointer',
-        opacity: titleHidden ? 0 : 1,
-        visibility: titleHidden ? 'hidden' : 'visible',
-        transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
-      }"
+    <button
+      :class="['text-white motion-project-title title-font', { 'motion-project-title--hidden': titleHidden }]"
       @click="handleTitleClick"
+      @keydown.enter.prevent="handleTitleClick"
     >
       {{ titleText }}
-    </h1>
+    </button>
   </div>
 
   <!-- Progress Bar (Bottom) -->
   <div
     v-if="images.length > 1"
-    class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 w-full px-6"
-    :style="{
-      opacity: showBottomBar ? 1 : 0,
-      transform: showBottomBar ? 'translate(-50%, 0)' : 'translate(-50%, 10px)',
-      transition: 'opacity 0.15s ease-in-out, transform 0.15s ease-in-out',
-      pointerEvents: currentSlide > 0 ? 'auto' : 'none',
-    }"
+    class="progress-bar progress-bar--bottom absolute bottom-5 left-1/2 -translate-x-1/2 z-20 w-full px-6"
+    :class="{ 'progress-bar--visible': showBottomBar }"
+    :style="{ pointerEvents: currentSlide > 0 ? 'auto' : 'none' }"
   >
     <div class="h-0.5 bg-gray-500/50 rounded-full overflow-hidden backdrop-blur-sm">
       <div class="h-full bg-gray-50" :style="{ width: `${scrollProgress * 100}%` }" />
@@ -229,13 +209,9 @@ const showTopBar = computed(() => props.showTopProgressBar && props.images.lengt
   <!-- Progress Bar (Top) -->
   <div
     v-if="showTopBar"
-    class="absolute top-5 left-1/2 -translate-x-1/2 z-20 w-full px-6"
-    :style="{
-      opacity: showBottomBar ? 1 : 0,
-      transform: showBottomBar ? 'translate(-50%, 0)' : 'translate(-50%, -10px)',
-      transition: 'opacity 0.15s ease-in-out, transform 0.15s ease-in-out',
-      pointerEvents: currentSlide > 0 ? 'auto' : 'none',
-    }"
+    class="progress-bar progress-bar--top absolute top-5 left-1/2 -translate-x-1/2 z-20 w-full px-6"
+    :class="{ 'progress-bar--visible': showBottomBar }"
+    :style="{ pointerEvents: currentSlide > 0 ? 'auto' : 'none' }"
   >
     <div class="h-0.5 bg-gray-500/50 rounded-full overflow-hidden backdrop-blur-sm">
       <div class="h-full bg-gray-50" :style="{ width: `${scrollProgress * 100}%` }" />
@@ -307,8 +283,17 @@ const showTopBar = computed(() => props.showTopProgressBar && props.images.lengt
 }
 
 .motion-carousel__slide--blur {
+  display: block;
   background: transparent;
   z-index: 15;
+  cursor: pointer;
+  appearance: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
 }
 
 .motion-carousel__slide--blur > .blur-overlay {
@@ -331,24 +316,53 @@ const showTopBar = computed(() => props.showTopProgressBar && props.images.lengt
 }
 
 .motion-project-title {
-  font-size: v-bind('fontSizes.mobile + "rem"');
+  display: block;
+  width: 100%;
+  pointer-events: auto;
+  cursor: pointer;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  text-align: center;
 }
 
-@media (min-width: 768px) {
-  .motion-project-title {
-    font-size: v-bind('fontSizes.tablet + "rem"');
-  }
+.motion-project-title--hidden {
+  opacity: 0;
+  visibility: hidden;
 }
 
-@media (min-width: 1024px) {
-  .motion-project-title {
-    font-size: v-bind('fontSizes.desktop + "rem"');
-  }
+.project-title-container {
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
-@media (min-width: 1280px) {
-  .motion-project-title {
-    font-size: v-bind('fontSizes.largeDesktop + "rem"');
-  }
+.progress-bar {
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+}
+
+.progress-bar--visible {
+  opacity: 1;
+}
+
+.progress-bar--bottom {
+  transform: translate(-50%, 10px);
+}
+
+.progress-bar--bottom.progress-bar--visible {
+  transform: translate(-50%, 0);
+}
+
+.progress-bar--top {
+  transform: translate(-50%, -10px);
+}
+
+.progress-bar--top.progress-bar--visible {
+  transform: translate(-50%, 0);
 }
 </style>

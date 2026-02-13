@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import type { About, Homepage, Settings } from '~/plugins/pocketbase.client'
-import { pb } from '~/plugins/pocketbase.client'
-
 const props = defineProps<{
   isOpen: boolean
 }>()
@@ -18,12 +15,11 @@ const saving = ref(false)
 const { data: rawData, refresh, status } = useAsyncData(
   'settings-sidebar',
   async () => {
-    const [about, homepage, settings] = await Promise.all([
-      pb.collection('About').getFirstListItem<About>('Is_Active = true'),
-      pb.collection('Homepage').getFirstListItem<Homepage>('Is_Active = true'),
+    const [about, homepage, settings, fontSizes] = await Promise.all([
       pb.collection('Settings').getFirstListItem<Settings>(''),
+      $fetch<{ mobile: number, tablet: number, desktop: number, largeDesktop: number }>('/api/font-sizes'),
     ])
-    return { about, homepage, settings }
+    return { about, homepage, settings, fontSizes }
   },
   { immediate: false },
 )
@@ -66,10 +62,10 @@ watch(rawData, (data) => {
   heroTitle.value = data.homepage.Hero_Title
 
   showTopProgressBar.value = data.settings.Show_Top_Progress_Bar
-  mobileFontSize.value = data.settings.Mobile_Font_Size
-  tabletFontSize.value = data.settings.Tablet_Font_Size
-  desktopFontSize.value = data.settings.Desktop_Font_Size
-  largeDesktopFontSize.value = data.settings.Large_Desktop_Font_Size
+  mobileFontSize.value = data.fontSizes.mobile
+  tabletFontSize.value = data.fontSizes.tablet
+  desktopFontSize.value = data.fontSizes.desktop
+  largeDesktopFontSize.value = data.fontSizes.largeDesktop
 
   // Favicon is now stored locally
   faviconUrl.value = `/assets/favicon.ico?v=${data.settings.updated}`
@@ -151,14 +147,20 @@ async function handleSubmit(e: Event) {
         method: 'PUT',
         body: {
           Show_Top_Progress_Bar: showTopProgressBar.value,
-          Mobile_Font_Size: mobileFontSize.value,
-          Tablet_Font_Size: tabletFontSize.value,
-          Desktop_Font_Size: desktopFontSize.value,
-          Large_Desktop_Font_Size: largeDesktopFontSize.value,
         },
         headers: authHeaders,
       })
     }
+
+    await $fetch('/api/font-sizes', {
+      method: 'PUT',
+      body: {
+        mobile: mobileFontSize.value,
+        tablet: tabletFontSize.value,
+        desktop: desktopFontSize.value,
+        largeDesktop: largeDesktopFontSize.value,
+      },
+    })
 
     emit('showToast', 'Settings saved successfully!', 'success')
     emit('close')
@@ -192,15 +194,12 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
   <template v-if="isOpen">
     <!-- Backdrop -->
     <div
-      class="fixed inset-0 bg-neutral-900/70 backdrop-blur-md z-40 transition-opacity duration-300"
+      class="settings-backdrop fixed inset-0 bg-neutral-900/70 backdrop-blur-md z-40 transition-opacity duration-300"
       @click="emit('close')"
     />
 
     <!-- About Popup Preview -->
-    <div
-      class="fixed top-1/2"
-      :style="{ left: '25%', transform: 'translate(-50%, -50%)', zIndex: 45 }"
-    >
+    <div class="settings-preview fixed top-1/2">
       <LazyAboutPopup
         :is-visible="true"
         :about-data="previewAboutData"
@@ -209,10 +208,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
     </div>
 
     <!-- Sidebar -->
-    <div
-      class="fixed right-0 top-0 h-full w-3/4 md:w-1/2 bg-black/85 backdrop-blur-xl border-l border-neutral-700/60 shadow-2xl z-50 flex flex-col"
-      :style="{ fontFamily: 'EnduroWeb, sans-serif' }"
-    >
+    <div class="settings-sidebar fixed right-0 top-0 h-full w-3/4 md:w-1/2 bg-black/85 backdrop-blur-xl border-l border-neutral-700/60 shadow-2xl z-50 flex flex-col">
       <form class="flex flex-col h-full" @submit="handleSubmit">
         <!-- Sticky Header -->
         <div class="flex-shrink-0 p-8 border-b border-neutral-800/60 flex items-center gap-4 backdrop-blur-sm">
@@ -434,3 +430,19 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
     </div>
   </template>
 </template>
+
+<style scoped>
+.settings-backdrop {
+  z-index: 40;
+}
+
+.settings-preview {
+  left: 25%;
+  transform: translate(-50%, -50%);
+  z-index: 45;
+}
+
+.settings-sidebar {
+  font-family: 'EnduroWeb, sans-serif';
+}
+</style>

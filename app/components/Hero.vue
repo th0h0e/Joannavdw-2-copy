@@ -5,12 +5,6 @@ const props = defineProps<{
   isAboutPopupVisible: boolean
 }>()
 
-const fontSizes = {
-  mobile: 1.4,
-  tablet: 2.5,
-  desktop: 2.25,
-  largeDesktop: 3,
-}
 const hasAnimatedIn = ref(false)
 const hasTriggered = ref(false)
 const imageScaled = ref(false)
@@ -36,17 +30,13 @@ const chevronSize = computed(() => isTabletOrAbove.value ? 28 : 24)
 <template>
   <section
     id="hero-section"
-    class="relative w-full snap-center bg-white flex items-center justify-center overflow-hidden"
-    style="height: 100vh"
+    class="hero-section relative w-full snap-center bg-white flex items-center justify-center overflow-hidden"
   >
     <!-- Hero Background Image -->
     <div
-      class="absolute inset-0 bg-cover bg-center"
-      :style="{
-        backgroundImage: `url(${heroImage})`,
-        transform: imageScaled ? 'scale(1)' : 'scale(0.3)',
-        transition: 'transform 1.2s ease-out',
-      }"
+      class="hero-background absolute inset-0 bg-cover bg-center"
+      :class="{ 'hero-background--scaled': imageScaled }"
+      :style="{ backgroundImage: `url(${heroImage})` }"
     />
 
     <!-- Hero Headline -->
@@ -65,7 +55,7 @@ const chevronSize = computed(() => isTabletOrAbove.value ? 28 : 24)
         }"
       >
         <h1
-          :class="`text-white ${projectTitleClasses} hero-title`"
+          class="text-white hero-title title-font"
         >
           {{ heroTitle }}
         </h1>
@@ -73,10 +63,7 @@ const chevronSize = computed(() => isTabletOrAbove.value ? 28 : 24)
     </Transition>
 
     <!-- Scroll Hint -->
-    <div
-      class="absolute bottom-8 z-10 text-white"
-      :style="{ left: '50%', marginLeft: '-12px', opacity: 1 }"
-    >
+    <div class="scroll-hint absolute bottom-8 z-10 text-white">
       <ChevronDown
         :width="chevronSize"
         :height="chevronSize"
@@ -88,6 +75,25 @@ const chevronSize = computed(() => isTabletOrAbove.value ? 28 : 24)
 </template>
 
 <style scoped>
+.hero-section {
+  height: 100vh;
+}
+
+.hero-background {
+  transform: scale(0.3);
+  transition: transform 1.2s ease-out;
+}
+
+.hero-background--scaled {
+  transform: scale(1);
+}
+
+.scroll-hint {
+  left: 50%;
+  margin-left: -12px;
+  opacity: 1;
+}
+
 @keyframes fadeInTitle {
   from {
     opacity: 0;
@@ -97,27 +103,4 @@ const chevronSize = computed(() => isTabletOrAbove.value ? 28 : 24)
   }
 }
 
-.hero-title {
-  font-size: v-bind('fontSizes.mobile + "rem"');
-  font-family: 'EnduroWeb, sans-serif';
-  letter-spacing: 0.03em;
-}
-
-@media (min-width: 768px) {
-  .hero-title {
-    font-size: v-bind('fontSizes.tablet + "rem"');
-  }
-}
-
-@media (min-width: 1024px) {
-  .hero-title {
-    font-size: v-bind('fontSizes.desktop + "rem"');
-  }
-}
-
-@media (min-width: 1280px) {
-  .hero-title {
-    font-size: v-bind('fontSizes.largeDesktop + "rem"');
-  }
-}
 </style>
