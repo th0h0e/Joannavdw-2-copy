@@ -39,7 +39,7 @@ export default defineNuxtConfig({
   },
 
   // Global CSS (replaces import in main.ts)
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/main.css'],
 
   postcss: {
     plugins: {
