@@ -14,12 +14,11 @@ onMounted(() => {
     hasTriggered.value = true
     hasAnimatedIn.value = true
   }
+  // Trigger scale animation after mount
   requestAnimationFrame(() => {
     imageScaled.value = true
   })
 })
-
-const { isMobile } = useDevice()
 
 const showTitle = computed(() => !props.isAboutPopupVisible)
 const titleDelay = computed(() => hasAnimatedIn.value ? '0s' : '1.2s')
@@ -29,7 +28,6 @@ const titleDelay = computed(() => hasAnimatedIn.value ? '0s' : '1.2s')
   <section
     id="hero-section"
     class="hero-section relative w-full snap-center bg-white flex items-center justify-center overflow-hidden"
-    :class="{ 'hero-section--mobile': isMobile }"
   >
     <!-- Hero Background Image -->
     <div
@@ -71,10 +69,6 @@ const titleDelay = computed(() => hasAnimatedIn.value ? '0s' : '1.2s')
 <style scoped>
 .hero-section {
   height: 100vh;
-}
-
-.hero-section--mobile {
-  height: 100lvh;
 }
 
 .hero-background {

@@ -56,9 +56,6 @@ const titleText = computed(() => isOnBlurSlide.value ? 'NEXT PROJECT' : props.pr
 // Hide title when either popup is visible
 const titleHidden = computed(() => props.isPopupVisible || props.isAboutPopupVisible)
 
-// Adjust chevron size for tablet/desktop
-const { isDesktopOrTablet } = useDevice()
-const chevronSize = computed(() => isDesktopOrTablet ? 28 : 24)
 
 // Show bottom progress bar when scrolled past first slide
 const showBottomBar = computed(() => currentSlide.value > 0 && currentSlide.value <= props.images.length)
@@ -279,12 +276,7 @@ function handleTitleClick() {
                 willChange: 'transform, opacity',
               }"
             >
-              <ChevronDown
-                :width="chevronSize"
-                :height="chevronSize"
-                color="white"
-                class="drop-shadow-2xl"
-              />
+              <UIcon name="i-lucide-chevron-down" class="size-6" />
             </div>
           </div>
         </div>

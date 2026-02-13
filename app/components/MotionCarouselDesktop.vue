@@ -305,12 +305,7 @@ function handleNextSlide() {
       @click="scrollToNextSection"
       @keydown.down.prevent="scrollToNextSection"
     >
-      <ChevronDown
-        :width="28"
-        :height="28"
-        color="white"
-        class="drop-shadow-2xl hover:opacity-70 transition-opacity duration-300"
-      />
+      <UIcon name="i-lucide-chevron-down" class="size-6 hover:opacity-70 transition-opacity duration-300" />
     </button>
   </div>
 
@@ -327,12 +322,7 @@ function handleNextSlide() {
     aria-label="Next slide"
     @click="handleNextSlide"
   >
-    <ChevronRight
-      :width="28"
-      :height="28"
-      color="white"
-      class="drop-shadow-2xl pointer-events-none"
-    />
+    <UIcon name="i-lucide-chevron-right" class="size-6 pointer-events-none" />
   </button>
 </template>
 
