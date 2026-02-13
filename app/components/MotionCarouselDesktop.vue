@@ -29,47 +29,6 @@ const fontSizes = {
 }
 const lastImage = computed(() => props.images[props.images.length - 1])
 
-useHead({
-  style: [
-    {
-      innerHTML: `
-        .motion-carousel-desktop {
-          position: relative; height: 100%; width: 100%;
-          background-size: cover; background-position: center;
-          overflow-x: auto; overscroll-behavior-x: contain;
-          scroll-snap-type: x mandatory; scroll-behavior: smooth;
-          scrollbar-width: none; -ms-overflow-style: none;
-          scroll-snap-align: none;
-        }
-        .motion-carousel-desktop::-webkit-scrollbar { display: none; }
-        .motion-carousel-desktop__background {
-          position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-          background-size: cover; background-position: center; z-index: 5;
-        }
-        .motion-carousel-desktop__container {
-          position: relative; height: 100%; width: 100%; display: flex; z-index: 10;
-        }
-        .motion-carousel-desktop__slide {
-          position: relative; height: 100%; flex-shrink: 0;
-          min-width: 50vw; width: 50vw;
-          scroll-snap-align: center; scroll-snap-stop: always;
-          background-size: cover; background-position: center; background-color: black;
-        }
-        .motion-carousel-desktop__slide--blur {
-          min-width: 100vw !important; width: 100vw !important;
-          background: transparent; z-index: 15;
-        }
-        .motion-project-title-desktop {
-          font-size: ${fontSizes.desktop}rem;
-        }
-        @media (min-width: 1280px) {
-          .motion-project-title-desktop { font-size: ${fontSizes.largeDesktop}rem; }
-        }
-      `,
-    },
-  ],
-})
-
 function handleScroll() {
   const carousel = containerRef.value
   if (!carousel)
@@ -292,3 +251,73 @@ const showRightChevron = computed(() => props.images.length > 1 && currentSlide.
     />
   </button>
 </template>
+
+<style scoped>
+.motion-carousel-desktop {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-align: none;
+}
+
+.motion-carousel-desktop::-webkit-scrollbar {
+  display: none;
+}
+
+.motion-carousel-desktop__background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: 5;
+}
+
+.motion-carousel-desktop__container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  z-index: 10;
+}
+
+.motion-carousel-desktop__slide {
+  position: relative;
+  height: 100%;
+  flex-shrink: 0;
+  min-width: 50vw;
+  width: 50vw;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  background-size: cover;
+  background-position: center;
+  background-color: black;
+}
+
+.motion-carousel-desktop__slide--blur {
+  min-width: 100vw !important;
+  width: 100vw !important;
+  background: transparent;
+  z-index: 15;
+}
+
+.motion-project-title-desktop {
+  font-size: v-bind('fontSizes.desktop + "rem"');
+}
+
+@media (min-width: 1280px) {
+  .motion-project-title-desktop {
+    font-size: v-bind('fontSizes.largeDesktop + "rem"');
+  }
+}
+</style>
