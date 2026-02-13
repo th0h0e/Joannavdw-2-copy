@@ -186,7 +186,7 @@ const showTopBar = computed(() => props.showTopProgressBar && props.images.lengt
     :class="`project-title-container absolute top-1/2 left-1/2 z-[200] text-center w-full ${projectTitleContainerClasses}`"
   >
     <button
-      :class="['text-white motion-project-title title-font', { 'motion-project-title--hidden': titleHidden }]"
+      class="text-white motion-project-title title-font" :class="[{ 'motion-project-title--hidden': titleHidden }]"
       @click="handleTitleClick"
       @keydown.enter.prevent="handleTitleClick"
     >
@@ -322,7 +322,9 @@ const showTopBar = computed(() => props.showTopProgressBar && props.images.lengt
   cursor: pointer;
   opacity: 1;
   visibility: visible;
-  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  transition:
+    opacity 0.3s ease-in-out,
+    visibility 0.3s ease-in-out;
   appearance: none;
   background: none;
   border: none;
@@ -343,7 +345,9 @@ const showTopBar = computed(() => props.showTopProgressBar && props.images.lengt
 
 .progress-bar {
   opacity: 0;
-  transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+  transition:
+    opacity 0.15s ease-in-out,
+    transform 0.15s ease-in-out;
 }
 
 .progress-bar--visible {

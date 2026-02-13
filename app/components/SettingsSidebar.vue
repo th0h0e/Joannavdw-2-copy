@@ -193,8 +193,9 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
 <template>
   <template v-if="isOpen">
     <!-- Backdrop -->
-    <div
+    <button
       class="settings-backdrop fixed inset-0 bg-neutral-900/70 backdrop-blur-md z-40 transition-opacity duration-300"
+      aria-label="Close settings"
       @click="emit('close')"
     />
 
@@ -222,7 +223,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
           </div>
 
           <!-- Favicon Avatar -->
-          <div
+          <button
             class="flex-shrink-0 w-12 h-12 rounded-sm bg-white/10 border border-neutral-700/60 hover:border-white/30 cursor-pointer transition-all overflow-hidden group hover:shadow-lg hover:shadow-white/5"
             title="Click to update favicon"
             @click="faviconFileInput?.click()"
@@ -243,13 +244,15 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
                 <polyline points="21 15 16 10 5 21" />
               </svg>
             </div>
-          </div>
+          </button>
 
           <input
+            id="faviconFileInput"
             ref="faviconFileInput"
             type="file"
             accept="image/png,image/x-icon,image/svg+xml"
             class="hidden"
+            aria-label="Update Favicon"
             @change="handleFaviconUpdate"
           >
         </div>
@@ -262,13 +265,15 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
               Hero Section
             </h3>
             <div>
-              <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">Hero Title</label>
-              <input
-                v-model="heroTitle"
-                type="text"
-                class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                placeholder="Creative Strategy and Communication"
-              >
+              <!-- eslint-disable-next-line vue-a11y/label-has-for -->
+              <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">Hero Title
+                <input
+                  v-model="heroTitle"
+                  type="text"
+                  class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
+                  placeholder="Creative Strategy and Communication"
+                >
+              </label>
             </div>
           </div>
 
@@ -281,39 +286,45 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
             </h3>
             <div class="space-y-4">
               <div>
-                <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">About Description</label>
-                <textarea
-                  v-model="aboutDescription"
-                  :rows="4"
-                  class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all resize-none"
-                />
+                <!-- eslint-disable-next-line vue-a11y/label-has-for -->
+                <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">About Description
+                  <textarea
+                    v-model="aboutDescription"
+                    :rows="4"
+                    class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all resize-none"
+                  />
+                </label>
               </div>
               <div>
-                <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">Expertise Description</label>
-                <textarea
-                  v-model="expertiseDescription"
-                  :rows="3"
-                  class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all resize-none"
-                />
+                <!-- eslint-disable-next-line vue-a11y/label-has-for -->
+                <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">Expertise Description
+                  <textarea
+                    v-model="expertiseDescription"
+                    :rows="3"
+                    class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all resize-none"
+                  />
+                </label>
               </div>
               <div>
-                <label class="block text-xs font-medium text-neutral-300 mb-3 uppercase tracking-wider">Client List</label>
-                <div class="flex gap-2 mb-3">
-                  <input
-                    v-model="newClient"
-                    type="text"
-                    class="flex-1 px-4 py-2.5 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                    placeholder="e.g., NIKE"
-                    @keypress.enter.prevent="handleAddClient"
-                  >
-                  <button
-                    type="button"
-                    class="px-6 py-3 bg-white text-black rounded-sm text-sm hover:bg-neutral-100 font-medium transition-all uppercase tracking-wide"
-                    @click="handleAddClient"
-                  >
-                    Add
-                  </button>
-                </div>
+                <!-- eslint-disable-next-line vue-a11y/label-has-for -->
+                <label class="block text-xs font-medium text-neutral-300 mb-3 uppercase tracking-wider">Client List
+                  <div class="flex gap-2 mb-3">
+                    <input
+                      v-model="newClient"
+                      type="text"
+                      class="flex-1 px-4 py-2.5 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
+                      placeholder="e.g., NIKE"
+                      @keypress.enter.prevent="handleAddClient"
+                    >
+                    <button
+                      type="button"
+                      class="px-6 py-3 bg-white text-black rounded-sm text-sm hover:bg-neutral-100 font-medium transition-all uppercase tracking-wide"
+                      @click="handleAddClient"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </label>
                 <div class="flex flex-wrap gap-2">
                   <div
                     v-for="(client, idx) in clientList"
@@ -343,58 +354,70 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
             </h3>
             <div class="space-y-4">
               <div>
-                <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">Contact Email</label>
-                <input
-                  v-model="contactEmail"
-                  type="email"
-                  class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                  placeholder="hello@example.com"
-                >
+                <!-- eslint-disable-next-line vue-a11y/label-has-for -->
+                <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">Contact Email
+                  <input
+                    v-model="contactEmail"
+                    type="email"
+                    class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
+                    placeholder="hello@example.com"
+                  >
+                </label>
               </div>
               <div>
+                <!-- eslint-disable-next-line vue-a11y/label-has-for -->
                 <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">Font Sizes (rem)</label>
                 <div class="grid grid-cols-4 gap-2">
                   <div>
-                    <label class="block text-xs text-neutral-400 mb-1">Mobile</label>
-                    <input
-                      v-model.number="mobileFontSize"
-                      type="number"
-                      step="0.125"
-                      class="w-full px-2 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                    >
+                    <!-- eslint-disable-next-line vue-a11y/label-has-for -->
+                    <label class="block text-xs text-neutral-400 mb-1">Mobile
+                      <input
+                        v-model.number="mobileFontSize"
+                        type="number"
+                        step="0.125"
+                        class="w-full px-2 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
+                      >
+                    </label>
                   </div>
                   <div>
-                    <label class="block text-xs text-neutral-400 mb-1">Tablet</label>
-                    <input
-                      v-model.number="tabletFontSize"
-                      type="number"
-                      step="0.125"
-                      class="w-full px-2 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                    >
+                    <!-- eslint-disable-next-line vue-a11y/label-has-for -->
+                    <label class="block text-xs text-neutral-400 mb-1">Tablet
+                      <input
+                        v-model.number="tabletFontSize"
+                        type="number"
+                        step="0.125"
+                        class="w-full px-2 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
+                      >
+                    </label>
                   </div>
                   <div>
-                    <label class="block text-xs text-neutral-400 mb-1">Desktop</label>
-                    <input
-                      v-model.number="desktopFontSize"
-                      type="number"
-                      step="0.125"
-                      class="w-full px-2 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                    >
+                    <!-- eslint-disable-next-line vue-a11y/label-has-for -->
+                    <label class="block text-xs text-neutral-400 mb-1">Desktop
+                      <input
+                        v-model.number="desktopFontSize"
+                        type="number"
+                        step="0.125"
+                        class="w-full px-2 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
+                      >
+                    </label>
                   </div>
                   <div>
-                    <label class="block text-xs text-neutral-400 mb-1">Large</label>
-                    <input
-                      v-model.number="largeDesktopFontSize"
-                      type="number"
-                      step="0.125"
-                      class="w-full px-2 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                    >
+                    <!-- eslint-disable-next-line vue-a11y/label-has-for -->
+                    <label class="block text-xs text-neutral-400 mb-1">Large
+                      <input
+                        v-model.number="largeDesktopFontSize"
+                        type="number"
+                        step="0.125"
+                        class="w-full px-2 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
+                      >
+                    </label>
                   </div>
                 </div>
               </div>
               <div>
-                <label class="flex items-center gap-3 cursor-pointer">
+                <label for="showTopProgressBar" class="flex items-center gap-3 cursor-pointer">
                   <input
+                    id="showTopProgressBar"
                     v-model="showTopProgressBar"
                     type="checkbox"
                     class="w-4 h-4 bg-black/30 border border-neutral-700/60 rounded-sm text-white focus:ring-1 focus:ring-white/20"
@@ -434,6 +457,14 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
 <style scoped>
 .settings-backdrop {
   z-index: 40;
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
 }
 
 .settings-preview {

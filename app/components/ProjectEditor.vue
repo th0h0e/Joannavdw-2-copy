@@ -232,8 +232,9 @@ async function handleSubmit(e: Event) {
 <template>
   <Teleport to="body">
     <!-- Backdrop -->
-    <div
+    <button
       class="fixed inset-0 bg-neutral-900/70 backdrop-blur-md z-40 transition-opacity duration-300"
+      aria-label="Cancel editing"
       @click="emit('cancel')"
     />
 
@@ -268,85 +269,91 @@ async function handleSubmit(e: Event) {
         <div class="flex-1 overflow-y-auto p-8 space-y-8">
           <!-- Images -->
           <div>
+            <!-- eslint-disable-next-line vue-a11y/label-has-for -->
             <label class="block text-xs font-medium text-neutral-300 mb-3 uppercase tracking-wider">
               Images (Drag to reorder)
-            </label>
 
-            <!-- Drag and Drop Upload Zone with Images -->
-            <div
-              class="relative border-2 border-dashed rounded-sm transition-all" :class="[
-                isDraggingFile ? 'border-white/40 bg-white/5' : 'border-neutral-700/60 bg-black/30',
-                images.length === 0 ? 'cursor-pointer hover:border-neutral-600/60 hover:bg-black/40' : '',
-              ]"
-              @dragenter="handleFileDragEnter"
-              @dragleave="handleFileDragLeave"
-              @dragover="handleFileDragOver"
-              @drop="handleFileDrop"
-            >
-              <input
-                id="image-upload"
-                type="file"
-                multiple
-                accept="image/*"
-                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                :style="{ pointerEvents: images.length > 0 ? 'none' : 'auto' }"
-                @change="handleImageUpload"
+              <!-- Drag and Drop Upload Zone with Images -->
+              <!-- eslint-disable-next-line vue-a11y/no-static-element-interactions -->
+              <div
+                class="relative border-2 border-dashed rounded-sm transition-all" :class="[
+                  isDraggingFile ? 'border-white/40 bg-white/5' : 'border-neutral-700/60 bg-black/30',
+                  images.length === 0 ? 'cursor-pointer hover:border-neutral-600/60 hover:bg-black/40' : '',
+                ]"
+                @dragenter="handleFileDragEnter"
+                @dragleave="handleFileDragLeave"
+                @dragover="handleFileDragOver"
+                @drop="handleFileDrop"
               >
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  :style="{ pointerEvents: images.length > 0 ? 'none' : 'auto' }"
+                  @change="handleImageUpload"
+                >
 
-              <!-- Empty State -->
-              <label v-if="images.length === 0" for="image-upload" class="block py-12 px-6 text-center cursor-pointer">
-                <div class="flex flex-col items-center gap-3">
-                  <svg
-                    class="w-12 h-12 transition-colors" :class="[isDraggingFile ? 'text-white' : 'text-neutral-500']"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" :stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                  <div>
-                    <p class="text-sm font-medium transition-colors uppercase tracking-wide" :class="[isDraggingFile ? 'text-white' : 'text-neutral-300']">
-                      {{ isDraggingFile ? 'Drop images here' : 'Drag & drop images' }}
-                    </p>
-                    <p class="text-xs text-neutral-500 mt-1 tracking-wide">or click to browse</p>
+                <!-- Empty State -->
+                <div v-if="images.length === 0" class="block py-12 px-6 text-center cursor-pointer pointer-events-none">
+                  <div class="flex flex-col items-center gap-3">
+                    <svg
+                      class="w-12 h-12 transition-colors" :class="[isDraggingFile ? 'text-white' : 'text-neutral-500']"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" :stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <div>
+                      <p class="text-sm font-medium transition-colors uppercase tracking-wide" :class="[isDraggingFile ? 'text-white' : 'text-neutral-300']">
+                        {{ isDraggingFile ? 'Drop images here' : 'Drag & drop images' }}
+                      </p>
+                      <p class="text-xs text-neutral-500 mt-1 tracking-wide">
+                        or click to browse
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </label>
 
-              <!-- Image Grid -->
-              <div v-if="images.length > 0" class="p-4">
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  <div
-                    v-for="(image, index) in images"
-                    :key="image.id"
-                    draggable="true"
-                    class="relative group cursor-move border rounded-sm overflow-hidden hover:border-neutral-600 transition-all" :class="[
-                      draggedIndex === index ? 'border-neutral-500 opacity-50' : 'border-neutral-700/60',
-                    ]"
-                    @dragstart="handleDragStart(index)"
-                    @dragover="handleDragOver($event, index)"
-                    @dragend="handleDragEnd"
-                  >
-                    <div class="aspect-square bg-black/50">
-                      <img :src="image.url" :alt="image.filename" class="w-full h-full object-cover">
-                    </div>
-                    <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white px-2 py-1 rounded-sm text-xs font-medium">
-                      {{ index + 1 }}
-                    </div>
-                    <button
-                      type="button"
-                      class="absolute top-2 right-2 bg-red-600/10 backdrop-blur-md text-red-400 px-2.5 py-1 rounded-sm text-xs hover:bg-red-600/20 hover:text-red-300 opacity-0 group-hover:opacity-100 transition-all font-medium uppercase tracking-wide border border-red-600/20 hover:border-red-600/30"
-                      @click="handleDeleteImage(image)"
+                <!-- Image Grid -->
+                <div v-if="images.length > 0" class="p-4">
+                  <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <!-- eslint-disable-next-line vue-a11y/no-static-element-interactions -->
+                    <div
+                      v-for="(image, index) in images"
+                      :key="image.id"
+                      draggable="true"
+                      class="relative group cursor-move border rounded-sm overflow-hidden hover:border-neutral-600 transition-all" :class="[
+                        draggedIndex === index ? 'border-neutral-500 opacity-50' : 'border-neutral-700/60',
+                      ]"
+                      role="button"
+                      tabindex="0"
+                      @dragstart="handleDragStart(index)"
+                      @dragover="handleDragOver($event, index)"
+                      @dragend="handleDragEnd"
                     >
-                      Delete
-                    </button>
-                    <div class="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white px-2 py-1.5 text-xs truncate">
-                      {{ image.filename }}
+                      <div class="aspect-square bg-black/50">
+                        <img :src="image.url" :alt="image.filename" class="w-full h-full object-cover">
+                      </div>
+                      <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white px-2 py-1 rounded-sm text-xs font-medium">
+                        {{ index + 1 }}
+                      </div>
+                      <button
+                        type="button"
+                        class="absolute top-2 right-2 bg-red-600/10 backdrop-blur-md text-red-400 px-2.5 py-1 rounded-sm text-xs hover:bg-red-600/20 hover:text-red-300 opacity-0 group-hover:opacity-100 transition-all font-medium uppercase tracking-wide border border-red-600/20 hover:border-red-600/30"
+                        @click="handleDeleteImage(image)"
+                      >
+                        Delete
+                      </button>
+                      <div class="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white px-2 py-1.5 text-xs truncate">
+                        {{ image.filename }}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </label>
           </div>
 
           <!-- Divider -->
@@ -354,70 +361,71 @@ async function handleSubmit(e: Event) {
 
           <!-- Title -->
           <div>
-            <label for="title" class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">
+            <!-- eslint-disable-next-line vue-a11y/label-has-for -->
+            <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">
               Project Title *
+              <input
+                v-model="title"
+                type="text"
+                required
+                class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
+                placeholder="e.g., Maria Bodil for Nike"
+              >
             </label>
-            <input
-              id="title"
-              v-model="title"
-              type="text"
-              required
-              class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-              placeholder="e.g., Maria Bodil for Nike"
-            >
           </div>
 
           <!-- Description -->
           <div>
-            <label for="description" class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">
+            <!-- eslint-disable-next-line vue-a11y/label-has-for -->
+            <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">
               Description *
+              <textarea
+                v-model="description"
+                required
+                :rows="6"
+                class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all resize-none"
+                placeholder="Project description..."
+              />
             </label>
-            <textarea
-              id="description"
-              v-model="description"
-              required
-              :rows="6"
-              class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all resize-none"
-              placeholder="Project description..."
-            />
           </div>
 
           <!-- Order -->
           <div>
-            <label for="order" class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">
+            <!-- eslint-disable-next-line vue-a11y/label-has-for -->
+            <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">
               Position in Portfolio *
+              <input
+                v-model.number="order"
+                type="number"
+                required
+                min="0"
+                class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-sm transition-all"
+              >
             </label>
-            <input
-              id="order"
-              v-model.number="order"
-              type="number"
-              required
-              min="0"
-              class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-sm transition-all"
-            >
           </div>
 
           <!-- Responsibilities -->
           <div>
+            <!-- eslint-disable-next-line vue-a11y/label-has-for -->
             <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">
               Responsibilities
+              <div class="flex gap-2 mb-3">
+                <input
+                  v-model="newResponsibility"
+                  type="text"
+                  class="flex-1 px-4 py-2.5 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
+                  placeholder="e.g., CREATIVE PRODUCTION"
+                  @keypress.enter.prevent="handleAddResponsibility"
+                >
+                <button
+                  type="button"
+                  class="px-6 py-3 bg-white text-black rounded-sm text-sm hover:bg-neutral-100 font-medium transition-all uppercase tracking-wide"
+                  @click="handleAddResponsibility"
+                >
+                  Add
+                </button>
+              </div>
             </label>
-            <div class="flex gap-2 mb-3">
-              <input
-                v-model="newResponsibility"
-                type="text"
-                class="flex-1 px-4 py-2.5 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                placeholder="e.g., CREATIVE PRODUCTION"
-                @keypress.enter.prevent="handleAddResponsibility"
-              >
-              <button
-                type="button"
-                class="px-6 py-3 bg-white text-black rounded-sm text-sm hover:bg-neutral-100 font-medium transition-all uppercase tracking-wide"
-                @click="handleAddResponsibility"
-              >
-                Add
-              </button>
-            </div>
             <div class="flex flex-wrap gap-2">
               <span
                 v-for="(resp, idx) in responsibilities"

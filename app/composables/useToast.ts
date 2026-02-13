@@ -4,7 +4,6 @@ export interface Toast {
   type: 'success' | 'error'
 }
 
-// eslint-disable-next-line react/no-unnecessary-use-prefix
 export function useAppToast() {
   const toasts = ref<Toast[]>([])
 

@@ -33,7 +33,7 @@ const topPosition = computed(() => {
 </script>
 
 <template>
-  <div
+  <button
     class="logo-container"
     :class="{ 'logo-container--hidden': isHidden }"
     :style="{
@@ -41,6 +41,7 @@ const topPosition = computed(() => {
       height: containerHeight,
       top: topPosition,
     }"
+    aria-label="Open menu"
     @click="emit('click')"
   >
     <img
@@ -48,7 +49,7 @@ const topPosition = computed(() => {
       alt="Van Der Weg Logo Bottom"
       class="logo-image"
     >
-  </div>
+  </button>
 </template>
 
 <style scoped>
@@ -59,9 +60,16 @@ const topPosition = computed(() => {
   z-index: 50;
   cursor: pointer;
   mix-blend-mode: exclusion;
-  transition: top 0.7s ease-out, opacity 0.3s ease-out;
+  transition:
+    top 0.7s ease-out,
+    opacity 0.3s ease-out;
   opacity: 1;
   pointer-events: auto;
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
 }
 
 .logo-container--hidden {

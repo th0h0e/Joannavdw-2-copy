@@ -22,9 +22,10 @@ function handleContact(aboutData: About | null) {
 <template>
   <!-- Backdrop with blur -->
   <Transition name="about-backdrop">
-    <div
+    <button
       v-if="isVisible"
       class="popup-backdrop fixed inset-0 z-40"
+      aria-label="Close popup"
       @click="emit('close')"
     />
   </Transition>
@@ -100,6 +101,17 @@ function handleContact(aboutData: About | null) {
 
 <style scoped>
 /* Component-specific styles */
+.popup-backdrop {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+
 .popup-logo-top {
   width: 4.5rem;
   height: auto;

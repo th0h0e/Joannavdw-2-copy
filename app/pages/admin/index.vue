@@ -62,27 +62,29 @@ async function handleLogin(e: Event) {
 
       <form class="space-y-6" @submit="handleLogin">
         <div>
-          <label for="email" class="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wider">Email</label>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            required
-            class="w-full px-4 py-3 bg-neutral-800/60 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-neutral-600 focus:border-neutral-600 placeholder-neutral-500 text-sm transition-all"
-            placeholder="admin@example.com"
-          >
+          <!-- eslint-disable-next-line vue-a11y/label-has-for -->
+          <label class="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wider">Email
+            <input
+              v-model="email"
+              type="email"
+              required
+              class="w-full px-4 py-3 bg-neutral-800/60 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-neutral-600 focus:border-neutral-600 placeholder-neutral-500 text-sm transition-all"
+              placeholder="admin@example.com"
+            >
+          </label>
         </div>
 
         <div>
-          <label for="password" class="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wider">Password</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            required
-            class="w-full px-4 py-3 bg-neutral-800/60 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-neutral-600 focus:border-neutral-600 placeholder-neutral-500 text-sm transition-all"
-            placeholder="••••••••"
-          >
+          <!-- eslint-disable-next-line vue-a11y/label-has-for -->
+          <label class="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wider">Password
+            <input
+              v-model="password"
+              type="password"
+              required
+              class="w-full px-4 py-3 bg-neutral-800/60 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-neutral-600 focus:border-neutral-600 placeholder-neutral-500 text-sm transition-all"
+              placeholder="••••••••"
+            >
+          </label>
         </div>
 
         <div v-if="error" class="bg-red-950/20 border border-red-800/30 text-red-200 px-4 py-3 rounded-sm text-sm">

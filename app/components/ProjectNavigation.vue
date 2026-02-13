@@ -29,4 +29,3 @@ function handleClick(e: MouseEvent, index: number) {
     </ul>
   </div>
 </template>
-

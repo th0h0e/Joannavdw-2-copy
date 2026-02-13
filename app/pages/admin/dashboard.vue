@@ -313,19 +313,18 @@ async function handleDragEnd() {
               <template v-if="heroTitle">
                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div class="text-center px-6">
-                    <h1
+                    <button
                       :contenteditable="isEditingTitle"
                       class="admin-title text-white uppercase leading-none text-4xl outline-none pointer-events-auto inline-block" :class="[
                         isEditingTitle ? 'cursor-text' : 'cursor-pointer hover:opacity-80 transition-opacity',
                       ]"
                       :title="!isEditingTitle ? 'Click to edit' : undefined"
                       @click="!isEditingTitle && handleTitleClick()"
-                      @input="(e: Event) => tempTitle = (e.target as HTMLElement).textContent || ''"
                       @keydown.enter.prevent="handleTitleSave"
                       @keydown.escape.prevent="handleTitleCancel"
                     >
                       {{ heroTitle }}
-                    </h1>
+                    </button>
                   </div>
                 </div>
                 <div v-if="isEditingTitle" class="absolute bottom-6 right-6 flex gap-2 z-10 pointer-events-none">
@@ -403,8 +402,8 @@ async function handleDragEnd() {
           {{ showMobilePreview ? 'Hide mobile preview' : 'Show mobile preview' }}
         </button>
 
-        <input ref="heroFileInput" type="file" accept="image/*" class="hidden" @change="handleHeroImageUpdate">
-        <input ref="heroMobileFileInput" type="file" accept="image/*" class="hidden" @change="handleHeroImageMobileUpdate">
+        <input id="heroFileInput" ref="heroFileInput" type="file" accept="image/*" class="hidden" aria-label="Update Desktop Hero Image" @change="handleHeroImageUpdate">
+        <input id="heroMobileFileInput" ref="heroMobileFileInput" type="file" accept="image/*" class="hidden" aria-label="Update Mobile Hero Image" @change="handleHeroImageMobileUpdate">
       </div>
 
       <!-- Divider -->
@@ -412,11 +411,14 @@ async function handleDragEnd() {
 
       <!-- Projects List -->
       <div class="flex flex-col gap-3">
+        <!-- eslint-disable-next-line vue-a11y/no-static-element-interactions -->
         <div
           v-for="project in projects"
           :key="project.id"
           draggable="true"
           class="project-card group bg-gradient-to-br from-neutral-900/50 to-neutral-900/30 rounded-sm border border-neutral-800/70 hover:border-neutral-700 hover:from-neutral-900/70 hover:to-neutral-900/50 cursor-grab active:cursor-grabbing flex items-stretch gap-0 overflow-hidden backdrop-blur-sm"
+          role="button"
+          tabindex="0"
           @dragstart="handleDragStart($event, project.id)"
           @dragover="handleDragOver($event, project.id)"
           @dragend="handleDragEnd"
@@ -537,8 +539,9 @@ async function handleDragEnd() {
 
     <!-- Delete Confirmation Modal -->
     <template v-if="deleteConfirmation">
-      <div
+      <button
         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-200"
+        aria-label="Cancel deletion"
         @click="deleteConfirmation = null"
       >
         <div
@@ -566,7 +569,7 @@ async function handleDragEnd() {
             </button>
           </div>
         </div>
-      </div>
+      </button>
     </template>
   </div>
 </template>
@@ -578,8 +581,17 @@ async function handleDragEnd() {
 }
 
 .admin-title {
-  font-family: 'EnduroWeb, sans-serif';
+  font-family: 'EnduroWeb', sans-serif;
   letter-spacing: 0.03em;
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  display: inline-block;
 }
 
 /* Preview containers */

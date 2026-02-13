@@ -15,9 +15,10 @@ const emit = defineEmits<{
 
 <template>
   <Transition name="popup-backdrop">
-    <div
+    <button
       v-if="isVisible"
       class="fixed inset-0 z-40"
+      aria-label="Close popup"
       @click="emit('close')"
     />
   </Transition>
@@ -54,6 +55,18 @@ const emit = defineEmits<{
 </template>
 
 <style scoped>
+/* Component-specific styles */
+.popup-backdrop {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+
 /* Component-specific transition styles */
 .popup-enter-active,
 .popup-leave-active {

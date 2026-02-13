@@ -107,5 +107,4 @@ const chevronSize = computed(() => isTabletOrAbove.value ? 28 : 24)
     opacity: 1;
   }
 }
-
 </style>

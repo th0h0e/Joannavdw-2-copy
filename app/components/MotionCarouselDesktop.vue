@@ -153,9 +153,8 @@ const showRightChevron = computed(() => props.images.length > 1 && currentSlide.
     :class="`project-title-container absolute top-1/2 left-1/2 z-[200] text-center w-full ${projectTitleContainerClasses}`"
   >
     <button
-      :class="[
-        'text-white motion-project-title-desktop title-font',
-        { 'motion-project-title-desktop--hidden': titleHidden }
+      class="text-white motion-project-title-desktop title-font" :class="[
+        { 'motion-project-title-desktop--hidden': titleHidden },
       ]"
       @click="handleTitleClick"
       @keydown.enter.prevent="handleTitleClick"
@@ -304,7 +303,9 @@ const showRightChevron = computed(() => props.images.length > 1 && currentSlide.
   cursor: pointer;
   opacity: 1;
   visibility: visible;
-  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  transition:
+    opacity 0.3s ease-in-out,
+    visibility 0.3s ease-in-out;
   appearance: none;
   background: none;
   border: none;
@@ -332,7 +333,9 @@ const showRightChevron = computed(() => props.images.length > 1 && currentSlide.
   width: 100%;
   opacity: 0;
   transform: translateY(10px) translateZ(0);
-  transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+  transition:
+    opacity 0.15s ease-in-out,
+    transform 0.15s ease-in-out;
 }
 
 .progress-bar-inner--visible {
@@ -349,7 +352,9 @@ const showRightChevron = computed(() => props.images.length > 1 && currentSlide.
   display: block;
   opacity: 0;
   transform: translateY(-10px) translateZ(0);
-  transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+  transition:
+    opacity 0.15s ease-in-out,
+    transform 0.15s ease-in-out;
   cursor: pointer;
   appearance: none;
   background: none;
@@ -366,5 +371,4 @@ const showRightChevron = computed(() => props.images.length > 1 && currentSlide.
 .right-chevron {
   opacity: 1;
 }
-
 </style>

@@ -7,7 +7,7 @@ const props = withDefaults(defineProps<{
 })
 
 const isOpen = ref(false)
-const { isTabletOrAbove } = useBreakpoints()
+useBreakpoints()
 
 function toggleMenu() {
   if (props.isPopupVisible)
@@ -94,7 +94,11 @@ function handleLinkClick(index: number) {
 
 .hamburger-icon {
   display: block;
-  transition: transform 0.3s, background-color 0.3s, width 0.3s, height 0.3s;
+  transition:
+    transform 0.3s,
+    background-color 0.3s,
+    width 0.3s,
+    height 0.3s;
 }
 
 .hamburger-icon--closed {

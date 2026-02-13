@@ -5,7 +5,6 @@ import type { Settings } from '~/plugins/pocketbase.client'
  * Favicon is now stored locally at /assets/favicon.ico (via unstorage).
  * Cache-busting uses the settings.updated timestamp.
  */
-// eslint-disable-next-line react/no-unnecessary-use-prefix
 export function useFaviconCache(settingsRef: Ref<Settings | null>) {
   const faviconHref = ref<string>('/assets/favicon.ico')
 
