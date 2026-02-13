@@ -49,7 +49,7 @@ const chevronSize = computed(() => isTabletOrAbove.value ? 28 : 24)
     >
       <div
         v-if="showTitle"
-        :class="`absolute top-1/2 left-1/2 z-10 text-center w-full ${projectTitleContainerClasses}`"
+        class="absolute top-1/2 left-1/2 z-10 text-center w-full"
         :style="{
           transform: 'translate(-50%, -50%)',
           animation: `fadeInTitle 0.15s ease-out ${titleDelay} both`,

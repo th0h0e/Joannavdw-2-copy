@@ -15,20 +15,20 @@ function getImageUrl(collectionId: string, recordId: string, filename: string) {
 }
 
 // Single-record collections — take first active item
-const aboutData = computed(() => aboutRes.value?.items?.find(i => i.Is_Active) ?? null)
-const homepageData = computed(() => homepageRes.value?.items?.find(i => i.Is_Active) ?? null)
+const aboutData = computed(() => aboutRes.value?.items?.find((i: Record<string, unknown>) => i.Is_Active) ?? null)
+const homepageData = computed(() => homepageRes.value?.items?.find((i: Record<string, unknown>) => i.Is_Active) ?? null)
 const settingsData = computed(() => settingsRes.value?.items?.[0] ?? null)
 
 // Transform portfolio projects
 const projectsData = computed(() => {
   const items = portfolioRes.value?.items ?? []
   return items
-    .sort((a, b) => a.Order - b.Order)
-    .map(project => ({
+    .sort((a: Record<string, unknown>, b: Record<string, unknown>) => (a.Order as number) - (b.Order as number))
+    .map((project: Record<string, unknown>) => ({
       title: project.Title,
       description: project.Description,
       responsibility: project.Responsibility_json,
-      images: project.Images.map(filename => ({
+      images: (project.Images as string[]).map(filename => ({
         src: getImageUrl(project.collectionId, project.id, filename),
       })),
     }))
@@ -48,18 +48,41 @@ useFaviconCache(settingsData)
 const projectTitles = computed(() => projectsData.value.map(p => p.title))
 const projectCount = computed(() => projectsData.value.length)
 
-// Popup management
-const {
-  showPopup,
-  showAboutPopup,
-  popupProjectTitle,
-  popupProjectDescription,
-  popupProjectResponsibility,
-  handleShowPopup,
-  handleClosePopup,
-  handleShowAboutPopup,
-  handleCloseAboutPopup,
-} = usePopup(projectsData)
+// Simple modal state refs
+const showPopup = ref(false)
+const showAboutPopup = ref(false)
+
+// Popup content data
+const popupProjectTitle = ref('')
+const popupProjectDescription = ref('')
+const popupProjectResponsibility = ref<string[]>([])
+
+// Popup handlers
+function handleShowPopup(projectTitle: string) {
+  const project = projectsData.value.find(p => p.title === projectTitle)
+  popupProjectTitle.value = projectTitle
+  popupProjectDescription.value = project?.description || ''
+  popupProjectResponsibility.value = project?.responsibility || []
+  showPopup.value = true
+}
+
+function handleClosePopup() {
+  showPopup.value = false
+}
+
+function handleShowAboutPopup() {
+  showAboutPopup.value = true
+}
+
+function handleCloseAboutPopup() {
+  showAboutPopup.value = false
+}
+
+// Keyboard shortcuts
+defineShortcuts({
+  o: () => showAboutPopup.value = !showAboutPopup.value,
+  p: () => showPopup.value = !showPopup.value,
+})
 
 // Carousel reset and mobile swipe hint
 const { resetInactiveCarousels } = useCarouselReset(projectCount)
@@ -205,20 +228,22 @@ function handleRetry() {
       <ProjectIndex :project-titles="projectTitles" />
     </main>
 
-    <!-- Global Popup -->
-    <LazyProjectPopup
-      :is-visible="showPopup"
-      :project-title="popupProjectTitle"
-      :project-description="popupProjectDescription"
-      :project-responsibility="popupProjectResponsibility"
-      @close="handleClosePopup"
-    />
+    <!-- Project Popup Modal -->
+    <UModal v-model:open="showPopup" :overlay="false">
+      <template #content>
+        <ProjectPopup
+          :project-title="popupProjectTitle"
+          :project-description="popupProjectDescription"
+          :project-responsibility="popupProjectResponsibility"
+        />
+      </template>
+    </UModal>
 
-    <!-- About Popup -->
-    <LazyAboutPopup
-      :is-visible="showAboutPopup"
-      :about-data="aboutData"
-      @close="handleCloseAboutPopup"
-    />
+    <!-- About Popup Modal -->
+    <UModal v-model:open="showAboutPopup" :overlay="false">
+      <template #content>
+        <AboutPopup :about-data="aboutData" />
+      </template>
+    </UModal>
   </div>
 </template>

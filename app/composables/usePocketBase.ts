@@ -15,7 +15,7 @@ function convertPocketBaseProject(project: PortfolioProject): ConvertedProject {
     images: project.Images.map(filename => ({
       src: getImageUrl(project, filename),
     })),
-    responsibility: project.Responsibility_json || project.Responsibility,
+    responsibility: project.Responsibility_json as string[] | undefined,
   }
 }
 

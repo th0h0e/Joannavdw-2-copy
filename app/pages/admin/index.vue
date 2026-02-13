@@ -2,8 +2,12 @@
 import loginBackground from '~/assets/admin-login-bg.jpg'
 import { pb } from '~/plugins/pocketbase.client'
 
-const email = ref('')
-const password = ref('')
+// Form state
+const formState = reactive({
+  email: '',
+  password: '',
+})
+
 const error = ref('')
 const loading = ref(false)
 
@@ -13,13 +17,12 @@ onMounted(() => {
   }
 })
 
-async function handleLogin(e: Event) {
-  e.preventDefault()
+async function handleLogin() {
   error.value = ''
   loading.value = true
 
   try {
-    await pb.collection('users').authWithPassword(email.value, password.value)
+    await pb.collection('users').authWithPassword(formState.email, formState.password)
     await navigateTo('/admin/dashboard')
   }
   catch (err: unknown) {
@@ -60,45 +63,41 @@ async function handleLogin(e: Event) {
         </p>
       </div>
 
-      <form class="space-y-6" @submit="handleLogin">
-        <div>
-          <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-          <label class="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wider">Email
-            <input
-              v-model="email"
-              type="email"
-              required
-              class="w-full px-4 py-3 bg-neutral-800/60 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-neutral-600 focus:border-neutral-600 placeholder-neutral-500 text-sm transition-all"
-              placeholder="admin@example.com"
-            >
-          </label>
-        </div>
+      <UForm :state="formState" class="space-y-6" @submit="handleLogin">
+        <UFormField label="Email" required>
+          <UInput
+            v-model="formState.email"
+            type="email"
+            placeholder="admin@example.com"
+            color="neutral"
+            variant="subtle"
+            class="w-full"
+          />
+        </UFormField>
 
-        <div>
-          <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-          <label class="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wider">Password
-            <input
-              v-model="password"
-              type="password"
-              required
-              class="w-full px-4 py-3 bg-neutral-800/60 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-neutral-600 focus:border-neutral-600 placeholder-neutral-500 text-sm transition-all"
-              placeholder="••••••••"
-            >
-          </label>
-        </div>
+        <UFormField label="Password" required>
+          <UInput
+            v-model="formState.password"
+            type="password"
+            placeholder="••••••••"
+            color="neutral"
+            variant="subtle"
+            class="w-full"
+          />
+        </UFormField>
 
         <div v-if="error" class="bg-red-950/20 border border-red-800/30 text-red-200 px-4 py-3 rounded-sm text-sm">
           {{ error }}
         </div>
 
-        <button
+        <UButton
           type="submit"
-          :disabled="loading"
-          class="w-full px-6 py-2.5 bg-black/30 border border-neutral-700/60 text-neutral-200 rounded-sm hover:bg-black/50 hover:text-white hover:border-neutral-600/60 disabled:bg-neutral-600 disabled:text-neutral-500 disabled:cursor-not-allowed transition-all text-sm uppercase tracking-wide"
+          :loading="loading"
+          class="w-full"
         >
           {{ loading ? 'Logging in...' : 'Login' }}
-        </button>
-      </form>
+        </UButton>
+      </UForm>
 
       <div class="mt-6 text-center">
         <NuxtLink to="/" class="text-xs text-neutral-400 hover:text-white transition-colors uppercase tracking-wide">

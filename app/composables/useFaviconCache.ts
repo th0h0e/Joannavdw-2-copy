@@ -1,11 +1,9 @@
-import type { Settings } from '~/plugins/pocketbase.client'
-
 /**
  * Sets the site favicon from local storage.
  * Favicon is now stored locally at /assets/favicon.ico (via unstorage).
  * Cache-busting uses the settings.updated timestamp.
  */
-export function useFaviconCache(settingsRef: Ref<Settings | null>) {
+export function useFaviconCache(settingsRef: Ref<Record<string, unknown> | null>) {
   const faviconHref = ref<string>('/assets/favicon.ico')
 
   // useHead is auto-imported by Nuxt

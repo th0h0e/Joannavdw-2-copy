@@ -17,6 +17,7 @@ const emit = defineEmits<{
 }>()
 
 const containerRef = ref<HTMLDivElement | null>(null)
+const projectTitleRef = useTemplateRef('projectTitleRef')
 const scrollProgress = ref(0)
 const currentSlide = ref(0)
 const isOnBlurSlide = ref(false)
@@ -150,7 +151,8 @@ const showRightChevron = computed(() => props.images.length > 1 && currentSlide.
 
   <!-- Project Title -->
   <div
-    :class="`project-title-container absolute top-1/2 left-1/2 z-[200] text-center w-full ${projectTitleContainerClasses}`"
+    ref="projectTitleRef"
+    class="project-title-container absolute top-1/2 left-1/2 z-[200] text-center w-full"
   >
     <button
       class="text-white motion-project-title-desktop title-font" :class="[

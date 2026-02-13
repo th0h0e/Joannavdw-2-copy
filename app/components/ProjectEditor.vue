@@ -20,11 +20,14 @@ const emit = defineEmits<{
   showToast: [message: string, type: 'success' | 'error']
 }>()
 
-const title = ref(props.project?.Title || '')
-const description = ref(props.project?.Description || '')
-const order = ref(props.project?.Order || 0)
-const responsibilities = ref<string[]>(props.project?.Responsibility_json || props.project?.Responsibility || [])
-const newResponsibility = ref('')
+// Form state
+const formState = reactive({
+  title: props.project?.Title || '',
+  description: props.project?.Description || '',
+  order: props.project?.Order || 0,
+  responsibilities: props.project?.Responsibility_json || props.project?.Responsibility || [] as string[],
+})
+
 const images = ref<ImageItem[]>([])
 const imagesToDelete = ref<string[]>([])
 const loading = ref(false)
@@ -49,17 +52,21 @@ watch(() => props.project, (project) => {
       isExisting: true,
     }))
   }
+  // Update form state when project changes
+  if (project) {
+    formState.title = project.Title || ''
+    formState.description = project.Description || ''
+    formState.order = project.Order || 0
+    formState.responsibilities = project.Responsibility_json || project.Responsibility || []
+  }
 }, { immediate: true })
 
-function handleAddResponsibility() {
-  if (newResponsibility.value.trim()) {
-    responsibilities.value.push(newResponsibility.value.trim().toUpperCase())
-    newResponsibility.value = ''
-  }
-}
+// Display value transformer for uppercase display
+const uppercaseDisplay = (value: string) => value.toUpperCase()
 
-function handleRemoveResponsibility(index: number) {
-  responsibilities.value = responsibilities.value.filter((_, i) => i !== index)
+// Convert tag values to uppercase before adding
+function handleAddTag(value: string) {
+  return value.toUpperCase()
 }
 
 function handleImageUpload(e: Event) {
@@ -144,17 +151,17 @@ function handleDragEnd() {
   draggedIndex.value = null
 }
 
-async function handleSubmit(e: Event) {
-  e.preventDefault()
+async function handleSubmit(e?: Event) {
+  e?.preventDefault()
   loading.value = true
 
   try {
     const formData = new FormData()
-    formData.append('Title', title.value)
-    formData.append('Description', description.value)
-    formData.append('Order', order.value.toString())
+    formData.append('Title', formState.title)
+    formData.append('Description', formState.description)
+    formData.append('Order', formState.order.toString())
 
-    responsibilities.value.forEach((resp) => {
+    formState.responsibilities.forEach((resp: string) => {
       formData.append('Responsibility_json', resp)
     })
 
@@ -244,9 +251,9 @@ async function handleSubmit(e: Event) {
       class="project-editor__preview absolute top-1/2"
     >
       <LazyProjectPopupPreview
-        :project-title="title"
-        :project-description="description"
-        :project-responsibility="responsibilities"
+        :project-title="formState.title"
+        :project-description="formState.description"
+        :project-responsibility="formState.responsibilities"
       />
     </div>
 
@@ -254,7 +261,7 @@ async function handleSubmit(e: Event) {
     <div
       class="project-editor__sidebar fixed right-0 top-0 w-3/4 md:w-2/3 lg:w-1/2 bg-black/85 backdrop-blur-xl border-l border-neutral-700/60 shadow-2xl z-50 flex flex-col"
     >
-      <form class="flex flex-col h-full" @submit="handleSubmit">
+      <UForm :state="formState" class="flex flex-col h-full" @submit="handleSubmit">
         <!-- Sticky Header -->
         <div class="flex-shrink-0 p-8 border-b border-neutral-800/60 backdrop-blur-sm">
           <h2 class="text-xl font-medium text-white tracking-tight">
@@ -339,13 +346,16 @@ async function handleSubmit(e: Event) {
                       <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white px-2 py-1 rounded-sm text-xs font-medium">
                         {{ index + 1 }}
                       </div>
-                      <button
+                      <UButton
                         type="button"
-                        class="absolute top-2 right-2 bg-red-600/10 backdrop-blur-md text-red-400 px-2.5 py-1 rounded-sm text-xs hover:bg-red-600/20 hover:text-red-300 opacity-0 group-hover:opacity-100 transition-all font-medium uppercase tracking-wide border border-red-600/20 hover:border-red-600/30"
+                        color="error"
+                        variant="soft"
+                        size="xs"
+                        class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all"
                         @click="handleDeleteImage(image)"
                       >
                         Delete
-                      </button>
+                      </UButton>
                       <div class="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white px-2 py-1.5 text-xs truncate">
                         {{ image.filename }}
                       </div>
@@ -360,109 +370,75 @@ async function handleSubmit(e: Event) {
           <div class="border-t border-white/10" />
 
           <!-- Title -->
-          <div>
-            <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-            <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">
-              Project Title *
-              <input
-                v-model="title"
-                type="text"
-                required
-                class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                placeholder="e.g., Maria Bodil for Nike"
-              >
-            </label>
-          </div>
+          <UFormField label="Project Title" required>
+            <UInput
+              v-model="formState.title"
+              placeholder="e.g., Maria Bodil for Nike"
+              color="neutral"
+              variant="subtle"
+              class="w-full"
+            />
+          </UFormField>
 
           <!-- Description -->
-          <div>
-            <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-            <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">
-              Description *
-              <textarea
-                v-model="description"
-                required
-                :rows="6"
-                class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all resize-none"
-                placeholder="Project description..."
-              />
-            </label>
-          </div>
+          <UFormField label="Description" required>
+            <UTextarea
+              v-model="formState.description"
+              :rows="6"
+              placeholder="Project description..."
+              color="neutral"
+              variant="subtle"
+              class="w-full"
+            />
+          </UFormField>
 
           <!-- Order -->
-          <div>
-            <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-            <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">
-              Position in Portfolio *
-              <input
-                v-model.number="order"
-                type="number"
-                required
-                min="0"
-                class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-sm transition-all"
-              >
-            </label>
-          </div>
+          <UFormField label="Position in Portfolio" required>
+            <UInputNumber
+              v-model="formState.order"
+              :min="0"
+              :increment="false"
+              :decrement="false"
+              color="neutral"
+              variant="subtle"
+              class="w-full"
+            />
+          </UFormField>
 
           <!-- Responsibilities -->
-          <div>
-            <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-            <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">
-              Responsibilities
-              <div class="flex gap-2 mb-3">
-                <input
-                  v-model="newResponsibility"
-                  type="text"
-                  class="flex-1 px-4 py-2.5 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                  placeholder="e.g., CREATIVE PRODUCTION"
-                  @keypress.enter.prevent="handleAddResponsibility"
-                >
-                <button
-                  type="button"
-                  class="px-6 py-3 bg-white text-black rounded-sm text-sm hover:bg-neutral-100 font-medium transition-all uppercase tracking-wide"
-                  @click="handleAddResponsibility"
-                >
-                  Add
-                </button>
-              </div>
-            </label>
-            <div class="flex flex-wrap gap-2">
-              <span
-                v-for="(resp, idx) in responsibilities"
-                :key="`${resp}-${idx}`"
-                class="inline-flex items-center gap-2 bg-black/30 border border-neutral-700/40 text-neutral-200 px-3 py-1.5 rounded-sm text-xs tracking-wide"
-              >
-                {{ resp }}
-                <button
-                  type="button"
-                  class="text-red-400 hover:text-red-300 text-sm transition-colors"
-                  @click="handleRemoveResponsibility(idx)"
-                >
-                  &times;
-                </button>
-              </span>
-            </div>
-          </div>
+          <UFormField label="Responsibilities" help="Press Enter to add a responsibility">
+            <UInputTags
+              v-model="formState.responsibilities"
+              placeholder="e.g., CREATIVE PRODUCTION"
+              color="neutral"
+              variant="subtle"
+              :display-value="uppercaseDisplay"
+              :convert-value="handleAddTag"
+              class="w-full"
+            />
+          </UFormField>
         </div>
 
         <!-- Sticky Footer -->
         <div class="flex-shrink-0 p-8 border-t border-neutral-800/60 flex gap-3 backdrop-blur-sm">
-          <button
+          <UButton
             type="button"
-            class="flex-1 px-6 py-3 bg-black/30 border border-neutral-700/60 text-neutral-200 rounded-sm hover:bg-black/50 hover:text-white hover:border-neutral-600/60 transition-all text-sm uppercase tracking-wide font-medium"
+            variant="outline"
+            color="neutral"
+            class="flex-1"
             @click="emit('cancel')"
           >
             Cancel
-          </button>
-          <button
+          </UButton>
+          <UButton
             type="submit"
-            :disabled="loading"
-            class="flex-1 px-6 py-3 bg-white text-black rounded-sm hover:bg-neutral-100 disabled:bg-neutral-600 disabled:text-neutral-500 disabled:cursor-not-allowed transition-all font-medium text-sm uppercase tracking-wide hover:shadow-lg hover:shadow-white/10"
+            :loading="loading"
+            class="flex-1"
           >
             {{ loading ? 'Saving...' : project ? 'Update Project' : 'Create Project' }}
-          </button>
+          </UButton>
         </div>
-      </form>
+      </UForm>
     </div>
   </Teleport>
 </template>

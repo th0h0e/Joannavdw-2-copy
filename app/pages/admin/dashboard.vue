@@ -3,10 +3,10 @@ import type { Homepage, PortfolioProject } from '~/plugins/pocketbase.client'
 import { getImageUrl, pb } from '~/plugins/pocketbase.client'
 
 definePageMeta({
-  middleware: 'auth',
+  layout: 'admin',
 })
 
-const { toasts, showToast } = useAppToast()
+const { showToast } = useAppToast()
 
 const editingProject = ref<PortfolioProject | null>(null)
 const showNewProjectForm = ref(false)
@@ -15,7 +15,8 @@ const showMobilePreview = ref(false)
 const isReordering = ref(false)
 const isEditingTitle = ref(false)
 const tempTitle = ref('')
-const deleteConfirmation = ref<{ projectId: string } | null>(null)
+const isDeleteModalOpen = ref(false)
+const projectToDelete = ref<string | null>(null)
 const heroFileInput = ref<HTMLInputElement | null>(null)
 const heroMobileFileInput = ref<HTMLInputElement | null>(null)
 
@@ -152,18 +153,20 @@ function handleTitleCancel() {
 }
 
 function handleDelete(projectId: string) {
-  deleteConfirmation.value = { projectId }
+  projectToDelete.value = projectId
+  isDeleteModalOpen.value = true
 }
 
 async function confirmDelete() {
-  if (!deleteConfirmation.value)
+  if (!projectToDelete.value)
     return
   try {
-    await $fetch(`/api/projects/${deleteConfirmation.value.projectId}`, {
+    await $fetch(`/api/projects/${projectToDelete.value}`, {
       method: 'DELETE',
       headers: { Authorization: pb.authStore.token },
     })
-    deleteConfirmation.value = null
+    isDeleteModalOpen.value = false
+    projectToDelete.value = null
     await refreshProjects()
     showToast('Project deleted successfully', 'success')
   }
@@ -176,7 +179,8 @@ async function confirmDelete() {
       return
     }
     showToast(`Failed to delete project: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
-    deleteConfirmation.value = null
+    isDeleteModalOpen.value = false
+    projectToDelete.value = null
   }
 }
 
@@ -270,34 +274,46 @@ async function handleDragEnd() {
           </p>
         </div>
         <div class="flex items-center gap-3">
-          <NuxtLink to="/" class="px-4 py-2 text-xs tracking-wide text-neutral-400 hover:text-white transition-colors uppercase">
+          <UButton
+            to="/"
+            variant="ghost"
+            color="neutral"
+            size="sm"
+            class="uppercase text-xs tracking-wide"
+          >
             View Portfolio
-          </NuxtLink>
-          <button
-            class="p-2 text-neutral-400 hover:text-white transition-colors"
+          </UButton>
+          <UButton
+            variant="ghost"
+            color="neutral"
+            size="sm"
+            icon="i-lucide-settings"
             aria-label="Settings"
             @click="showSettings = true"
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
-              <path d="M16.5 10c0 .5-.1 1-.2 1.4l1.4.8c.2.1.2.4.1.6l-1.5 2.6c-.1.2-.4.3-.6.2l-1.4-.8c-.6.5-1.3.9-2 1.1l-.3 1.6c0 .2-.2.4-.5.4h-3c-.3 0-.5-.2-.5-.4l-.3-1.6c-.7-.2-1.4-.6-2-1.1l-1.4.8c-.2.1-.5 0-.6-.2l-1.5-2.6c-.1-.2 0-.5.1-.6l1.4-.8c-.1-.4-.2-.9-.2-1.4s.1-1 .2-1.4l-1.4-.8c-.2-.1-.2-.4-.1-.6l1.5-2.6c.1-.2.4-.3.6-.2l1.4.8c.6-.5 1.3-.9 2-1.1l.3-1.6c0-.2.2-.4.5-.4h3c.3 0 .5.2.5.4l.3 1.6c.7.2 1.4.6 2 1.1l1.4-.8c.2-.1.5 0 .6.2l1.5 2.6c.1.2 0 .5-.1.6l-1.4.8c.1.4.2.9.2 1.4z" />
-            </svg>
-          </button>
-          <button
-            class="px-4 py-2 text-xs tracking-wide bg-neutral-800/70 hover:bg-neutral-800 text-neutral-300 hover:text-white rounded-sm transition-colors uppercase"
+          />
+          <UButton
+            variant="outline"
+            color="neutral"
+            size="sm"
+            class="uppercase text-xs tracking-wide"
             @click="handleLogout"
           >
             Logout
-          </button>
+          </UButton>
         </div>
       </div>
     </header>
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-      <div v-if="error" class="bg-red-950/20 border border-red-800/30 text-red-200 px-4 py-3 rounded-sm mb-8 text-sm">
-        {{ error }}
-      </div>
+      <UAlert
+        v-if="error"
+        color="error"
+        variant="soft"
+        :title="error"
+        icon="i-lucide-alert-circle"
+        class="mb-8"
+      />
 
       <!-- Hero Image Section -->
       <div v-if="heroImage || heroImageMobile" class="mb-12">
@@ -328,38 +344,36 @@ async function handleDragEnd() {
                   </div>
                 </div>
                 <div v-if="isEditingTitle" class="absolute bottom-6 right-6 flex gap-2 z-10 pointer-events-none">
-                  <button
-                    class="w-10 h-10 flex items-center justify-center bg-black/60 border border-white/30 text-white rounded-sm hover:bg-black/80 transition-all shadow-lg backdrop-blur-md pointer-events-auto"
+                  <UButton
+                    color="neutral"
+                    variant="outline"
+                    size="sm"
+                    icon="i-lucide-x"
+                    class="pointer-events-auto"
                     title="Cancel"
                     @click="handleTitleCancel"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                  </button>
-                  <button
-                    class="w-10 h-10 flex items-center justify-center bg-white text-black rounded-sm hover:bg-neutral-100 transition-all shadow-lg pointer-events-auto"
+                  />
+                  <UButton
+                    size="sm"
+                    icon="i-lucide-check"
+                    class="pointer-events-auto"
                     title="Save"
                     @click="handleTitleSave"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  </button>
+                  />
                 </div>
               </template>
 
               <!-- Update Button -->
               <div v-if="!isEditingTitle" class="absolute bottom-0 right-0 p-6 pointer-events-auto group/update">
-                <button
-                  class="w-10 h-10 flex items-center justify-center bg-black/60 border border-neutral-700/60 text-neutral-200 rounded-sm hover:bg-black/80 hover:text-white hover:border-neutral-600/60 transition-all shadow-lg backdrop-blur-md opacity-0 group-hover/update:opacity-100"
+                <UButton
+                  variant="outline"
+                  color="neutral"
+                  size="sm"
+                  icon="i-lucide-image"
+                  class="opacity-0 group-hover/update:opacity-100 transition-all"
                   title="Update Desktop Hero"
                   @click="heroFileInput?.click()"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
-                  </svg>
-                </button>
+                />
               </div>
             </div>
           </div>
@@ -380,27 +394,30 @@ async function handleDragEnd() {
               <img :src="heroImageMobile" alt="Hero Mobile" class="absolute inset-0 w-full h-full object-cover">
 
               <div v-if="!isEditingTitle" class="absolute bottom-0 right-0 p-6 pointer-events-auto group/update">
-                <button
-                  class="w-9 h-9 flex items-center justify-center bg-black/60 border border-neutral-700/60 text-neutral-200 rounded-sm hover:bg-black/80 hover:text-white hover:border-neutral-600/60 transition-all shadow-lg backdrop-blur-md opacity-0 group-hover/update:opacity-100"
+                <UButton
+                  variant="outline"
+                  color="neutral"
+                  size="sm"
+                  icon="i-lucide-image"
+                  class="opacity-0 group-hover/update:opacity-100 transition-all"
                   title="Update Mobile Hero"
                   @click="heroMobileFileInput?.click()"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
-                  </svg>
-                </button>
+                />
               </div>
             </div>
           </div>
         </div>
 
         <!-- Toggle mobile preview -->
-        <button
-          class="mt-3 text-xs text-neutral-500 hover:text-white transition-colors uppercase tracking-wide"
+        <UButton
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          class="mt-3 uppercase text-xs tracking-wide"
           @click="showMobilePreview = !showMobilePreview"
         >
           {{ showMobilePreview ? 'Hide mobile preview' : 'Show mobile preview' }}
-        </button>
+        </UButton>
 
         <input id="heroFileInput" ref="heroFileInput" type="file" accept="image/*" class="hidden" aria-label="Update Desktop Hero Image" @change="handleHeroImageUpdate">
         <input id="heroMobileFileInput" ref="heroMobileFileInput" type="file" accept="image/*" class="hidden" aria-label="Update Mobile Hero Image" @change="handleHeroImageMobileUpdate">
@@ -463,18 +480,24 @@ async function handleDragEnd() {
 
             <!-- Actions -->
             <div class="flex gap-2.5">
-              <button
-                class="px-5 py-2.5 bg-neutral-800/70 border border-neutral-700/60 text-neutral-200 rounded-sm text-xs hover:bg-neutral-700/60 hover:text-white hover:border-neutral-600 font-medium transition-all duration-200 uppercase tracking-wider shadow-sm hover:shadow-md"
+              <UButton
+                variant="outline"
+                color="neutral"
+                size="sm"
+                class="uppercase text-xs tracking-wide"
                 @click="editingProject = project"
               >
                 Edit
-              </button>
-              <button
-                class="px-5 py-2.5 bg-red-950/30 text-red-400 rounded-sm text-xs hover:bg-red-900/40 hover:text-red-300 font-medium transition-all duration-200 uppercase tracking-wider border border-red-900/40 hover:border-red-800/60 shadow-sm hover:shadow-md"
+              </UButton>
+              <UButton
+                color="error"
+                variant="soft"
+                size="sm"
+                class="uppercase text-xs tracking-wide"
                 @click="handleDelete(project.id)"
               >
                 Delete
-              </button>
+              </UButton>
             </div>
           </div>
 
@@ -499,12 +522,16 @@ async function handleDragEnd() {
 
       <!-- Create New Project Button -->
       <div class="mt-12">
-        <button
-          class="px-8 py-2.5 bg-white text-black rounded-sm text-sm hover:bg-neutral-100 transition-all font-medium tracking-wide uppercase hover:shadow-lg hover:shadow-white/5"
+        <UButton
+          size="md"
+          class="uppercase text-sm tracking-wide"
           @click="showNewProjectForm = true"
         >
-          + New Project
-        </button>
+          <template #leading>
+            <UIcon name="i-lucide-plus" class="size-4" />
+          </template>
+          New Project
+        </UButton>
       </div>
     </main>
 
@@ -524,53 +551,31 @@ async function handleDragEnd() {
       @show-toast="(msg: string, type: 'success' | 'error') => showToast(msg, type)"
     />
 
-    <!-- Toast Notifications -->
-    <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none">
-      <div
-        v-for="toast in toasts"
-        :key="toast.id"
-        class="px-4 py-3 rounded-sm text-sm font-medium backdrop-blur-md pointer-events-auto transition-all duration-300" :class="[
-          toast.type === 'success' ? 'bg-green-500/20 border border-green-500/40 text-green-200' : 'bg-red-500/20 border border-red-500/40 text-red-200',
-        ]"
-      >
-        {{ toast.message }}
-      </div>
-    </div>
-
     <!-- Delete Confirmation Modal -->
-    <template v-if="deleteConfirmation">
-      <button
-        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-200"
-        aria-label="Cancel deletion"
-        @click="deleteConfirmation = null"
-      >
-        <div
-          class="bg-neutral-900/95 border border-neutral-800/70 rounded-sm p-6 max-w-sm mx-4"
-          @click.stop
+    <UModal v-model:open="isDeleteModalOpen" title="Delete Project">
+      <template #body>
+        <p class="text-sm text-neutral-400">
+          Are you sure you want to delete this project? This action cannot be undone.
+        </p>
+      </template>
+      <template #footer>
+        <UButton
+          variant="outline"
+          color="neutral"
+          class="flex-1 uppercase text-sm tracking-wide"
+          @click="isDeleteModalOpen = false"
         >
-          <h3 class="text-lg font-medium text-white mb-2">
-            Delete Project
-          </h3>
-          <p class="text-sm text-neutral-400 mb-6">
-            Are you sure you want to delete this project? This action cannot be undone.
-          </p>
-          <div class="flex gap-3">
-            <button
-              class="flex-1 px-4 py-2.5 bg-neutral-800/70 border border-neutral-700/60 text-neutral-200 rounded-sm text-sm hover:bg-neutral-700/60 hover:text-white font-medium transition-all uppercase tracking-wide"
-              @click="deleteConfirmation = null"
-            >
-              Cancel
-            </button>
-            <button
-              class="flex-1 px-4 py-2.5 bg-red-950/30 text-red-400 rounded-sm text-sm hover:bg-red-900/40 hover:text-red-300 font-medium transition-all uppercase tracking-wide border border-red-900/40 hover:border-red-800/60"
-              @click="confirmDelete"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      </button>
-    </template>
+          Cancel
+        </UButton>
+        <UButton
+          color="error"
+          class="flex-1 uppercase text-sm tracking-wide"
+          @click="confirmDelete"
+        >
+          Delete
+        </UButton>
+      </template>
+    </UModal>
   </div>
 </template>
 

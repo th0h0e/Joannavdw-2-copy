@@ -46,8 +46,10 @@ const faviconUrl = ref('')
 const aboutDescription = ref('')
 const expertiseDescription = ref('')
 const clientList = ref<string[]>([])
-const newClient = ref('')
 const contactEmail = ref('')
+
+// Display value transformer for uppercase display
+const uppercaseDisplay = (value: string) => value.toUpperCase()
 
 // Populate form fields when data arrives
 watch(rawData, (data) => {
@@ -77,15 +79,9 @@ watch(() => props.isOpen, (isOpen) => {
     refresh()
 })
 
-function handleAddClient() {
-  if (newClient.value.trim()) {
-    clientList.value.push(newClient.value.trim().toUpperCase())
-    newClient.value = ''
-  }
-}
-
-function handleRemoveClient(index: number) {
-  clientList.value = clientList.value.filter((_, i) => i !== index)
+// Convert tag values to uppercase before adding
+function handleAddTag(value: string) {
+  return value.toUpperCase()
 }
 
 async function handleFaviconUpdate(event: Event) {
@@ -210,7 +206,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
 
     <!-- Sidebar -->
     <div class="settings-sidebar fixed right-0 top-0 h-full w-3/4 md:w-1/2 bg-black/85 backdrop-blur-xl border-l border-neutral-700/60 shadow-2xl z-50 flex flex-col">
-      <form class="flex flex-col h-full" @submit="handleSubmit">
+      <UForm :state="{}" class="flex flex-col h-full" @submit="handleSubmit">
         <!-- Sticky Header -->
         <div class="flex-shrink-0 p-8 border-b border-neutral-800/60 flex items-center gap-4 backdrop-blur-sm">
           <div class="flex-1">
@@ -223,8 +219,9 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
           </div>
 
           <!-- Favicon Avatar -->
-          <button
-            class="flex-shrink-0 w-12 h-12 rounded-sm bg-white/10 border border-neutral-700/60 hover:border-white/30 cursor-pointer transition-all overflow-hidden group hover:shadow-lg hover:shadow-white/5"
+          <UButton
+            variant="ghost"
+            class="flex-shrink-0 w-12 h-12 rounded-sm overflow-hidden"
             title="Click to update favicon"
             @click="faviconFileInput?.click()"
           >
@@ -236,7 +233,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
             >
             <div
               v-else
-              class="w-full h-full flex items-center justify-center text-neutral-500 group-hover:text-neutral-400 transition-colors"
+              class="w-full h-full flex items-center justify-center"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -244,7 +241,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
                 <polyline points="21 15 16 10 5 21" />
               </svg>
             </div>
-          </button>
+          </UButton>
 
           <input
             id="faviconFileInput"
@@ -264,17 +261,12 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
             <h3 class="text-sm font-medium text-white mb-4 uppercase tracking-wider">
               Hero Section
             </h3>
-            <div>
-              <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-              <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">Hero Title
-                <input
-                  v-model="heroTitle"
-                  type="text"
-                  class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                  placeholder="Creative Strategy and Communication"
-                >
-              </label>
-            </div>
+            <UFormField label="Hero Title">
+              <UInput
+                v-model="heroTitle"
+                placeholder="Creative Strategy and Communication"
+              />
+            </UFormField>
           </div>
 
           <div class="border-t border-neutral-700/60" />
@@ -285,62 +277,30 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
               About Section
             </h3>
             <div class="space-y-4">
+              <UFormField label="About Description">
+                <UTextarea
+                  v-model="aboutDescription"
+                  :rows="4"
+                />
+              </UFormField>
+              <UFormField label="Expertise Description">
+                <UTextarea
+                  v-model="expertiseDescription"
+                  :rows="3"
+                />
+              </UFormField>
               <div>
-                <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-                <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">About Description
-                  <textarea
-                    v-model="aboutDescription"
-                    :rows="4"
-                    class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all resize-none"
+                <UFormField label="Client List" help="Press Enter to add a client">
+                  <UInputTags
+                    v-model="clientList"
+                    placeholder="e.g., NIKE"
+                    color="neutral"
+                    variant="subtle"
+                    :display-value="uppercaseDisplay"
+                    :convert-value="handleAddTag"
+                    class="bg-black/30 border-neutral-700/60"
                   />
-                </label>
-              </div>
-              <div>
-                <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-                <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">Expertise Description
-                  <textarea
-                    v-model="expertiseDescription"
-                    :rows="3"
-                    class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all resize-none"
-                  />
-                </label>
-              </div>
-              <div>
-                <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-                <label class="block text-xs font-medium text-neutral-300 mb-3 uppercase tracking-wider">Client List
-                  <div class="flex gap-2 mb-3">
-                    <input
-                      v-model="newClient"
-                      type="text"
-                      class="flex-1 px-4 py-2.5 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                      placeholder="e.g., NIKE"
-                      @keypress.enter.prevent="handleAddClient"
-                    >
-                    <button
-                      type="button"
-                      class="px-6 py-3 bg-white text-black rounded-sm text-sm hover:bg-neutral-100 font-medium transition-all uppercase tracking-wide"
-                      @click="handleAddClient"
-                    >
-                      Add
-                    </button>
-                  </div>
-                </label>
-                <div class="flex flex-wrap gap-2">
-                  <div
-                    v-for="(client, idx) in clientList"
-                    :key="`${client}-${idx}`"
-                    class="flex items-center gap-2 px-3 py-1.5 bg-neutral-800/60 text-neutral-200 rounded-sm text-xs border border-neutral-700/60"
-                  >
-                    {{ client }}
-                    <button
-                      type="button"
-                      class="text-red-400 hover:text-red-300 text-sm transition-colors"
-                      @click="handleRemoveClient(idx)"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                </div>
+                </UFormField>
               </div>
             </div>
           </div>
@@ -353,103 +313,89 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
               Global Settings
             </h3>
             <div class="space-y-4">
+              <UFormField label="Contact Email">
+                <UInput
+                  v-model="contactEmail"
+                  type="email"
+                  placeholder="hello@example.com"
+                />
+              </UFormField>
               <div>
-                <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-                <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">Contact Email
-                  <input
-                    v-model="contactEmail"
-                    type="email"
-                    class="w-full px-4 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                    placeholder="hello@example.com"
-                  >
-                </label>
-              </div>
-              <div>
-                <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-                <label class="block text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">Font Sizes (rem)</label>
+                <p class="text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">
+                  Font Sizes (rem)
+                </p>
                 <div class="grid grid-cols-4 gap-2">
-                  <div>
-                    <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-                    <label class="block text-xs text-neutral-400 mb-1">Mobile
-                      <input
-                        v-model.number="mobileFontSize"
-                        type="number"
-                        step="0.125"
-                        class="w-full px-2 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                      >
-                    </label>
-                  </div>
-                  <div>
-                    <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-                    <label class="block text-xs text-neutral-400 mb-1">Tablet
-                      <input
-                        v-model.number="tabletFontSize"
-                        type="number"
-                        step="0.125"
-                        class="w-full px-2 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                      >
-                    </label>
-                  </div>
-                  <div>
-                    <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-                    <label class="block text-xs text-neutral-400 mb-1">Desktop
-                      <input
-                        v-model.number="desktopFontSize"
-                        type="number"
-                        step="0.125"
-                        class="w-full px-2 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                      >
-                    </label>
-                  </div>
-                  <div>
-                    <!-- eslint-disable-next-line vue-a11y/label-has-for -->
-                    <label class="block text-xs text-neutral-400 mb-1">Large
-                      <input
-                        v-model.number="largeDesktopFontSize"
-                        type="number"
-                        step="0.125"
-                        class="w-full px-2 py-3 bg-black/30 border border-neutral-700/60 text-white rounded-sm focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 placeholder-neutral-500 text-sm transition-all"
-                      >
-                    </label>
-                  </div>
+                  <UFormField label="Mobile">
+                    <UInputNumber
+                      v-model="mobileFontSize"
+                      :step="0.125"
+                      :increment="false"
+                      :decrement="false"
+                      color="neutral"
+                      variant="subtle"
+                    />
+                  </UFormField>
+                  <UFormField label="Tablet">
+                    <UInputNumber
+                      v-model="tabletFontSize"
+                      :step="0.125"
+                      :increment="false"
+                      :decrement="false"
+                      color="neutral"
+                      variant="subtle"
+                    />
+                  </UFormField>
+                  <UFormField label="Desktop">
+                    <UInputNumber
+                      v-model="desktopFontSize"
+                      :step="0.125"
+                      :increment="false"
+                      :decrement="false"
+                      color="neutral"
+                      variant="subtle"
+                    />
+                  </UFormField>
+                  <UFormField label="Large">
+                    <UInputNumber
+                      v-model="largeDesktopFontSize"
+                      :step="0.125"
+                      :increment="false"
+                      :decrement="false"
+                      color="neutral"
+                      variant="subtle"
+                    />
+                  </UFormField>
                 </div>
               </div>
-              <div>
-                <label for="showTopProgressBar" class="flex items-center gap-3 cursor-pointer">
-                  <input
-                    id="showTopProgressBar"
-                    v-model="showTopProgressBar"
-                    type="checkbox"
-                    class="w-4 h-4 bg-black/30 border border-neutral-700/60 rounded-sm text-white focus:ring-1 focus:ring-white/20"
-                  >
-                  <span class="text-xs font-medium text-neutral-300 uppercase tracking-wider">Show Top Progress Bar</span>
-                </label>
-                <p class="text-xs text-neutral-500 mt-1 ml-7">
+              <UFormField>
+                <USwitch v-model="showTopProgressBar" label="Show Top Progress Bar" />
+                <p class="text-xs text-neutral-500 mt-1">
                   Display progress bar at top of carousel
                 </p>
-              </div>
+              </UFormField>
             </div>
           </div>
         </div>
 
         <!-- Sticky Footer -->
         <div class="flex-shrink-0 p-8 border-t border-neutral-800/60 flex gap-3 backdrop-blur-sm">
-          <button
+          <UButton
             type="button"
-            class="flex-1 px-6 py-3 bg-black/30 border border-neutral-700/60 text-neutral-200 rounded-sm text-sm hover:bg-black/50 hover:text-white hover:border-neutral-600/60 font-medium transition-all uppercase tracking-wide"
+            variant="outline"
+            class="flex-1"
             @click="emit('close')"
           >
             Cancel
-          </button>
-          <button
+          </UButton>
+          <UButton
             type="submit"
-            :disabled="loading"
-            class="flex-1 px-6 py-3 bg-white text-black rounded-sm text-sm hover:bg-neutral-100 hover:shadow-lg hover:shadow-white/10 transition-all font-medium tracking-wide uppercase disabled:bg-neutral-600 disabled:text-neutral-400"
+            :loading="loading"
+            class="flex-1"
           >
             {{ loading ? 'Saving...' : 'Save Changes' }}
-          </button>
+          </UButton>
         </div>
-      </form>
+      </UForm>
     </div>
   </template>
 </template>
