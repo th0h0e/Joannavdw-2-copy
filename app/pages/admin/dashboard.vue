@@ -256,8 +256,7 @@ async function handleDragEnd() {
 
   <div
     v-else
-    class="min-h-screen bg-black"
-    :style="{ fontFamily: 'EnduroWeb, sans-serif' }"
+    class="admin-container min-h-screen bg-black"
   >
     <!-- Header -->
     <header class="border-b border-neutral-800/70 backdrop-blur-sm bg-black/80 sticky top-0 z-10">
@@ -306,8 +305,7 @@ async function handleDragEnd() {
           <!-- Desktop Preview -->
           <div :style="{ width: showMobilePreview ? '66.67%' : '100%', transition: 'width 0.3s ease-out', flexShrink: 0 }">
             <div
-              class="relative w-full rounded-sm overflow-hidden bg-neutral-900/30 border border-neutral-800/70 group"
-              :style="{ height: '680px', boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.4)' }"
+              class="preview-container relative w-full rounded-sm overflow-hidden bg-neutral-900/30 border border-neutral-800/70 group"
             >
               <img :src="heroImage" alt="Hero Desktop" class="absolute inset-0 w-full h-full object-cover">
 
@@ -317,10 +315,9 @@ async function handleDragEnd() {
                   <div class="text-center px-6">
                     <h1
                       :contenteditable="isEditingTitle"
-                      class="text-white uppercase leading-none text-4xl outline-none pointer-events-auto inline-block" :class="[
+                      class="admin-title text-white uppercase leading-none text-4xl outline-none pointer-events-auto inline-block" :class="[
                         isEditingTitle ? 'cursor-text' : 'cursor-pointer hover:opacity-80 transition-opacity',
                       ]"
-                      :style="{ fontFamily: 'EnduroWeb, sans-serif', letterSpacing: '0.03em' }"
                       :title="!isEditingTitle ? 'Click to edit' : undefined"
                       @click="!isEditingTitle && handleTitleClick()"
                       @input="(e: Event) => tempTitle = (e.target as HTMLElement).textContent || ''"
@@ -379,8 +376,7 @@ async function handleDragEnd() {
             }"
           >
             <div
-              class="relative w-full rounded-sm overflow-hidden bg-neutral-900/30 border border-neutral-800/70 group"
-              :style="{ height: '680px', boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.4)' }"
+              class="preview-container relative w-full rounded-sm overflow-hidden bg-neutral-900/30 border border-neutral-800/70 group"
             >
               <img :src="heroImageMobile" alt="Hero Mobile" class="absolute inset-0 w-full h-full object-cover">
 
@@ -420,8 +416,7 @@ async function handleDragEnd() {
           v-for="project in projects"
           :key="project.id"
           draggable="true"
-          class="group bg-gradient-to-br from-neutral-900/50 to-neutral-900/30 rounded-sm border border-neutral-800/70 hover:border-neutral-700 hover:from-neutral-900/70 hover:to-neutral-900/50 cursor-grab active:cursor-grabbing flex items-stretch gap-0 overflow-hidden backdrop-blur-sm"
-          :style="{ position: 'relative', boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.4)' }"
+          class="project-card group bg-gradient-to-br from-neutral-900/50 to-neutral-900/30 rounded-sm border border-neutral-800/70 hover:border-neutral-700 hover:from-neutral-900/70 hover:to-neutral-900/50 cursor-grab active:cursor-grabbing flex items-stretch gap-0 overflow-hidden backdrop-blur-sm"
           @dragstart="handleDragStart($event, project.id)"
           @dragover="handleDragOver($event, project.id)"
           @dragend="handleDragEnd"
@@ -575,3 +570,27 @@ async function handleDragEnd() {
     </template>
   </div>
 </template>
+
+<style scoped>
+/* Admin typography */
+.admin-container {
+  font-family: 'EnduroWeb, sans-serif';
+}
+
+.admin-title {
+  font-family: 'EnduroWeb, sans-serif';
+  letter-spacing: 0.03em;
+}
+
+/* Preview containers */
+.preview-container {
+  height: 680px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Project cards */
+.project-card {
+  position: relative;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+}
+</style>
