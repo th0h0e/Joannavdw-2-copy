@@ -16,33 +16,6 @@ const hasAnimatedIn = ref(false)
 const hasTriggered = ref(false)
 const imageScaled = ref(false)
 
-useHead({
-  style: [
-    {
-      innerHTML: `
-        .hero-title {
-          font-size: ${fontSizes.mobile}rem;
-        }
-        @media (min-width: 768px) {
-          .hero-title {
-            font-size: ${fontSizes.tablet}rem;
-          }
-        }
-        @media (min-width: 1024px) {
-          .hero-title {
-            font-size: ${fontSizes.desktop}rem;
-          }
-        }
-        @media (min-width: 1280px) {
-          .hero-title {
-            font-size: ${fontSizes.largeDesktop}rem;
-          }
-        }
-      `,
-    },
-  ],
-})
-
 onMounted(() => {
   if (!hasTriggered.value && !props.isAboutPopupVisible) {
     hasTriggered.value = true
@@ -94,10 +67,6 @@ const chevronSize = computed(() => isTabletOrAbove.value ? 28 : 24)
       >
         <h1
           :class="`text-white ${projectTitleClasses} hero-title`"
-          :style="{
-            fontFamily: 'EnduroWeb, sans-serif',
-            letterSpacing: '0.03em',
-          }"
         >
           {{ heroTitle }}
         </h1>
@@ -126,6 +95,30 @@ const chevronSize = computed(() => isTabletOrAbove.value ? 28 : 24)
   }
   to {
     opacity: 1;
+  }
+}
+
+.hero-title {
+  font-size: v-bind('fontSizes.mobile + "rem"');
+  font-family: 'EnduroWeb, sans-serif';
+  letter-spacing: 0.03em;
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: v-bind('fontSizes.tablet + "rem"');
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-title {
+    font-size: v-bind('fontSizes.desktop + "rem"');
+  }
+}
+
+@media (min-width: 1280px) {
+  .hero-title {
+    font-size: v-bind('fontSizes.largeDesktop + "rem"');
   }
 }
 </style>

@@ -24,12 +24,7 @@ function handleContact(aboutData: About | null) {
   <Transition name="about-backdrop">
     <div
       v-if="isVisible"
-      class="fixed inset-0 z-40"
-      :style="{
-        background: 'rgba(0, 0, 0, 0.3)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-      }"
+      class="popup-backdrop fixed inset-0 z-40"
       @click="emit('close')"
     />
   </Transition>
@@ -38,25 +33,13 @@ function handleContact(aboutData: About | null) {
   <Transition name="popup">
     <div
       v-if="isVisible"
-      class="fixed z-50 popup-container"
-      :style="{
-        top: '50%',
-        left: '50%',
-        width: '280px',
-        position: 'fixed',
-        transform: 'translate(-50%, -50%) scale(var(--scale, 1))',
-      }"
+      class="popup-container z-50"
     >
       <div class="relative">
         <img
           :src="ProjectCardSVG"
           alt="About Card"
-          class="w-full h-auto"
-          :style="{
-            width: '280px',
-            height: 'auto',
-            filter: 'drop-shadow(0 8px 20px rgba(0, 0, 0, 0.15))',
-          }"
+          class="popup-card-image w-full h-auto"
         >
 
         <!-- About Content Overlay -->
@@ -66,62 +49,35 @@ function handleContact(aboutData: About | null) {
             <img
               :src="Asset7Logo"
               alt="Joanna Logo"
-              :style="{ width: '4.5rem', height: 'auto', filter: 'brightness(0)' }"
+              class="popup-logo-top"
             >
           </div>
 
           <!-- Content -->
           <div class="flex-1 flex flex-col justify-center">
-            <h2
-              class="text-black uppercase text-center leading-tight"
-              :style="{ fontFamily: 'EnduroWeb, sans-serif', letterSpacing: '0.03em', fontSize: '12px', marginBottom: '18px' }"
-            >
+            <h2 class="popup-text popup-title text-black uppercase">
               {{ aboutData?.Portfolio_Title || 'Story Driven Strategy' }}
             </h2>
-            <p
-              class="text-black text-center leading-tight"
-              :style="{ fontFamily: 'EnduroWeb, sans-serif', letterSpacing: '0.03em', fontSize: '12px', marginBottom: '18px' }"
-            >
+            <p class="popup-text popup-title text-black">
               {{ aboutData?.About_Description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean mattis ipsum vel nulla blandit, eu porta ligula mattis. Phasellus mattis rutrum elit, sed cursus risus tempus quis. Mauris sed ante et lectus consectetur aliquet. Sed in orci a metus aliquam porttitor.' }}
             </p>
 
-            <h3
-              class="text-black uppercase text-center leading-tight"
-              :style="{ fontFamily: 'EnduroWeb, sans-serif', letterSpacing: '0.03em', fontSize: '12px', marginBottom: '18px' }"
-            >
+            <h3 class="popup-text popup-title text-black uppercase">
               {{ aboutData?.Expertise_Title || 'Expertise' }}
             </h3>
-            <p
-              class="text-black text-center leading-tight"
-              :style="{ fontFamily: 'EnduroWeb, sans-serif', letterSpacing: '0.03em', fontSize: '12px', marginBottom: '18px' }"
-            >
+            <p class="popup-text popup-title text-black">
               {{ aboutData?.Expertise_Description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean mattis ipsum vel nulla blandit.' }}
             </p>
 
-            <h3
-              class="text-black uppercase text-center leading-tight"
-              :style="{ fontFamily: 'EnduroWeb, sans-serif', letterSpacing: '0.03em', fontSize: '12px', marginBottom: '18px' }"
-            >
+            <h3 class="popup-text popup-title text-black uppercase">
               {{ aboutData?.Selected_Clients_Title || 'Selected Clients' }}
             </h3>
-            <p
-              class="text-black text-center leading-tight"
-              :style="{ fontFamily: 'EnduroWeb, sans-serif', letterSpacing: '0.03em', fontSize: '12px', marginBottom: '18px' }"
-            >
+            <p class="popup-text popup-title text-black">
               {{ (aboutData?.Client_List_Json || aboutData?.Client_List)?.join(', ') || 'Ipsum, Dolor, Sit Amet, Consectetur, Adipiscing, Aenean, Mattis, Blandit.' }}
             </p>
 
             <button
-              class="text-black text-center leading-tight cursor-pointer hover:opacity-70 transition-opacity duration-300"
-              :style="{
-                fontFamily: 'EnduroWeb, sans-serif',
-                letterSpacing: '0.03em',
-                fontSize: '12px',
-                textDecoration: 'underline',
-                background: 'none',
-                border: 'none',
-                width: '100%',
-              }"
+              class="popup-text popup-contact-button text-black"
               @click="handleContact(aboutData)"
             >
               {{ aboutData?.Contact_Message || 'Get in touch' }}
@@ -133,7 +89,7 @@ function handleContact(aboutData: About | null) {
             <img
               :src="Asset11Logo"
               alt="Van Der Weg Logo"
-              :style="{ width: '8rem', height: 'auto', filter: 'brightness(0)' }"
+              class="popup-logo-bottom"
             >
           </div>
         </div>
@@ -143,12 +99,33 @@ function handleContact(aboutData: About | null) {
 </template>
 
 <style scoped>
-@property --scale {
-  syntax: '<number>';
-  inherits: false;
-  initial-value: 1;
+/* Component-specific styles */
+.popup-logo-top {
+  width: 4.5rem;
+  height: auto;
+  filter: brightness(0);
 }
 
+.popup-logo-bottom {
+  width: 8rem;
+  height: auto;
+  filter: brightness(0);
+}
+
+.popup-contact-button {
+  text-decoration: underline;
+  background: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.popup-contact-button:hover {
+  opacity: 0.7;
+}
+
+/* Component-specific transition styles */
 .popup-enter-active,
 .popup-leave-active {
   transition:

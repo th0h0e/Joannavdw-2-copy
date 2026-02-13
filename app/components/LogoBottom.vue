@@ -34,17 +34,12 @@ const topPosition = computed(() => {
 
 <template>
   <div
-    class="fixed cursor-pointer flex items-center justify-center"
+    class="logo-container"
     :style="{
-      left: '50%',
-      transform: 'translateX(-50%)',
-      zIndex: 9999,
-      mixBlendMode: 'exclusion',
       width: containerWidth,
       height: containerHeight,
       opacity: isHidden ? 0 : 1,
       pointerEvents: isHidden ? 'none' : 'auto',
-      transition: 'top 1.2s ease-out, opacity 0.3s ease-out, width 0.3s ease-out, height 0.3s ease-out',
       top: topPosition,
     }"
     @click="emit('click')"
@@ -52,15 +47,15 @@ const topPosition = computed(() => {
     <img
       :src="Asset11Logo"
       alt="Van Der Weg Logo Bottom"
-      :style="{
-        filter: 'brightness(0) invert(1)',
-        maxWidth: '100%',
-        maxHeight: '83.33%',
-        width: 'auto',
-        height: 'auto',
-        objectFit: 'contain',
-        display: 'block',
-      }"
+      class="logo-image"
     >
   </div>
 </template>
+
+<style scoped>
+/* Component-specific logo sizing */
+.logo-image {
+  max-width: 100%;
+  max-height: 83.33%;
+}
+</style>

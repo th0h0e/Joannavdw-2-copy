@@ -71,15 +71,6 @@ section {
   html {
     -webkit-text-size-adjust: 100%;
   }
-
-  /* Force GPU acceleration for smoother animations */
-  h1,
-  h2,
-  h3 {
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    will-change: transform, opacity;
-  }
 }
 
 /* Immersive full-screen experience */
@@ -108,37 +99,7 @@ body {
   /* DO NOT add transform here - it breaks position: fixed for portals/overlays */
 }
 
-/* Hide scrollbar utility */
-.scrollbar-hide {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* GPU acceleration for animated elements */
-[data-motion-component],
-img,
-video,
-canvas {
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-}
-
-/* Optimize rendering for frequently updated elements */
-.will-change-transform {
-  will-change: transform;
-}
-
-.will-change-opacity {
-  will-change: opacity;
-}
-
-/* GPU acceleration for carousel containers */
+/* GPU acceleration for carousel containers only (needed for smooth scrolling) */
 [class*='carousel'],
 [class*='Carousel'] {
   -webkit-transform: translate3d(0, 0, 0);
@@ -148,47 +109,67 @@ canvas {
   -webkit-overflow-scrolling: touch;
 }
 
-/* GPU acceleration for navigation and interactive elements */
-nav,
-button,
-a,
-[role='button'] {
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+/* ============================================
+   Shared Component Styles
+   ============================================ */
+
+/* Popup Shared Styles */
+@property --scale {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 1;
 }
 
-/* GPU acceleration for text elements and headings */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p {
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+.popup-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 280px;
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
 }
 
-/* GPU acceleration for fixed/absolute positioned elements */
-[style*='position: fixed'],
-[style*='position: absolute'],
-.fixed,
-.absolute {
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+.popup-card-image {
+  width: 280px;
+  height: auto;
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.15));
 }
 
-/* GPU acceleration for containers and divs with overflow */
-div[style*='overflow'] {
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-overflow-scrolling: touch;
+.popup-text {
+  font-family: 'EnduroWeb, sans-serif';
+  letter-spacing: 0.03em;
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.popup-title {
+  margin-bottom: 18px;
+}
+
+.popup-backdrop {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Logo Shared Styles */
+.logo-container {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  mix-blend-mode: exclusion;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: top 1.2s ease-out, opacity 0.3s ease-out, width 0.3s ease-out, height 0.3s ease-out;
+}
+
+.logo-image {
+  filter: brightness(0) invert(1);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
 }
