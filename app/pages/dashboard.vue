@@ -83,11 +83,7 @@ async function handleHeroImageUpdate(event: Event) {
   try {
     const formData = new FormData()
     formData.append('Hero_Image', file)
-    await $fetch(`/api/homepage/${homepageId.value}`, {
-      method: 'PUT',
-      body: formData,
-      headers: { Authorization: pb.authStore.token },
-    })
+    await pb.collection('Homepage').update(homepageId.value, formData)
     await refreshHomepage()
   }
   catch (err: unknown) {
@@ -103,11 +99,7 @@ async function handleHeroImageMobileUpdate(event: Event) {
   try {
     const formData = new FormData()
     formData.append('Hero_Image_Mobile', file)
-    await $fetch(`/api/homepage/${homepageId.value}`, {
-      method: 'PUT',
-      body: formData,
-      headers: { Authorization: pb.authStore.token },
-    })
+    await pb.collection('Homepage').update(homepageId.value, formData)
     await refreshHomepage()
   }
   catch (err: unknown) {
@@ -132,11 +124,7 @@ async function handleTitleSave() {
     return
   }
   try {
-    await $fetch(`/api/homepage/${homepageId.value}`, {
-      method: 'PUT',
-      body: { Hero_Title: tempTitle.value.trim() },
-      headers: { Authorization: pb.authStore.token },
-    })
+    await pb.collection('Homepage').update(homepageId.value, { Hero_Title: tempTitle.value.trim() })
     heroTitle.value = tempTitle.value.trim()
     isEditingTitle.value = false
   }
@@ -161,19 +149,15 @@ async function confirmDelete() {
   if (!projectToDelete.value)
     return
   try {
-    await $fetch(`/api/projects/${projectToDelete.value}`, {
-      method: 'DELETE',
-      headers: { Authorization: pb.authStore.token },
-    })
+    await pb.collection('Portfolio_Projects').delete(projectToDelete.value)
     isDeleteModalOpen.value = false
     projectToDelete.value = null
     await refreshProjects()
     showToast('Project deleted successfully', 'success')
   }
   catch (err: unknown) {
-    const typedErr = err as { statusCode?: number, data?: { statusCode?: number, message?: string }, message?: string }
-    const status = typedErr?.statusCode || typedErr?.data?.statusCode
-    if (status === 401 || status === 403) {
+    const typedErr = err as { status?: number, data?: { message?: string }, message?: string }
+    if (typedErr?.status === 401 || typedErr?.status === 403) {
       pb.authStore.clear()
       navigateTo('/admin')
       return
@@ -226,16 +210,9 @@ async function handleDragEnd() {
   draggedProjectId.value = null
 
   try {
-    await $fetch('/api/projects/reorder', {
-      method: 'PUT',
-      body: {
-        items: projects.value.map((project, index) => ({
-          id: project.id,
-          order: index + 1,
-        })),
-      },
-      headers: { Authorization: pb.authStore.token },
-    })
+    for (const [index, project] of projects.value.entries()) {
+      await pb.collection('Portfolio_Projects').update(project.id, { Order: index + 1 })
+    }
   }
   catch (err: unknown) {
     await refreshProjects()

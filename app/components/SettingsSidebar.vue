@@ -103,36 +103,22 @@ async function handleSubmit(e: Event) {
   saving.value = true
 
   try {
-    const authHeaders = { Authorization: pb.authStore.token }
-
     if (homepageData.value) {
-      await $fetch(`/api/homepage/${homepageData.value.id}`, {
-        method: 'PUT',
-        body: { Hero_Title: heroTitle.value },
-        headers: authHeaders,
-      })
+      await pb.collection('Homepage').update(homepageData.value.id, { Hero_Title: heroTitle.value })
     }
 
     if (aboutData.value) {
-      await $fetch(`/api/about/${aboutData.value.id}`, {
-        method: 'PUT',
-        body: {
-          About_Description: aboutDescription.value,
-          Expertise_Description: expertiseDescription.value,
-          Client_List_Json: clientList.value,
-          Contact_Email: contactEmail.value,
-        },
-        headers: authHeaders,
+      await pb.collection('About').update(aboutData.value.id, {
+        About_Description: aboutDescription.value,
+        Expertise_Description: expertiseDescription.value,
+        Client_List_Json: clientList.value,
+        Contact_Email: contactEmail.value,
       })
     }
 
     if (settingsData.value) {
-      await $fetch(`/api/settings/${settingsData.value.id}`, {
-        method: 'PUT',
-        body: {
-          Show_Top_Progress_Bar: showTopProgressBar.value,
-        },
-        headers: authHeaders,
+      await pb.collection('Settings').update(settingsData.value.id, {
+        Show_Top_Progress_Bar: showTopProgressBar.value,
       })
     }
 

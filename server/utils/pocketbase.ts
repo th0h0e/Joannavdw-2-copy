@@ -1,10 +1,8 @@
 import type { H3Event } from 'h3'
 import PocketBase from 'pocketbase'
 
-/**
- * Creates an authenticated PocketBase instance from the request's Authorization header.
- * Auto-imported in all server/ routes via Nuxt's server/utils convention.
- */
+// Server-side auth utility for ISR cache invalidation endpoint.
+// Admin dashboard uses PocketBase SDK directly on the client (no server proxy needed).
 export function getAuthenticatedPb(event: H3Event): PocketBase {
   const token = getHeader(event, 'authorization') || ''
   if (!token) {

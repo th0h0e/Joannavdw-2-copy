@@ -1,3 +1,7 @@
+// Debug endpoint to inspect current cache state
+// Returns all cache keys matching 'pocketbase:' prefix and their sizes
+// Useful for verifying ISR is working and cache entries exist
+// Requires authentication via Bearer token
 export default defineEventHandler(async (event) => {
   // Use getAuthenticatedPb to validate auth (throws 401 if invalid)
   getAuthenticatedPb(event)

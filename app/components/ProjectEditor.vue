@@ -191,27 +191,18 @@ async function handleSubmit(e?: Event) {
     }
 
     if (props.project) {
-      await $fetch(`/api/projects/${props.project.id}`, {
-        method: 'PUT',
-        body: formData,
-        headers: { Authorization: pb.authStore.token },
-      })
+      await pb.collection('Portfolio_Projects').update(props.project.id, formData)
     }
     else {
-      await $fetch('/api/projects', {
-        method: 'POST',
-        body: formData,
-        headers: { Authorization: pb.authStore.token },
-      })
+      await pb.collection('Portfolio_Projects').create(formData)
     }
 
     emit('save')
   }
   catch (err: unknown) {
     console.error('Error saving project:', err)
-    const error = err as { statusCode?: number, data?: { statusCode?: number, message?: string }, message?: string }
-    const status = error?.statusCode || error?.data?.statusCode
-    if (status === 401 || status === 403) {
+    const error = err as { status?: number, data?: { message?: string }, message?: string }
+    if (error?.status === 401 || error?.status === 403) {
       emit('showToast', 'Your session has expired. Please login again.', 'error')
       pb.authStore.clear()
       window.location.href = '/admin'

@@ -15,3 +15,8 @@ export default defineCachedEventHandler(async () => {
   swr: true,
   getKey: () => 'data',
 })
+
+// ISR: defineCachedEventHandler caches the response for 1 year (maxAge).
+// The handler only runs on cache MISS - on HIT, cached data is returned directly.
+// Cache is stored at: pocketbase:portfolio:data.json (use /api/revalidate to clear)
+// SWR (Stale-While-Revalidate) ensures users always get a response, even if stale

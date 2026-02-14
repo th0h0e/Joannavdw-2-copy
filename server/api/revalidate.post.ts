@@ -1,9 +1,15 @@
+// Maps PocketBase collection names to their cache key names
+// Used to determine which cache entries to invalidate
 const COLLECTION_CACHE_KEYS: Record<string, string> = {
   About: 'about',
   Homepage: 'homepage',
   Portfolio_Projects: 'portfolio',
 }
 
+// Manual cache invalidation endpoint - called from dashboard "Publish Changes" button
+// Requires authentication via Bearer token (validated by getAuthenticatedPb)
+// Body: { collections: string[] } - optional array of collection names to invalidate
+// If no collections specified, invalidates ALL PocketBase cache entries
 export default defineEventHandler(async (event) => {
   console.warn(`[ISR] ${new Date().toISOString()} - REVALIDATE: Request received`)
 
