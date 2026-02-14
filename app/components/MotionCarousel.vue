@@ -309,8 +309,8 @@ onUnmounted(() => {
     :style="{ pointerEvents: currentSlide > 0 ? 'auto' : 'none', transform: progressBarTransform }"
   >
     <UProgress
-      :value="scrollProgress * 100"
-      :max="100"
+      v-model="scrollProgress"
+      :max="1"
       size="xs"
       :ui="{
         base: 'bg-gray-500/50 backdrop-blur-sm',
@@ -327,8 +327,8 @@ onUnmounted(() => {
     :style="{ pointerEvents: currentSlide > 0 ? 'auto' : 'none', transform: topProgressBarTransform }"
   >
     <UProgress
-      :value="scrollProgress * 100"
-      :max="100"
+      v-model="scrollProgress"
+      :max="1"
       size="xs"
       :ui="{
         base: 'bg-gray-500/50 backdrop-blur-sm',
