@@ -32,7 +32,7 @@ const showRightChevron = computed(() =>
 
 const progressBarVisible = computed(() => currentSlide.value > 0 && !isOnBlurSlide.value)
 const progressBarTransform = computed(() =>
-  progressBarVisible.value ? 'translate(-50%, 0) translateZ(0)' : 'translate(-50%, 10px) translateZ(0)',
+  progressBarVisible.value ? 'translateY(0) translateZ(0)' : 'translateY(10px) translateZ(0)',
 )
 
 function handleScroll() {
@@ -171,11 +171,10 @@ onUnmounted(() => {
 
   <div
     v-if="images.length > 1"
-    class="absolute bottom-7 left-1/2 z-20 w-4/5 will-change-transform"
-    :style="{ transform: 'translate(-50%, 0) translateZ(0)' }"
+    class="absolute bottom-7 left-0 right-0 z-20 flex justify-center px-6 will-change-transform"
   >
     <div
-      class="w-full transition-[opacity,transform] duration-150 ease-in-out"
+      class="w-full max-w-md transition-[opacity,transform] duration-150 ease-in-out"
       :class="[progressBarVisible ? 'opacity-100' : 'opacity-0']"
       :style="{ pointerEvents: progressBarVisible ? 'auto' : 'none', transform: progressBarTransform }"
     >
@@ -187,8 +186,7 @@ onUnmounted(() => {
 
   <div
     v-if="images.length > 1"
-    class="absolute bottom-10 left-1/2 z-20 will-change-transform"
-    :style="{ transform: 'translate(-50%, 0) translateZ(0)' }"
+    class="absolute bottom-10 left-0 right-0 z-20 flex justify-center will-change-transform"
   >
     <button
       class="block cursor-pointer appearance-none bg-none border-0 p-0 m-0 transition-[opacity,transform] duration-150 ease-in-out"
