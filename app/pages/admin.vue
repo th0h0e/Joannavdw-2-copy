@@ -35,7 +35,7 @@ async function handleLogin() {
 
 <template>
   <div
-    class="min-h-screen bg-inverted flex items-center justify-center px-6 relative overflow-hidden font-sans"
+    class="min-h-screen bg-default flex items-center justify-center px-6 relative overflow-hidden font-sans"
   >
     <div
       class="absolute inset-0 bg-cover bg-center"
@@ -46,11 +46,11 @@ async function handleLogin() {
       }"
     />
 
-    <div class="absolute inset-0 bg-inverted/70" />
+    <div class="absolute inset-0 bg-default/70" />
 
-    <div class="max-w-md w-full bg-inverted/80 border border-default p-10 backdrop-blur-xl relative z-10">
+    <div class="max-w-md w-full bg-elevated border border-default p-10 backdrop-blur-xl relative z-10">
       <div class="text-center mb-8">
-        <h1 class="text-xl font-medium text-inverted tracking-tight">
+        <h1 class="text-xl font-medium text-highlighted tracking-tight">
           Admin Login
         </h1>
         <p class="text-xs text-muted mt-2 tracking-wide uppercase">
@@ -95,7 +95,7 @@ async function handleLogin() {
       </UForm>
 
       <div class="mt-6 text-center">
-        <NuxtLink to="/" class="text-xs text-muted hover:text-inverted transition-colors uppercase tracking-wide">
+        <NuxtLink to="/" class="text-xs text-muted hover:text-highlighted transition-colors uppercase tracking-wide">
           &larr; Back to Portfolio
         </NuxtLink>
       </div>

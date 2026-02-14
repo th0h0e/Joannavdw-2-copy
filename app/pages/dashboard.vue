@@ -238,21 +238,21 @@ async function handlePublishChanges() {
 <template>
   <div
     v-if="loading"
-    class="min-h-screen bg-inverted flex items-center justify-center"
+    class="min-h-screen bg-default flex items-center justify-center"
   >
-    <div class="text-xl text-inverted">
+    <div class="text-xl text-highlighted">
       Loading...
     </div>
   </div>
 
   <div
     v-else
-    class="admin-container min-h-screen bg-inverted"
+    class="admin-container min-h-screen bg-default"
   >
-    <header class="border-b border-default backdrop-blur-sm bg-inverted/80 sticky top-0 z-10">
+    <header class="border-b border-default backdrop-blur-sm bg-default/80 sticky top-0 z-10">
       <div class="max-w-7xl mx-auto px-6 lg:px-8 py-6 flex justify-between items-center">
         <div>
-          <h1 class="text-xl font-medium text-inverted tracking-tight">
+          <h1 class="text-xl font-medium text-highlighted tracking-tight">
             Portfolio
           </h1>
           <p class="text-xs text-muted mt-1 tracking-wide">
@@ -260,6 +260,7 @@ async function handlePublishChanges() {
           </p>
         </div>
         <div class="flex items-center gap-3">
+          <UColorModeButton />
           <UButton
             variant="outline"
             color="neutral"
@@ -323,7 +324,7 @@ async function handlePublishChanges() {
                   <div class="text-center px-6">
                     <button
                       :contenteditable="isEditingTitle"
-                      class="admin-title text-inverted uppercase leading-none text-4xl outline-none pointer-events-auto inline-block" :class="[
+                      class="admin-title text-white uppercase leading-none text-4xl outline-none pointer-events-auto inline-block" :class="[
                         isEditingTitle ? 'cursor-text' : 'cursor-pointer hover:opacity-80 transition-opacity',
                       ]"
                       :title="!isEditingTitle ? 'Click to edit' : undefined"
@@ -434,14 +435,14 @@ async function handlePublishChanges() {
             <div v-else class="w-full h-full flex items-center justify-center bg-elevated">
               <span class="text-dimmed text-sm">&ndash;</span>
             </div>
-            <div class="absolute top-2 left-2 bg-inverted/70 backdrop-blur-md text-inverted px-2 py-1 text-xs font-medium tracking-wide">
+            <div class="absolute top-2 left-2 bg-default/70 backdrop-blur-md text-highlighted px-2 py-1 text-xs font-medium tracking-wide">
               {{ project.Images?.length || 0 }} {{ project.Images?.length === 1 ? 'image' : 'images' }}
             </div>
           </div>
 
           <div class="flex-1 min-w-0 p-5">
             <div class="mb-2">
-              <h3 class="font-semibold text-base text-inverted tracking-tight">
+              <h3 class="font-semibold text-base text-highlighted tracking-tight">
                 {{ project.Title }}
               </h3>
             </div>

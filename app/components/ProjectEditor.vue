@@ -227,7 +227,7 @@ onUnmounted(() => {
 <template>
   <Teleport to="body">
     <button
-      class="fixed inset-0 bg-inverted/70 backdrop-blur-md z-40 transition-opacity duration-300 appearance-none bg-transparent border-0 p-0 m-0 text-left"
+      class="fixed inset-0 bg-default/70 backdrop-blur-md z-40 transition-opacity duration-300 appearance-none bg-transparent border-0 p-0 m-0 text-left"
       aria-label="Cancel editing"
       @click="emit('cancel')"
     />
@@ -244,11 +244,11 @@ onUnmounted(() => {
     </div>
 
     <div
-      class="fixed right-0 top-0 w-3/4 md:w-2/3 lg:w-1/2 bg-inverted/85 backdrop-blur-xl border-l border-default shadow-2xl z-50 flex flex-col h-screen font-['EnduroWeb',sans-serif]"
+      class="fixed right-0 top-0 w-3/4 md:w-2/3 lg:w-1/2 bg-elevated backdrop-blur-xl border-l border-default shadow-2xl z-50 flex flex-col h-screen font-['EnduroWeb',sans-serif]"
     >
       <UForm :state="formState" class="flex flex-col h-full" @submit="handleSubmit">
         <div class="flex-shrink-0 p-8 border-b border-default backdrop-blur-sm">
-          <h2 class="text-xl font-medium text-inverted tracking-tight">
+          <h2 class="text-xl font-medium text-highlighted tracking-tight">
             {{ project ? 'Edit Project' : 'New Project' }}
           </h2>
           <p class="text-xs text-muted mt-1 tracking-wide uppercase">
@@ -320,7 +320,7 @@ onUnmounted(() => {
                     <div class="aspect-square bg-elevated">
                       <img :src="image.url" :alt="image.filename" class="w-full h-full object-cover">
                     </div>
-                    <div class="absolute top-2 left-2 bg-inverted/60 backdrop-blur-sm text-inverted px-2 py-1 text-xs font-medium">
+                    <div class="absolute top-2 left-2 bg-default/60 backdrop-blur-sm text-highlighted px-2 py-1 text-xs font-medium">
                       {{ index + 1 }}
                     </div>
                     <UButton
@@ -334,7 +334,7 @@ onUnmounted(() => {
                     >
                       Delete
                     </UButton>
-                    <div class="absolute bottom-0 left-0 right-0 bg-inverted/60 backdrop-blur-sm text-inverted px-2 py-1.5 text-xs truncate">
+                    <div class="absolute bottom-0 left-0 right-0 bg-default/60 backdrop-blur-sm text-highlighted px-2 py-1.5 text-xs truncate">
                       {{ image.filename }}
                     </div>
                   </div>

@@ -162,7 +162,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
 <template>
   <template v-if="isOpen">
     <button
-      class="fixed inset-0 bg-inverted/70 backdrop-blur-md z-40 transition-opacity duration-300 appearance-none bg-transparent border-0 p-0 m-0 text-left"
+      class="fixed inset-0 bg-default/70 backdrop-blur-md z-40 transition-opacity duration-300 appearance-none bg-transparent border-0 p-0 m-0 text-left"
       aria-label="Close settings"
       @click="emit('close')"
     />
@@ -175,11 +175,11 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
       />
     </div>
 
-    <div class="fixed right-0 top-0 h-full w-3/4 md:w-1/2 bg-inverted/85 backdrop-blur-xl border-l border-default shadow-2xl z-50 flex flex-col font-['EnduroWeb',sans-serif]">
+    <div class="fixed right-0 top-0 h-full w-3/4 md:w-1/2 bg-elevated backdrop-blur-xl border-l border-default shadow-2xl z-50 flex flex-col font-['EnduroWeb',sans-serif]">
       <UForm :state="{}" class="flex flex-col h-full" @submit="handleSubmit">
         <div class="flex-shrink-0 p-8 border-b border-default flex items-center gap-4 backdrop-blur-sm">
           <div class="flex-1">
-            <h2 class="text-xl font-medium text-inverted tracking-tight">
+            <h2 class="text-xl font-medium text-highlighted tracking-tight">
               Settings
             </h2>
             <p class="text-xs text-muted mt-1 tracking-wide uppercase">
@@ -220,7 +220,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
 
         <div class="flex-1 overflow-y-auto p-8 space-y-8">
           <div>
-            <h3 class="text-sm font-medium text-inverted mb-4 uppercase tracking-wider">
+            <h3 class="text-sm font-medium text-highlighted mb-4 uppercase tracking-wider">
               Hero Section
             </h3>
             <UFormField label="Hero Title">
@@ -236,7 +236,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
           <div class="border-t border-default" />
 
           <div>
-            <h3 class="text-sm font-medium text-inverted mb-4 uppercase tracking-wider">
+            <h3 class="text-sm font-medium text-highlighted mb-4 uppercase tracking-wider">
               About Section
             </h3>
             <div class="space-y-4">
@@ -274,7 +274,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
           <div class="border-t border-default" />
 
           <div>
-            <h3 class="text-sm font-medium text-inverted mb-4 uppercase tracking-wider">
+            <h3 class="text-sm font-medium text-highlighted mb-4 uppercase tracking-wider">
               Global Settings
             </h3>
             <div class="space-y-4">
