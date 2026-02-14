@@ -1,4 +1,5 @@
 import { dirname, join } from 'node:path'
+import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import * as Sentry from '@sentry/nuxt'
 import dotenv from 'dotenv'

@@ -5,18 +5,11 @@ const props = defineProps<{
 
 const { heroImage, heroTitle } = useHomepageData()
 
-const hasAnimatedIn = ref(false)
-const hasTriggered = ref(false)
 const imageScaled = ref(false)
 
 const showTitle = computed(() => !props.isAboutPopupVisible)
-const titleDelay = computed(() => hasAnimatedIn.value ? '0s' : '1.2s')
 
 onMounted(() => {
-  if (!hasTriggered.value && !props.isAboutPopupVisible) {
-    hasTriggered.value = true
-    hasAnimatedIn.value = true
-  }
   requestAnimationFrame(() => {
     imageScaled.value = true
   })
@@ -29,13 +22,13 @@ onMounted(() => {
     class="relative w-full h-screen snap-center bg-white flex items-center justify-center overflow-hidden"
   >
     <div
-      class="absolute inset-0 bg-cover bg-center transition-transform duration-[1.2s] ease-out"
-      :class="[imageScaled ? 'scale-100' : 'scale-[0.3]']"
+      class="absolute inset-0 bg-cover bg-center transition-transform duration-1200 ease-out"
+      :class="[imageScaled ? 'scale-100' : 'scale-30']"
       :style="{ backgroundImage: `url(${heroImage})` }"
     />
 
     <Transition
-      enter-active-class="transition-opacity duration-150"
+      enter-active-class="transition-opacity duration-150 delay-1200"
       leave-active-class="transition-opacity duration-150"
       enter-from-class="opacity-0"
       leave-to-class="opacity-0"
@@ -43,9 +36,6 @@ onMounted(() => {
       <div
         v-if="showTitle"
         class="absolute top-1/2 left-1/2 z-10 text-center w-full -translate-x-1/2 -translate-y-1/2"
-        :style="{
-          animation: `fadeInTitle 0.15s ease-out ${titleDelay} both`,
-        }"
       >
         <h1 class="text-white title-font">
           {{ heroTitle }}
@@ -60,12 +50,11 @@ onMounted(() => {
 </template>
 
 <style scoped>
-@keyframes fadeInTitle {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.duration-1200 {
+  transition-duration: 1200ms;
+}
+
+.scale-30 {
+  transform: scale(0.3);
 }
 </style>

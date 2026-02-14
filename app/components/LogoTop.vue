@@ -12,35 +12,25 @@ const emit = defineEmits<{
 }>()
 
 const { isMobile } = useDevice()
-const hasAnimated = ref(false)
+const mounted = ref(false)
 
 const containerWidth = computed(() => isMobile ? '160px' : '200px')
 const containerHeight = computed(() => isMobile ? '60px' : '80px')
 const isHidden = computed(() => props.showAboutPopup || (props.showPopup && isMobile))
-const topPosition = computed(() => {
-  if (!hasAnimated.value && props.isHero)
-    return 'calc(50% - 18vh)'
-  return '60px'
-})
 
 onMounted(() => {
-  requestAnimationFrame(() => {
-    hasAnimated.value = true
-  })
+  mounted.value = true
 })
 </script>
 
 <template>
   <button
-    class="fixed left-1/2 -translate-x-1/2 z-50 cursor-pointer mix-blend-exclusion transition-[top,opacity] ease-out pointer-events-auto appearance-none bg-none border-0 p-0 m-0"
+    class="logo-top fixed left-1/2 -translate-x-1/2 z-50 cursor-pointer mix-blend-exclusion appearance-none bg-none border-0 p-0 m-0"
     :class="[
-      isHidden ? 'opacity-0 pointer-events-none duration-300' : 'opacity-100 duration-700',
+      isHidden ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto',
+      mounted && isHero ? 'logo-top--hero' : 'logo-top--positioned',
     ]"
-    :style="{
-      width: containerWidth,
-      height: containerHeight,
-      top: topPosition,
-    }"
+    :style="{ width: containerWidth, height: containerHeight }"
     aria-label="Open menu"
     @click="emit('click')"
   >
@@ -51,3 +41,19 @@ onMounted(() => {
     >
   </button>
 </template>
+
+<style scoped>
+.logo-top {
+  transition:
+    top 0.7s ease-out,
+    opacity 0.3s ease-out;
+}
+
+.logo-top--hero {
+  top: calc(50% - 18vh);
+}
+
+.logo-top--positioned {
+  top: 60px;
+}
+</style>

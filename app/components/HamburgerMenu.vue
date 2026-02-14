@@ -45,17 +45,13 @@ function handleLinkClick(index: number) {
     @click="toggleMenu"
   >
     <div
-      class="block transition-[transform,background-color,width,height] duration-300"
-      :class="[
-        isOpen
-          ? 'mix-blend-normal bg-black w-[18px] h-[18px] rotate-45'
-          : 'mix-blend-exclusion bg-white w-[17.32px] h-[17.32px] md:w-[18px] md:h-[18px] rotate-0',
-      ]"
+      class="hamburger-icon"
+      :class="[isOpen ? 'hamburger-icon--open' : 'hamburger-icon--closed']"
     />
   </button>
 
   <Teleport to="body">
-    <Transition name="menu-backdrop">
+    <Transition name="fade">
       <div
         v-if="isOpen"
         class="fixed inset-0 bg-white z-[9998] cursor-pointer h-[100lvh]"
@@ -69,7 +65,7 @@ function handleLinkClick(index: number) {
       />
     </Transition>
 
-    <Transition name="menu-content">
+    <Transition name="scale-fade">
       <div
         v-if="isOpen"
         class="fixed inset-0 z-[9999] flex items-center justify-center h-[100lvh]"
@@ -86,25 +82,57 @@ function handleLinkClick(index: number) {
 </template>
 
 <style scoped>
-.menu-backdrop-enter-active,
-.menu-backdrop-leave-active {
+.hamburger-icon {
+  display: block;
+  transition:
+    transform 0.3s,
+    background-color 0.3s,
+    width 0.3s,
+    height 0.3s;
+}
+
+.hamburger-icon--closed {
+  mix-blend-mode: exclusion;
+  background-color: #ffffff;
+  width: 17.32px;
+  height: 17.32px;
+  transform: rotate(0deg);
+}
+
+.hamburger-icon--open {
+  mix-blend-mode: normal;
+  background-color: #000000;
+  width: 18px;
+  height: 18px;
+  transform: rotate(45deg);
+}
+
+@media (min-width: 768px) {
+  .hamburger-icon--closed {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.3s ease-out;
 }
 
-.menu-backdrop-enter-from,
-.menu-backdrop-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 
-.menu-content-enter-active,
-.menu-content-leave-active {
+.scale-fade-enter-active,
+.scale-fade-leave-active {
   transition:
     opacity 0.3s ease-out,
     transform 0.3s ease-out;
 }
 
-.menu-content-enter-from,
-.menu-content-leave-to {
+.scale-fade-enter-from,
+.scale-fade-leave-to {
   opacity: 0;
   transform: scale(0.95);
 }
