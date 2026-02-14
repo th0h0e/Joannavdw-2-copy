@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import ProjectCardSVG from '~/assets/Project Card/JVDW WEB LIGHT BOX copy.svg'
 
-defineProps<{
+const props = defineProps<{
   projectTitle: string
-  projectDescription: string
-  projectResponsibility: string[]
 }>()
+
+const { projects } = usePortfolioProjects()
+
+const project = computed(() => projects.value.find(p => p.title === props.projectTitle))
+const projectDescription = computed(() => project.value?.description || '')
+const projectResponsibility = computed<string[]>(() => project.value?.responsibility || [])
 </script>
 
 <template>

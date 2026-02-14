@@ -1,17 +1,64 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+@import "tailwindcss";
+@import "@nuxt/ui";
 @import './fonts.css';
 
-/* Custom Font - EnduroWeb */
-@font-face {
-  font-family: 'EnduroWeb';
-  src: url('/fonts/EnduroWeb-Medium.woff') format('woff');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
+/* ============================================
+   Nuxt UI Theme Configuration
+   ============================================ */
+
+@theme {
+  /* Font family definitions */
+  --font-display: "EnduroWeb", "sans-serif";
+  --font-sans: "EnduroWeb", system-ui, sans-serif;
 }
+
+/* ============================================
+   Nuxt UI CSS Variables - Light Mode
+   ============================================ */
+
+:root {
+  /* Primary color - customize shades as needed */
+  --ui-primary: var(--ui-color-primary-500);
+  --ui-secondary: var(--ui-color-secondary-500);
+  --ui-success: var(--ui-color-success-500);
+  --ui-info: var(--ui-color-info-500);
+  --ui-warning: var(--ui-color-warning-500);
+  --ui-error: var(--ui-color-error-500);
+
+  /* Text colors */
+  --ui-text-dimmed: var(--ui-color-neutral-400);
+  --ui-text-muted: var(--ui-color-neutral-500);
+  --ui-text-toned: var(--ui-color-neutral-600);
+  --ui-text: var(--ui-color-neutral-700);
+  --ui-text-highlighted: var(--ui-color-neutral-900);
+  --ui-text-inverted: white;
+
+  /* Background colors */
+  --ui-bg: white;
+  --ui-bg-muted: var(--ui-color-neutral-50);
+  --ui-bg-elevated: var(--ui-color-neutral-100);
+  --ui-bg-accented: var(--ui-color-neutral-200);
+  --ui-bg-inverted: var(--ui-color-neutral-900);
+
+  /* Border colors */
+  --ui-border: var(--ui-color-neutral-200);
+  --ui-border-muted: var(--ui-color-neutral-200);
+  --ui-border-accented: var(--ui-color-neutral-300);
+  --ui-border-inverted: var(--ui-color-neutral-900);
+
+  /* Radius */
+  --ui-radius: 0.25rem;
+
+  /* Container max width */
+  --ui-container: 80rem;
+
+  /* Header height */
+  --ui-header-height: calc(var(--spacing) * 16);
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
 
 /* Prevent browser back/forward navigation gestures */
 html,
@@ -19,7 +66,7 @@ body {
   overscroll-behavior-x: none;
 }
 
-/* Specifically target the main container */
+/* Specifically target the main container - REQUIRED for full-page scroll-snap */
 main {
   overscroll-behavior-x: none;
   overscroll-behavior-y: contain;
@@ -68,11 +115,6 @@ section {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-
-  /* Prevent text size adjustment on orientation change */
-  html {
-    -webkit-text-size-adjust: 100%;
-  }
 }
 
 /* Immersive full-screen experience */
@@ -86,10 +128,6 @@ body {
   /* Extend into safe areas on notched devices */
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 
-  /* Dark background for page transitions */
-  background-color: #0a0a0a; /* neutral-950 */
-
-  /* DO NOT add transform here - it breaks position: fixed for portals/overlays */
 }
 
 /* Ensure main container uses full dynamic viewport */
@@ -99,16 +137,6 @@ body {
   background-color: #0a0a0a; /* neutral-950 */
 
   /* DO NOT add transform here - it breaks position: fixed for portals/overlays */
-}
-
-/* GPU acceleration for carousel containers only (needed for smooth scrolling) */
-[class*='carousel'],
-[class*='Carousel'] {
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-overflow-scrolling: touch;
 }
 
 /* ============================================

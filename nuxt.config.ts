@@ -44,15 +44,8 @@ export default defineNuxtConfig({
     },
   },
 
-  // Global CSS (replaces import in main.ts)
+  // CSS imports
   css: ['~/assets/main.css'],
-
-  postcss: {
-    plugins: {
-      tailwindcss: {},
-      autoprefixer: {},
-    },
-  },
 
   // Runtime config — environment-driven values
   // Override via NUXT_PB_URL (server-only) and NUXT_PUBLIC_SENTRY_DSN env vars
