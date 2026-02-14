@@ -21,15 +21,15 @@ const projectResponsibility = computed<string[]>(() => project.value?.responsibi
     >
 
     <div class="absolute inset-0 flex flex-col justify-center px-4 py-8">
-      <h2 class="font-['Helvetica_Neue',Helvetica,Arial,sans-serif] text-xl font-bold tracking-wide leading-snug text-black uppercase">
+      <h2 class="text-card-title text-black">
         {{ projectTitle }}
       </h2>
-      <div class="font-['Helvetica_Neue',Helvetica,Arial,sans-serif] text-xl font-bold tracking-wide leading-snug text-black uppercase">
+      <div class="text-card-title text-black">
         <span v-for="(responsibility, index) in projectResponsibility" :key="`${responsibility}-${index}`">
           {{ responsibility }}<br v-if="index < projectResponsibility.length - 1">
         </span>
       </div>
-      <p class="font-['Helvetica_Neue',Helvetica,Arial,sans-serif] text-black">
+      <p class="text-card-body text-black">
         {{ projectDescription }}
       </p>
     </div>

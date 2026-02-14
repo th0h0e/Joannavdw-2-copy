@@ -151,10 +151,48 @@ body {
 }
 
 /* ============================================
+   Custom Font Utilities
+   ============================================ */
+
+.text-popup-title {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 1.125rem;
+}
+
+.text-popup-body {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.text-card-title {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.text-card-body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+}
+
+/* ============================================
    Shared Component Styles
    ============================================ */
 
-/* Popup Shared Styles */
 @property --scale {
   syntax: '<number>';
   inherits: false;
@@ -173,18 +211,6 @@ body {
   width: 280px;
   height: auto;
   filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.15));
-}
-
-.popup-text {
-  font-family: 'EnduroWeb', sans-serif;
-  letter-spacing: 0.03em;
-  font-size: 12px;
-  text-align: center;
-  line-height: 1.25;
-}
-
-.popup-title {
-  margin-bottom: 18px;
 }
 
 .popup-backdrop {

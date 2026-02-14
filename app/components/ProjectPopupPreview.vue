@@ -17,17 +17,17 @@ defineProps<{
     >
 
     <div class="absolute inset-0 flex flex-col justify-center px-4 py-8">
-      <h2 class="font-['EnduroWeb',sans-serif] tracking-[0.03em] text-xs text-black uppercase text-center leading-tight mb-[18px]">
+      <h2 class="text-popup-title text-black">
         {{ projectTitle }}
       </h2>
 
-      <div class="font-['EnduroWeb',sans-serif] tracking-[0.03em] text-xs text-black uppercase text-center leading-tight mb-[18px]">
+      <div class="text-popup-title text-black">
         <span v-for="(responsibility, index) in projectResponsibility" :key="`${responsibility}-${index}`">
           {{ responsibility }}<br v-if="index < projectResponsibility.length - 1">
         </span>
       </div>
 
-      <p class="font-['EnduroWeb',sans-serif] tracking-[0.03em] text-xs text-black text-center leading-tight">
+      <p class="text-popup-body text-black">
         {{ projectDescription }}
       </p>
     </div>
