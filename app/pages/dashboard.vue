@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { HomepageResponse, PortfolioProjectsResponse } from '~/shared/types/pocketbase-types'
+import { useSortable } from '@vueuse/integrations/useSortable'
 import { getImageUrl, pb } from '~/utils/pocketbase'
 
 definePageMeta({
@@ -20,7 +21,7 @@ const projectToDelete = ref<string | null>(null)
 const heroFileInput = ref<HTMLInputElement | null>(null)
 const heroMobileFileInput = ref<HTMLInputElement | null>(null)
 
-const draggedProjectId = ref<string | null>(null)
+const projectListRef = useTemplateRef('projectListRef')
 
 const { data: homepageRaw, refresh: refreshHomepage, error: homepageError } = useAsyncData(
   'admin-homepage',
@@ -37,6 +38,30 @@ watch(rawProjects, (val) => {
   if (val)
     projects.value = [...val]
 }, { immediate: true })
+
+useSortable(projectListRef, projects, {
+  animation: 150,
+  handle: '.project-card',
+  onEnd: async () => {
+    if (isReordering.value)
+      return
+
+    isReordering.value = true
+    try {
+      for (const [index, project] of projects.value.entries()) {
+        await pb.collection('Portfolio_Projects').update(project.id, { Order: index + 1 })
+      }
+    }
+    catch (err: unknown) {
+      await refreshProjects()
+      const typedErr = err as { data?: { message?: string }, message?: string }
+      showToast(`Failed to reorder projects: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
+    }
+    finally {
+      isReordering.value = false
+    }
+  },
+})
 
 const heroImage = computed(() =>
   homepageRaw.value?.Hero_Image ? getImageUrl(homepageRaw.value, homepageRaw.value.Hero_Image) : '',
@@ -168,53 +193,6 @@ async function handleSave() {
   showNewProjectForm.value = false
   await refreshProjects()
   showToast(isCreating ? 'Project created successfully' : 'Project updated successfully', 'success')
-}
-
-function handleDragStart(e: DragEvent, projectId: string) {
-  draggedProjectId.value = projectId
-  if (e.dataTransfer) {
-    e.dataTransfer.effectAllowed = 'move'
-  }
-}
-
-function handleDragOver(e: DragEvent, targetProjectId: string) {
-  e.preventDefault()
-  if (!draggedProjectId.value || draggedProjectId.value === targetProjectId)
-    return
-
-  const draggedIdx = projects.value.findIndex(p => p.id === draggedProjectId.value)
-  const targetIdx = projects.value.findIndex(p => p.id === targetProjectId)
-  if (draggedIdx === -1 || targetIdx === -1)
-    return
-
-  const newProjects = [...projects.value]
-  const [draggedItem] = newProjects.splice(draggedIdx, 1)
-  newProjects.splice(targetIdx, 0, draggedItem)
-  projects.value = newProjects
-}
-
-async function handleDragEnd() {
-  if (!draggedProjectId.value || isReordering.value) {
-    draggedProjectId.value = null
-    return
-  }
-
-  isReordering.value = true
-  draggedProjectId.value = null
-
-  try {
-    for (const [index, project] of projects.value.entries()) {
-      await pb.collection('Portfolio_Projects').update(project.id, { Order: index + 1 })
-    }
-  }
-  catch (err: unknown) {
-    await refreshProjects()
-    const typedErr = err as { data?: { message?: string }, message?: string }
-    showToast(`Failed to reorder projects: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
-  }
-  finally {
-    isReordering.value = false
-  }
 }
 
 async function handlePublishChanges() {
@@ -415,18 +393,13 @@ async function handlePublishChanges() {
 
       <div class="border-t border-default mb-12" />
 
-      <div class="flex flex-col gap-3">
-        <!-- eslint-disable-next-line vue-a11y/no-static-element-interactions -->
+      <div ref="projectListRef" class="flex flex-col gap-3">
         <div
           v-for="project in projects"
           :key="project.id"
-          draggable="true"
           class="project-card group bg-gradient-to-br from-elevated to-elevated/50 border border-default hover:border-accented hover:from-elevated hover:to-elevated/70 cursor-grab active:cursor-grabbing flex items-stretch gap-0 overflow-hidden backdrop-blur-sm"
           role="button"
           tabindex="0"
-          @dragstart="handleDragStart($event, project.id)"
-          @dragover="handleDragOver($event, project.id)"
-          @dragend="handleDragEnd"
         >
           <div class="relative w-1/3 bg-elevated overflow-hidden flex-shrink-0 border-r border-default self-stretch">
             <template v-if="project.Images && project.Images.length > 0">

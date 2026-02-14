@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { PortfolioProjectsResponse } from '~/shared/types/pocketbase-types'
+import { useDropZone, useScrollLock } from '@vueuse/core'
+import { useSortable } from '@vueuse/integrations/useSortable'
 import { getImageUrl, pb } from '~/utils/pocketbase'
 
 interface ImageItem {
@@ -20,6 +22,8 @@ const emit = defineEmits<{
   showToast: [message: string, type: 'success' | 'error']
 }>()
 
+useScrollLock(document.body, true)
+
 const formState = reactive({
   title: props.project?.Title ?? '',
   description: props.project?.Description ?? '',
@@ -30,9 +34,10 @@ const formState = reactive({
 const images = ref<ImageItem[]>([])
 const imagesToDelete = ref<string[]>([])
 const loading = ref(false)
-const draggedIndex = ref<number | null>(null)
-const isDraggingFile = ref(false)
 const { isMobile } = useDevice()
+
+const dropZoneRef = useTemplateRef('dropZoneRef')
+const imageGridRef = useTemplateRef('imageGridRef')
 
 watch(() => props.project, (project) => {
   if (project && project.Images) {
@@ -50,6 +55,29 @@ watch(() => props.project, (project) => {
     formState.responsibilities = project.Responsibility_json ?? []
   }
 }, { immediate: true })
+
+useSortable(imageGridRef, images, {
+  animation: 150,
+  handle: '.image-item',
+})
+
+const { isOverDropZone: isDraggingFile } = useDropZone(dropZoneRef, {
+  onDrop: (files) => {
+    if (!files)
+      return
+    const imageFiles = files.filter(file => file.type.startsWith('image/'))
+    const newImages: ImageItem[] = imageFiles.map((file, index) => ({
+      id: `new-${Date.now()}-${index}`,
+      file,
+      url: URL.createObjectURL(file),
+      filename: file.name,
+      isExisting: false,
+    }))
+    images.value = [...images.value, ...newImages]
+  },
+  dataTypes: ['image/*'],
+  multiple: true,
+})
 
 const uppercaseDisplay = (value: string) => value.toUpperCase()
 
@@ -73,44 +101,6 @@ function handleImageUpload(e: Event) {
   images.value = [...images.value, ...newImages]
 }
 
-function handleFileDragEnter(e: DragEvent) {
-  e.preventDefault()
-  e.stopPropagation()
-  isDraggingFile.value = true
-}
-
-function handleFileDragLeave(e: DragEvent) {
-  e.preventDefault()
-  e.stopPropagation()
-  isDraggingFile.value = false
-}
-
-function handleFileDragOver(e: DragEvent) {
-  e.preventDefault()
-  e.stopPropagation()
-}
-
-function handleFileDrop(e: DragEvent) {
-  e.preventDefault()
-  e.stopPropagation()
-  isDraggingFile.value = false
-
-  const files = e.dataTransfer?.files
-  if (!files || files.length === 0)
-    return
-
-  const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'))
-  const newImages: ImageItem[] = imageFiles.map((file, index) => ({
-    id: `new-${Date.now()}-${index}`,
-    file,
-    url: URL.createObjectURL(file),
-    filename: file.name,
-    isExisting: false,
-  }))
-
-  images.value = [...images.value, ...newImages]
-}
-
 function handleDeleteImage(image: ImageItem) {
   if (image.isExisting) {
     imagesToDelete.value.push(image.filename)
@@ -119,26 +109,6 @@ function handleDeleteImage(image: ImageItem) {
   if (!image.isExisting) {
     URL.revokeObjectURL(image.url)
   }
-}
-
-function handleDragStart(index: number) {
-  draggedIndex.value = index
-}
-
-function handleDragOver(e: DragEvent, index: number) {
-  e.preventDefault()
-  if (draggedIndex.value === null || draggedIndex.value === index)
-    return
-  const newImages = [...images.value]
-  const draggedItem = newImages[draggedIndex.value]
-  newImages.splice(draggedIndex.value, 1)
-  newImages.splice(index, 0, draggedItem)
-  images.value = newImages
-  draggedIndex.value = index
-}
-
-function handleDragEnd() {
-  draggedIndex.value = null
 }
 
 async function handleSubmit(e?: Event) {
@@ -214,14 +184,6 @@ async function handleSubmit(e?: Event) {
     loading.value = false
   }
 }
-
-onMounted(() => {
-  document.body.style.overflow = 'hidden'
-})
-
-onUnmounted(() => {
-  document.body.style.overflow = ''
-})
 </script>
 
 <template>
@@ -263,16 +225,13 @@ onUnmounted(() => {
             </span>
 
             <div
+              ref="dropZoneRef"
               class="relative border-2 border-dashed transition-all" :class="[
                 isDraggingFile ? 'border-primary bg-primary/5' : 'border-default bg-elevated/50',
                 images.length === 0 ? 'cursor-pointer hover:border-accented hover:bg-elevated' : '',
               ]"
               role="button"
               tabindex="0"
-              @dragenter="handleFileDragEnter"
-              @dragleave="handleFileDragLeave"
-              @dragover="handleFileDragOver"
-              @drop="handleFileDrop"
             >
               <input
                 type="file"
@@ -303,19 +262,13 @@ onUnmounted(() => {
               </div>
 
               <div v-if="images.length > 0" class="p-4">
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div ref="imageGridRef" class="grid grid-cols-2 md:grid-cols-3 gap-3">
                   <div
                     v-for="(image, index) in images"
                     :key="image.id"
-                    draggable="true"
-                    class="relative group cursor-move border overflow-hidden transition-all" :class="[
-                      draggedIndex === index ? 'border-primary opacity-50' : 'border-default hover:border-accented',
-                    ]"
+                    class="image-item relative group cursor-move border overflow-hidden transition-all border-default hover:border-accented"
                     role="button"
                     tabindex="0"
-                    @dragstart="handleDragStart(index)"
-                    @dragover="handleDragOver($event, index)"
-                    @dragend="handleDragEnd"
                   >
                     <div class="aspect-square bg-elevated">
                       <img :src="image.url" :alt="image.filename" class="w-full h-full object-cover">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useScroll, useElementSize } from '@vueuse/core'
 import type { ProjectImage } from '~/shared/types/project'
+import { onKeyDown, useElementSize, useScroll } from '@vueuse/core'
 
 const props = withDefaults(defineProps<{
   images: ProjectImage[]
@@ -29,6 +29,8 @@ const { width: containerWidth } = useElementSize(containerRef)
 
 const blurIntensity = ref(0)
 
+const halfWidth = computed(() => containerWidth.value * 0.5)
+
 const maxScroll = computed(() => {
   const carousel = containerRef.value
   if (!carousel)
@@ -48,14 +50,13 @@ const currentSlide = computed(() => {
     return Math.max(0, Math.min(currentIndex, props.totalSlides - 1))
   }
 
-  const halfWidth = containerWidth.value * 0.5
-  if (halfWidth <= 0)
+  if (halfWidth.value <= 0)
     return 0
 
   if (scrollX.value >= maxScroll.value - 5) {
     return props.totalSlides - 1
   }
-  const slideIndex = Math.round(scrollX.value / halfWidth)
+  const slideIndex = Math.round(scrollX.value / halfWidth.value)
   return Math.min(slideIndex, props.images.length - 1)
 })
 
@@ -144,24 +145,20 @@ function calculateBlurIntensity() {
   blurIntensity.value = visibility
 }
 
-function handleKeyDown(e: KeyboardEvent) {
-  if (isMobile)
-    return
+if (!isMobile) {
+  onKeyDown('ArrowRight', (e) => {
+    if (currentSlide.value < props.totalSlides - 1) {
+      e.preventDefault()
+      scrollX.value = (currentSlide.value + 1) * halfWidth.value
+    }
+  })
 
-  const carousel = containerRef.value
-  if (!carousel)
-    return
-
-  const halfWidth = carousel.offsetWidth * 0.5
-
-  if (e.key === 'ArrowRight' && currentSlide.value < props.totalSlides - 1) {
-    e.preventDefault()
-    carousel.scrollTo({ left: (currentSlide.value + 1) * halfWidth, behavior: 'smooth' })
-  }
-  else if (e.key === 'ArrowLeft' && currentSlide.value > 0) {
-    e.preventDefault()
-    carousel.scrollTo({ left: (currentSlide.value - 1) * halfWidth, behavior: 'smooth' })
-  }
+  onKeyDown('ArrowLeft', (e) => {
+    if (currentSlide.value > 0) {
+      e.preventDefault()
+      scrollX.value = (currentSlide.value - 1) * halfWidth.value
+    }
+  })
 }
 
 function scrollToNextSection() {
@@ -181,25 +178,8 @@ function handleTitleClick() {
 }
 
 function handleNextSlide() {
-  const carousel = containerRef.value
-  if (!carousel)
-    return
-
-  const halfWidth = carousel.offsetWidth * 0.5
-  carousel.scrollTo({ left: (currentSlide.value + 1) * halfWidth, behavior: 'smooth' })
+  scrollX.value = (currentSlide.value + 1) * halfWidth.value
 }
-
-onMounted(() => {
-  if (!isMobile) {
-    window.addEventListener('keydown', handleKeyDown)
-  }
-})
-
-onUnmounted(() => {
-  if (!isMobile) {
-    window.removeEventListener('keydown', handleKeyDown)
-  }
-})
 </script>
 
 <template>
