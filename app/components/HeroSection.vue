@@ -46,7 +46,7 @@ onMounted(() => {
     </Transition>
 
     <div class="absolute bottom-8 left-1/2 -translate-x-3 z-10 text-white">
-      <UIcon name="i-lucide-chevron-down" class="size-6" />
+      <UIcon name="i-lucide-chevron-down" class="size-6 text-white" />
     </div>
   </section>
 </template>

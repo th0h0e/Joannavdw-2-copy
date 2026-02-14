@@ -253,7 +253,7 @@ onUnmounted(() => {
                 class="absolute bottom-5 left-1/2 z-[100] cursor-pointer hover:opacity-70 transition-opacity duration-300 pointer-events-auto"
                 :style="{ opacity: blurIntensity ** 2, transform: 'translateX(-50%) translateZ(0)', willChange: 'transform, opacity' }"
               >
-                <UIcon name="i-lucide-chevron-down" class="size-6" />
+                <UIcon name="i-lucide-chevron-down" class="size-6 text-white" />
               </div>
             </div>
           </div>
@@ -336,7 +336,7 @@ onUnmounted(() => {
       @click="scrollToNextSection"
       @keydown.down.prevent="scrollToNextSection"
     >
-      <UIcon name="i-lucide-chevron-down" class="size-6 hover:opacity-70 transition-opacity duration-300" />
+      <UIcon name="i-lucide-chevron-down" class="size-6 text-white hover:opacity-70 transition-opacity duration-300" />
     </button>
   </div>
 
@@ -346,7 +346,7 @@ onUnmounted(() => {
     aria-label="Next slide"
     @click="handleNextSlide"
   >
-    <UIcon name="i-lucide-chevron-right" class="size-6 pointer-events-none" />
+    <UIcon name="i-lucide-chevron-right" class="size-6 text-white pointer-events-none" />
   </button>
 </template>
 
