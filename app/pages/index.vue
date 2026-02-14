@@ -77,21 +77,11 @@ useEdgeGesturePrevention()
         class="relative w-full snap-center"
         style="height: 100lvh"
       >
-        <MotionCarouselDesktop
-          v-if="$device.isDesktop || $device.isTablet"
-          :images="project.images"
-          :project-title="project.title"
-          :total-slides="project.images.length + 1"
-          :is-popup-visible="showPopup"
-          :is-about-popup-visible="showAboutPopup"
-          @show-popup="handleShowPopup"
-        />
         <MotionCarousel
-          v-else
           :images="project.images"
           :project-title="project.title"
-          :total-slides="project.images.length + 2"
-          :show-top-progress-bar="true"
+          :total-slides="$device.isMobile ? project.images.length + 2 : project.images.length + 1"
+          :show-top-progress-bar="$device.isMobile"
           :is-popup-visible="showPopup"
           :is-about-popup-visible="showAboutPopup"
           @show-popup="handleShowPopup"
