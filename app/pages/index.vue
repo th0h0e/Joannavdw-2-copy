@@ -68,8 +68,7 @@ useEdgeGesturePrevention()
         scrollSnapType: 'y mandatory',
       }"
     >
-      <DesktopHero v-if="$device.isDesktop || $device.isTablet" :is-about-popup-visible="showAboutPopup" />
-      <HeroMobile v-else :is-about-popup-visible="showAboutPopup" />
+      <HeroSection :is-about-popup-visible="showAboutPopup" />
 
       <section
         v-for="(project, index) in projectsData"
