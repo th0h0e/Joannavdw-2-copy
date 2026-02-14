@@ -272,7 +272,7 @@ async function handlePublishChanges() {
             variant="outline"
             color="neutral"
             size="sm"
-            icon="i-lucide-upload-cloud"
+            icon="i-ph-cloud-arrow-up"
             class="uppercase text-xs tracking-wide"
             @click="handlePublishChanges"
           >
@@ -291,7 +291,7 @@ async function handlePublishChanges() {
             variant="ghost"
             color="neutral"
             size="sm"
-            icon="i-lucide-settings"
+            icon="i-ph-gear"
             aria-label="Settings"
             @click="showSettings = true"
           />
@@ -315,7 +315,7 @@ async function handlePublishChanges() {
         color="error"
         variant="soft"
         :title="error"
-        icon="i-lucide-alert-circle"
+        icon="i-ph-warning-circle"
         class="mb-8"
       />
 
@@ -352,14 +352,14 @@ async function handlePublishChanges() {
                     color="neutral"
                     variant="outline"
                     size="sm"
-                    icon="i-lucide-x"
+                    icon="i-ph-x"
                     class="pointer-events-auto"
                     title="Cancel"
                     @click="handleTitleCancel"
                   />
                   <UButton
                     size="sm"
-                    icon="i-lucide-check"
+                    icon="i-ph-check"
                     class="pointer-events-auto"
                     title="Save"
                     @click="handleTitleSave"
@@ -373,7 +373,7 @@ async function handlePublishChanges() {
                   variant="outline"
                   color="neutral"
                   size="sm"
-                  icon="i-lucide-image"
+                  icon="i-ph-image"
                   class="opacity-0 group-hover/update:opacity-100 transition-all"
                   title="Update Desktop Hero"
                   @click="heroFileInput?.click()"
@@ -402,7 +402,7 @@ async function handlePublishChanges() {
                   variant="outline"
                   color="neutral"
                   size="sm"
-                  icon="i-lucide-image"
+                  icon="i-ph-image"
                   class="opacity-0 group-hover/update:opacity-100 transition-all"
                   title="Update Mobile Hero"
                   @click="heroMobileFileInput?.click()"
@@ -532,7 +532,7 @@ async function handlePublishChanges() {
           @click="showNewProjectForm = true"
         >
           <template #leading>
-            <UIcon name="i-lucide-plus" class="size-4" />
+            <UIcon name="i-ph-plus" class="size-4" />
           </template>
           New Project
         </UButton>

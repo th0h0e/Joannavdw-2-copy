@@ -331,6 +331,7 @@ onUnmounted(() => {
                       color="error"
                       variant="soft"
                       size="xs"
+                      icon="i-ph-trash"
                       class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all"
                       @click="handleDeleteImage(image)"
                     >
