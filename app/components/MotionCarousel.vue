@@ -38,16 +38,16 @@ const showTopBar = computed(() =>
 
 const progressBarTransform = computed(() => {
   if (showBottomBar.value) {
-    return 'translate(-50%, 0)'
+    return 'translateY(0)'
   }
-  return currentSlide.value > 0 ? 'translate(-50%, 0)' : 'translate(-50%, 10px)'
+  return currentSlide.value > 0 ? 'translateY(0)' : 'translateY(10px)'
 })
 
 const topProgressBarTransform = computed(() => {
   if (showBottomBar.value) {
-    return 'translate(-50%, 0)'
+    return 'translateY(0)'
   }
-  return 'translate(-50%, -10px)'
+  return 'translateY(-10px)'
 })
 
 function handleScroll() {
@@ -203,22 +203,22 @@ onUnmounted(() => {
 
   <div
     v-if="images.length > 1"
-    class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 w-full px-6 transition-[opacity,transform] duration-150 ease-in-out"
+    class="absolute bottom-5 left-0 right-0 z-20 flex justify-center px-6 transition-[opacity,transform] duration-150 ease-in-out"
     :class="[showBottomBar ? 'opacity-100' : 'opacity-0']"
     :style="{ pointerEvents: currentSlide > 0 ? 'auto' : 'none', transform: progressBarTransform }"
   >
-    <div class="h-0.5 bg-gray-500/50 rounded-full overflow-hidden backdrop-blur-sm">
+    <div class="h-0.5 w-full max-w-md bg-gray-500/50 rounded-full overflow-hidden backdrop-blur-sm">
       <div class="h-full bg-gray-50" :style="{ width: `${scrollProgress * 100}%` }" />
     </div>
   </div>
 
   <div
     v-if="showTopBar"
-    class="absolute top-5 left-1/2 -translate-x-1/2 z-20 w-full px-6 transition-[opacity,transform] duration-150 ease-in-out"
+    class="absolute top-5 left-0 right-0 z-20 flex justify-center px-6 transition-[opacity,transform] duration-150 ease-in-out"
     :class="[showBottomBar ? 'opacity-100' : 'opacity-0']"
     :style="{ pointerEvents: currentSlide > 0 ? 'auto' : 'none', transform: topProgressBarTransform }"
   >
-    <div class="h-0.5 bg-gray-500/50 rounded-full overflow-hidden backdrop-blur-sm">
+    <div class="h-0.5 w-full max-w-md bg-gray-500/50 rounded-full overflow-hidden backdrop-blur-sm">
       <div class="h-full bg-gray-50" :style="{ width: `${scrollProgress * 100}%` }" />
     </div>
   </div>

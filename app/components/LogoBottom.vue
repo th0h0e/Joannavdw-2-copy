@@ -25,7 +25,7 @@ onMounted(() => {
 
 <template>
   <button
-    class="logo-bottom fixed left-1/2 -translate-x-1/2 z-50 cursor-pointer mix-blend-exclusion appearance-none bg-none border-0 p-0 m-0"
+    class="logo-bottom fixed left-1/2 -translate-x-1/2 z-50 cursor-pointer mix-blend-exclusion appearance-none bg-none border-0 p-0 m-0 flex items-center justify-center"
     :class="[
       isHidden ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto',
       mounted && isHero ? 'logo-bottom--hero' : 'logo-bottom--positioned',
