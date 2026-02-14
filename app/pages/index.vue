@@ -1,6 +1,5 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default' })
-const { isDesktop } = useDevice()
 
 await Promise.all([
   useFetch('/api/data/about', { key: 'about' }),
@@ -34,7 +33,7 @@ defineShortcuts({
 
 const { resetInactiveCarousels } = useCarouselReset(projectCount)
 
-useMobileSwipeHint(isDesktop, projectCount)
+useMobileSwipeHint(projectCount)
 
 const { currentSectionIndex } = useSectionTracking(projectCount, resetInactiveCarousels)
 
