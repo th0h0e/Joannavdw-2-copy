@@ -151,42 +151,46 @@ body {
 }
 
 /* ============================================
-   Custom Font Utilities
+   Popup Card Styles (SVG Card Content)
    ============================================ */
 
 .text-popup-title {
   font-family: var(--font-display);
-  font-size: 0.75rem;
+  font-size: 12px;
   letter-spacing: 0.03em;
   line-height: 1.25;
   text-align: center;
   text-transform: uppercase;
-  margin-bottom: 1.125rem;
+  color: black;
+  margin-bottom: 18px;
 }
 
 .text-popup-body {
   font-family: var(--font-display);
-  font-size: 0.75rem;
+  font-size: 12px;
   letter-spacing: 0.03em;
   line-height: 1.25;
   text-align: center;
+  color: black;
+  margin-bottom: 18px;
 }
 
-.text-card-title {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  line-height: 1.4;
-  text-transform: uppercase;
+.text-popup-link {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+  text-align: center;
+  color: black;
+  text-decoration: underline;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: opacity 0.3s;
 }
 
-.text-card-body {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  line-height: 1.4;
+.text-popup-link:hover {
+  opacity: 0.7;
 }
 
 /* ============================================

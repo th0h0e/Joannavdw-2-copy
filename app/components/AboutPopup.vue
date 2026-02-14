@@ -29,29 +29,29 @@ function handleContact() {
       </div>
 
       <div class="flex-1 flex flex-col justify-center">
-        <h2 class="text-card-title text-black text-center">
+        <h2 class="text-popup-title">
           {{ aboutData?.Portfolio_Title || 'Story Driven Strategy' }}
         </h2>
-        <p class="text-card-body text-black text-center">
+        <p class="text-popup-body">
           {{ aboutData?.About_Description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean mattis ipsum vel nulla blandit, eu porta ligula mattis. Phasellus mattis rutrum elit, sed cursus risus tempus quis. Mauris sed ante et lectus consectetur aliquet. Sed in orci a metus aliquam porttitor.' }}
         </p>
 
-        <h3 class="text-card-title text-black text-center">
+        <h3 class="text-popup-title">
           {{ aboutData?.Expertise_Title || 'Expertise' }}
         </h3>
-        <p class="text-card-body text-black text-center">
+        <p class="text-popup-body">
           {{ aboutData?.Expertise_Description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean mattis ipsum vel nulla blandit.' }}
         </p>
 
-        <h3 class="text-card-title text-black text-center">
+        <h3 class="text-popup-title">
           {{ aboutData?.Selected_Clients_Title || 'Selected Clients' }}
         </h3>
-        <p class="text-card-body text-black text-center">
+        <p class="text-popup-body">
           {{ (aboutData?.Client_List_Json || [])?.join(', ') || 'Ipsum, Dolor, Sit Amet, Consectetur, Adipiscing, Aenean, Mattis, Blandit.' }}
         </p>
 
         <button
-          class="text-card-body underline bg-none border-0 w-full cursor-pointer transition-opacity duration-300 hover:opacity-70 text-black text-center"
+          class="text-popup-link"
           @click="handleContact"
         >
           {{ aboutData?.Contact_Message || 'Get in touch' }}

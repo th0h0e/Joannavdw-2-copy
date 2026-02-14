@@ -21,15 +21,15 @@ const projectResponsibility = computed<string[]>(() => project.value?.responsibi
     >
 
     <div class="absolute inset-0 flex flex-col justify-center px-4 py-8">
-      <h2 class="text-card-title text-black text-center">
+      <h2 class="text-popup-title">
         {{ projectTitle }}
       </h2>
-      <div class="text-card-title text-black text-center">
+      <div class="text-popup-title">
         <span v-for="(responsibility, index) in projectResponsibility" :key="`${responsibility}-${index}`">
           {{ responsibility }}<br v-if="index < projectResponsibility.length - 1">
         </span>
       </div>
-      <p class="text-card-body text-black text-center">
+      <p class="text-popup-body">
         {{ projectDescription }}
       </p>
     </div>
