@@ -231,6 +231,8 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
               <UInput
                 v-model="heroTitle"
                 placeholder="Creative Strategy and Communication"
+                color="neutral"
+                variant="subtle"
               />
             </UFormField>
           </div>
@@ -246,12 +248,16 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
                 <UTextarea
                   v-model="aboutDescription"
                   :rows="4"
+                  color="neutral"
+                  variant="subtle"
                 />
               </UFormField>
               <UFormField label="Expertise Description">
                 <UTextarea
                   v-model="expertiseDescription"
                   :rows="3"
+                  color="neutral"
+                  variant="subtle"
                 />
               </UFormField>
               <div>
@@ -282,6 +288,8 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
                   v-model="contactEmail"
                   type="email"
                   placeholder="hello@example.com"
+                  color="neutral"
+                  variant="subtle"
                 />
               </UFormField>
               <div>
