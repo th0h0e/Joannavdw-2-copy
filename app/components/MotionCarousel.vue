@@ -308,9 +308,16 @@ onUnmounted(() => {
     ]"
     :style="{ pointerEvents: currentSlide > 0 ? 'auto' : 'none', transform: progressBarTransform }"
   >
-    <div class="h-0.5 w-full max-w-md bg-gray-500/50 rounded-full overflow-hidden backdrop-blur-sm">
-      <div class="h-full bg-gray-50" :style="{ width: `${scrollProgress * 100}%` }" />
-    </div>
+    <UProgress
+      :value="scrollProgress * 100"
+      :max="100"
+      size="xs"
+      :ui="{
+        base: 'bg-gray-500/50 backdrop-blur-sm',
+        indicator: 'bg-gray-50',
+      }"
+      class="w-full max-w-md"
+    />
   </div>
 
   <div
@@ -319,9 +326,16 @@ onUnmounted(() => {
     :class="[showBottomBar ? 'opacity-100' : 'opacity-0']"
     :style="{ pointerEvents: currentSlide > 0 ? 'auto' : 'none', transform: topProgressBarTransform }"
   >
-    <div class="h-0.5 w-full max-w-md bg-gray-500/50 rounded-full overflow-hidden backdrop-blur-sm">
-      <div class="h-full bg-gray-50" :style="{ width: `${scrollProgress * 100}%` }" />
-    </div>
+    <UProgress
+      :value="scrollProgress * 100"
+      :max="100"
+      size="xs"
+      :ui="{
+        base: 'bg-gray-500/50 backdrop-blur-sm',
+        indicator: 'bg-gray-50',
+      }"
+      class="w-full max-w-md"
+    />
   </div>
 
   <div

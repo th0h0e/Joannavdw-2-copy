@@ -85,7 +85,7 @@ async function handleLogin() {
           />
         </UFormField>
 
-        <div v-if="error" class="bg-red-950/20 border border-red-800/30 text-red-200 px-4 py-3 rounded-sm text-sm">
+        <div v-if="error" class="bg-error-950/20 border border-error-800/30 text-error-200 px-4 py-3 rounded-sm text-sm">
           {{ error }}
         </div>
 
