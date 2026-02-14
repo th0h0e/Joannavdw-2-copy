@@ -1,10 +1,11 @@
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
-  projectTitles: string[]
   isPopupVisible?: boolean
 }>(), {
   isPopupVisible: false,
 })
+
+const { projectTitles } = usePortfolioProjects()
 
 const isOpen = ref(false)
 

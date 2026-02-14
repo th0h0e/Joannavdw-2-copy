@@ -3,11 +3,10 @@ import Asset7Logo from '~/assets/logo svg/Asset 7.svg'
 import Asset11Logo from '~/assets/logo svg/Asset 11.svg'
 import ProjectCardSVG from '~/assets/Project Card/JVDW WEB LIGHT BOX copy.svg'
 
-const { data: aboutRes } = useNuxtData('about')
-const aboutData = computed(() => aboutRes.value?.items?.find((i: Record<string, unknown>) => i.Is_Active) ?? null)
+const { aboutData } = useAboutData()
 
-function handleContact(aboutData: Record<string, unknown> | null) {
-  const email = (aboutData?.Contact_Email as string) || 'hello@joannavanderwerf.com'
+function handleContact() {
+  const email = aboutData.value?.Contact_Email || 'hello@joannavanderwerf.com'
   window.location.href = `mailto:${email}`
 }
 </script>
@@ -48,12 +47,12 @@ function handleContact(aboutData: Record<string, unknown> | null) {
           {{ aboutData?.Selected_Clients_Title || 'Selected Clients' }}
         </h3>
         <p class="text-card-body text-black">
-          {{ ((aboutData?.Client_List_Json as string[]) || (aboutData?.Client_List as string[]) || [])?.join(', ') || 'Ipsum, Dolor, Sit Amet, Consectetur, Adipiscing, Aenean, Mattis, Blandit.' }}
+          {{ (aboutData?.Client_List_Json || [])?.join(', ') || 'Ipsum, Dolor, Sit Amet, Consectetur, Adipiscing, Aenean, Mattis, Blandit.' }}
         </p>
 
         <button
           class="text-card-body underline bg-none border-0 w-full cursor-pointer transition-opacity duration-300 hover:opacity-70 text-black"
-          @click="handleContact(aboutData)"
+          @click="handleContact"
         >
           {{ aboutData?.Contact_Message || 'Get in touch' }}
         </button>
