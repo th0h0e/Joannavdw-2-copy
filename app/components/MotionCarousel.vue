@@ -56,7 +56,6 @@ const titleText = computed(() => isOnBlurSlide.value ? 'NEXT PROJECT' : props.pr
 // Hide title when either popup is visible
 const titleHidden = computed(() => props.isPopupVisible || props.isAboutPopupVisible)
 
-
 // Show bottom progress bar when scrolled past first slide
 const showBottomBar = computed(() => currentSlide.value > 0 && currentSlide.value <= props.images.length)
 

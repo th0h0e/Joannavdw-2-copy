@@ -4,7 +4,8 @@ export function useHomepageData() {
   const homepage = computed(() => homepageRes.value?.items?.find((i: Record<string, unknown>) => i.Is_Active) ?? null)
 
   const heroImage = computed(() => {
-    if (!homepage.value) return ''
+    if (!homepage.value)
+      return ''
     return `https://admin.kontext.site/api/files/${homepage.value.collectionId}/${homepage.value.id}/${homepage.value.Hero_Image}`
   })
 
