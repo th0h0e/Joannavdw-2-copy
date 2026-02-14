@@ -32,8 +32,10 @@ onMounted(() => {
 
 <template>
   <button
-    class="logo-container"
-    :class="{ 'logo-container--hidden': isHidden }"
+    class="fixed left-1/2 -translate-x-1/2 z-50 cursor-pointer mix-blend-exclusion transition-[top,opacity] ease-out pointer-events-auto appearance-none bg-none border-0 p-0 m-0"
+    :class="[
+      isHidden ? 'opacity-0 pointer-events-none duration-300' : 'opacity-100 duration-700',
+    ]"
     :style="{
       width: containerWidth,
       height: containerHeight,
@@ -45,38 +47,7 @@ onMounted(() => {
     <img
       :src="Asset7Logo"
       alt="Joanna Logo Top"
-      class="logo-image"
+      class="max-w-[54.15%] max-h-full"
     >
   </button>
 </template>
-
-<style scoped>
-.logo-container {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 50;
-  cursor: pointer;
-  mix-blend-mode: exclusion;
-  transition:
-    top 0.7s ease-out,
-    opacity 0.3s ease-out;
-  opacity: 1;
-  pointer-events: auto;
-  appearance: none;
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-
-.logo-container--hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.logo-image {
-  max-width: 54.15%;
-  max-height: 100%;
-}
-</style>

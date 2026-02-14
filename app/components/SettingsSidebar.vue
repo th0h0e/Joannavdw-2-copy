@@ -171,12 +171,12 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
 <template>
   <template v-if="isOpen">
     <button
-      class="settings-backdrop fixed inset-0 bg-neutral-900/70 backdrop-blur-md z-40 transition-opacity duration-300"
+      class="fixed inset-0 bg-neutral-900/70 backdrop-blur-md z-40 transition-opacity duration-300 appearance-none bg-transparent border-0 p-0 m-0 text-left"
       aria-label="Close settings"
       @click="emit('close')"
     />
 
-    <div class="settings-preview fixed top-1/2">
+    <div class="fixed top-1/2 left-[25%] -translate-x-1/2 -translate-y-1/2 z-[45]">
       <LazyAboutPopup
         :is-visible="true"
         :about-data="previewAboutData"
@@ -184,7 +184,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
       />
     </div>
 
-    <div class="settings-sidebar fixed right-0 top-0 h-full w-3/4 md:w-1/2 bg-black/85 backdrop-blur-xl border-l border-neutral-700/60 shadow-2xl z-50 flex flex-col">
+    <div class="fixed right-0 top-0 h-full w-3/4 md:w-1/2 bg-black/85 backdrop-blur-xl border-l border-neutral-700/60 shadow-2xl z-50 flex flex-col font-['EnduroWeb',sans-serif]">
       <UForm :state="{}" class="flex flex-col h-full" @submit="handleSubmit">
         <div class="flex-shrink-0 p-8 border-b border-neutral-800/60 flex items-center gap-4 backdrop-blur-sm">
           <div class="flex-1">
@@ -371,27 +371,3 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
     </div>
   </template>
 </template>
-
-<style scoped>
-.settings-backdrop {
-  z-index: 40;
-  appearance: none;
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
-  font: inherit;
-  color: inherit;
-  text-align: left;
-}
-
-.settings-preview {
-  left: 25%;
-  transform: translate(-50%, -50%);
-  z-index: 45;
-}
-
-.settings-sidebar {
-  font-family: 'EnduroWeb, sans-serif';
-}
-</style>

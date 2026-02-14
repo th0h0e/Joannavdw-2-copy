@@ -243,7 +243,7 @@ onUnmounted(() => {
 
     <div
       v-if="project && !isMobile"
-      class="project-editor__preview absolute top-1/2"
+      class="absolute top-1/2 left-[25%] -translate-x-1/2 -translate-y-1/2 z-[45] pointer-events-none"
     >
       <LazyProjectPopupPreview
         :project-title="formState.title"
@@ -253,7 +253,7 @@ onUnmounted(() => {
     </div>
 
     <div
-      class="project-editor__sidebar fixed right-0 top-0 w-3/4 md:w-2/3 lg:w-1/2 bg-black/85 backdrop-blur-xl border-l border-neutral-700/60 shadow-2xl z-50 flex flex-col"
+      class="fixed right-0 top-0 w-3/4 md:w-2/3 lg:w-1/2 bg-black/85 backdrop-blur-xl border-l border-neutral-700/60 shadow-2xl z-50 flex flex-col h-screen font-['EnduroWeb',sans-serif]"
     >
       <UForm :state="formState" class="flex flex-col h-full" @submit="handleSubmit">
         <div class="flex-shrink-0 p-8 border-b border-neutral-800/60 backdrop-blur-sm">
@@ -421,17 +421,3 @@ onUnmounted(() => {
     </div>
   </Teleport>
 </template>
-
-<style scoped>
-.project-editor__preview {
-  left: 25%;
-  transform: translate(-50%, -50%);
-  z-index: 45;
-  pointer-events: none;
-}
-
-.project-editor__sidebar {
-  font-family: 'EnduroWeb, sans-serif';
-  height: 100vh;
-}
-</style>

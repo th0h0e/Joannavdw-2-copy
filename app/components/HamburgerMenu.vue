@@ -39,13 +39,17 @@ function handleLinkClick(index: number) {
 <template>
   <button
     v-if="!isPopupVisible"
-    class="hamburger-button fixed top-[80px] right-5 md:top-[89px] md:right-[40px] z-[10000] cursor-pointer"
+    class="fixed top-[80px] right-5 md:top-[89px] md:right-[40px] z-[10000] cursor-pointer bg-none border-0 p-0"
     aria-label="Toggle menu"
     @click="toggleMenu"
   >
     <div
-      class="hamburger-icon"
-      :class="{ 'hamburger-icon--open': isOpen, 'hamburger-icon--closed': !isOpen }"
+      class="block transition-[transform,background-color,width,height] duration-300"
+      :class="[
+        isOpen
+          ? 'mix-blend-normal bg-black w-[18px] h-[18px] rotate-45'
+          : 'mix-blend-exclusion bg-white w-[17.32px] h-[17.32px] md:w-[18px] md:h-[18px] rotate-0',
+      ]"
     />
   </button>
 
@@ -53,7 +57,7 @@ function handleLinkClick(index: number) {
     <Transition name="menu-backdrop">
       <div
         v-if="isOpen"
-        class="menu-overlay fixed inset-0 bg-white z-[9998] cursor-pointer"
+        class="fixed inset-0 bg-white z-[9998] cursor-pointer h-[100lvh]"
         role="button"
         tabindex="0"
         aria-label="Close menu"
@@ -67,7 +71,7 @@ function handleLinkClick(index: number) {
     <Transition name="menu-content">
       <div
         v-if="isOpen"
-        class="menu-content-wrapper fixed inset-0 z-[9999] flex items-center justify-center"
+        class="fixed inset-0 z-[9999] flex items-center justify-center h-[100lvh]"
       >
         <div class="w-full flex items-center justify-center">
           <ProjectNavigation
@@ -81,52 +85,6 @@ function handleLinkClick(index: number) {
 </template>
 
 <style scoped>
-.hamburger-button {
-  background: none;
-  border: none;
-  padding: 0;
-}
-
-.hamburger-icon {
-  display: block;
-  transition:
-    transform 0.3s,
-    background-color 0.3s,
-    width 0.3s,
-    height 0.3s;
-}
-
-.hamburger-icon--closed {
-  mix-blend-mode: exclusion;
-  background-color: #ffffff;
-  width: 17.32px;
-  height: 17.32px;
-  transform: rotate(0deg);
-}
-
-.hamburger-icon--open {
-  mix-blend-mode: normal;
-  background-color: #000000;
-  width: 18px;
-  height: 18px;
-  transform: rotate(45deg);
-}
-
-@media (min-width: 768px) {
-  .hamburger-icon--closed {
-    width: 18px;
-    height: 18px;
-  }
-}
-
-.menu-overlay {
-  height: 100lvh;
-}
-
-.menu-content-wrapper {
-  height: 100lvh;
-}
-
 .menu-backdrop-enter-active,
 .menu-backdrop-leave-active {
   transition: opacity 0.3s ease-out;
