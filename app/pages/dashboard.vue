@@ -246,6 +246,23 @@ async function handleDragEnd() {
     isReordering.value = false
   }
 }
+
+async function handlePublishChanges() {
+  try {
+    await $fetch('/api/revalidate', {
+      method: 'POST',
+      body: {
+        collections: ['About', 'Homepage', 'Portfolio_Projects'],
+      },
+      headers: { Authorization: pb.authStore.token },
+    })
+    showToast('Changes published successfully!', 'success')
+  }
+  catch (err: unknown) {
+    const typedErr = err as { data?: { message?: string }, message?: string }
+    showToast(`Failed to publish: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
+  }
+}
 </script>
 
 <template>
@@ -274,6 +291,16 @@ async function handleDragEnd() {
           </p>
         </div>
         <div class="flex items-center gap-3">
+          <UButton
+            variant="outline"
+            color="neutral"
+            size="sm"
+            icon="i-lucide-upload-cloud"
+            class="uppercase text-xs tracking-wide"
+            @click="handlePublishChanges"
+          >
+            Publish Changes
+          </UButton>
           <UButton
             to="/"
             variant="ghost"

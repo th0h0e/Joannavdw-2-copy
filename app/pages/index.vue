@@ -3,9 +3,9 @@ definePageMeta({ layout: 'default' })
 const { isDesktop } = useDevice()
 
 await Promise.all([
-  useFetch('https://admin.kontext.site/api/collections/About/records', { key: 'about' }),
-  useFetch('https://admin.kontext.site/api/collections/Homepage/records', { key: 'homepage' }),
-  useFetch('https://admin.kontext.site/api/collections/Portfolio_Projects/records', { key: 'portfolio' }),
+  useFetch('/api/data/about', { key: 'about' }),
+  useFetch('/api/data/homepage', { key: 'homepage' }),
+  useFetch('/api/data/portfolio', { key: 'portfolio' }),
 ])
 
 const { projects: projectsData } = usePortfolioProjects()

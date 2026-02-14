@@ -60,6 +60,16 @@ export default defineNuxtConfig({
     },
   },
 
+  // Nitro configuration for ISR caching
+  nitro: {
+    storage: {
+      cache: {
+        driver: 'fs',
+        base: './.cache/nitro/cache',
+      },
+    },
+  },
+
   typescript: {
     strict: true,
   },
