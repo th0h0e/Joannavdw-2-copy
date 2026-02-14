@@ -21,9 +21,15 @@ function handleShowPopup(projectTitle: string) {
   showPopup.value = true
 }
 
+function closePopups() {
+  showPopup.value = false
+  showAboutPopup.value = false
+}
+
 defineShortcuts({
   o: () => showAboutPopup.value = !showAboutPopup.value,
   p: () => showPopup.value = !showPopup.value,
+  escape: () => closePopups(),
 })
 
 const { resetInactiveCarousels } = useCarouselReset(projectCount)
@@ -96,16 +102,49 @@ useEdgeGesturePrevention()
       <ProjectIndex />
     </main>
 
-    <UModal v-model:open="showPopup" :overlay="false">
-      <template #content>
-        <ProjectPopup :project-title="popupProjectTitle" />
-      </template>
-    </UModal>
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-opacity duration-300"
+        leave-active-class="transition-opacity duration-200"
+        enter-from-class="opacity-0"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="showPopup || showAboutPopup"
+          class="popup-backdrop fixed inset-0 z-[9998]"
+          role="button"
+          tabindex="-1"
+          aria-label="Close popup"
+          @click="closePopups"
+          @keydown.enter="closePopups"
+          @keydown.space="closePopups"
+        />
+      </Transition>
 
-    <UModal v-model:open="showAboutPopup" :overlay="false">
-      <template #content>
-        <AboutPopup />
-      </template>
-    </UModal>
+      <Transition
+        enter-active-class="transition-all duration-300 ease-out"
+        leave-active-class="transition-all duration-200 ease-in"
+        enter-from-class="opacity-0 scale-90"
+        leave-to-class="opacity-0 scale-90"
+      >
+        <ProjectPopup
+          v-if="showPopup"
+          :project-title="popupProjectTitle"
+          @click.stop
+        />
+      </Transition>
+
+      <Transition
+        enter-active-class="transition-all duration-300 ease-out"
+        leave-active-class="transition-all duration-200 ease-in"
+        enter-from-class="opacity-0 scale-90"
+        leave-to-class="opacity-0 scale-90"
+      >
+        <AboutPopup
+          v-if="showAboutPopup"
+          @click.stop
+        />
+      </Transition>
+    </Teleport>
   </div>
 </template>

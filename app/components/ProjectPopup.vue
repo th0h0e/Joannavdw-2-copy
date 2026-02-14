@@ -13,23 +13,23 @@ const projectResponsibility = computed<string[]>(() => project.value?.responsibi
 </script>
 
 <template>
-  <div class="relative">
+  <div class="popup-container">
     <img
       :src="ProjectCardSVG"
       alt="Project Card"
-      class="max-w-[90vw] max-h-[85vh] w-auto h-auto w-full h-auto"
+      class="popup-card-image"
     >
 
     <div class="absolute inset-0 flex flex-col justify-center px-4 py-8">
-      <h2 class="text-card-title text-black">
+      <h2 class="text-card-title text-black text-center">
         {{ projectTitle }}
       </h2>
-      <div class="text-card-title text-black">
+      <div class="text-card-title text-black text-center">
         <span v-for="(responsibility, index) in projectResponsibility" :key="`${responsibility}-${index}`">
           {{ responsibility }}<br v-if="index < projectResponsibility.length - 1">
         </span>
       </div>
-      <p class="text-card-body text-black">
+      <p class="text-card-body text-black text-center">
         {{ projectDescription }}
       </p>
     </div>

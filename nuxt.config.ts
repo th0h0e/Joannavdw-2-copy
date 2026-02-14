@@ -16,6 +16,7 @@ export default defineNuxtConfig({
   // Modules
   modules: [// Auto-imports all @vueuse/core composables
     '@vueuse/nuxt',
+    '@vueuse/motion',
     '@nuxt/eslint',
     '@sentry/nuxt/module',
     '@nuxtjs/device',

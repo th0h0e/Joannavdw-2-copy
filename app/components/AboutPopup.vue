@@ -12,11 +12,11 @@ function handleContact() {
 </script>
 
 <template>
-  <div class="relative">
+  <div class="popup-container">
     <img
       :src="ProjectCardSVG"
       alt="About Card"
-      class="max-w-[90vw] max-h-[85vh] w-auto h-auto w-full h-auto"
+      class="popup-card-image"
     >
 
     <div class="absolute inset-0 flex flex-col justify-between px-4 py-8">
@@ -29,29 +29,29 @@ function handleContact() {
       </div>
 
       <div class="flex-1 flex flex-col justify-center">
-        <h2 class="text-card-title text-black">
+        <h2 class="text-card-title text-black text-center">
           {{ aboutData?.Portfolio_Title || 'Story Driven Strategy' }}
         </h2>
-        <p class="text-card-body text-black">
+        <p class="text-card-body text-black text-center">
           {{ aboutData?.About_Description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean mattis ipsum vel nulla blandit, eu porta ligula mattis. Phasellus mattis rutrum elit, sed cursus risus tempus quis. Mauris sed ante et lectus consectetur aliquet. Sed in orci a metus aliquam porttitor.' }}
         </p>
 
-        <h3 class="text-card-title text-black">
+        <h3 class="text-card-title text-black text-center">
           {{ aboutData?.Expertise_Title || 'Expertise' }}
         </h3>
-        <p class="text-card-body text-black">
+        <p class="text-card-body text-black text-center">
           {{ aboutData?.Expertise_Description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean mattis ipsum vel nulla blandit.' }}
         </p>
 
-        <h3 class="text-card-title text-black">
+        <h3 class="text-card-title text-black text-center">
           {{ aboutData?.Selected_Clients_Title || 'Selected Clients' }}
         </h3>
-        <p class="text-card-body text-black">
+        <p class="text-card-body text-black text-center">
           {{ (aboutData?.Client_List_Json || [])?.join(', ') || 'Ipsum, Dolor, Sit Amet, Consectetur, Adipiscing, Aenean, Mattis, Blandit.' }}
         </p>
 
         <button
-          class="text-card-body underline bg-none border-0 w-full cursor-pointer transition-opacity duration-300 hover:opacity-70 text-black"
+          class="text-card-body underline bg-none border-0 w-full cursor-pointer transition-opacity duration-300 hover:opacity-70 text-black text-center"
           @click="handleContact"
         >
           {{ aboutData?.Contact_Message || 'Get in touch' }}
