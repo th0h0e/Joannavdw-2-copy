@@ -1,17 +1,11 @@
+import type { PaginatedResponse } from '~/shared/types/api'
 import type { AboutResponse } from '~/shared/types/pocketbase-types'
-
-interface AboutListResponse {
-  page: number
-  perPage: number
-  totalItems: number
-  totalPages: number
-  items: AboutResponse<string[]>[]
-}
+import { findActiveItem } from '~/shared/types/api'
 
 export function useAboutData() {
-  const { data: aboutRes } = useNuxtData<AboutListResponse>('about')
+  const { data: aboutRes } = useNuxtData<PaginatedResponse<AboutResponse<string[]>>>('about')
 
-  const aboutData = computed(() => aboutRes.value?.items?.find(i => i.Is_Active) ?? null)
+  const aboutData = computed(() => findActiveItem(aboutRes.value?.items))
 
   return { aboutData }
 }

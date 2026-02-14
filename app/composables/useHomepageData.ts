@@ -1,22 +1,17 @@
+import type { PaginatedResponse } from '~/shared/types/api'
 import type { HomepageResponse } from '~/shared/types/pocketbase-types'
-
-interface HomepageListResponse {
-  page: number
-  perPage: number
-  totalItems: number
-  totalPages: number
-  items: HomepageResponse[]
-}
+import { findActiveItem } from '~/shared/types/api'
+import { getImageUrl } from '~/utils/pocketbase'
 
 export function useHomepageData() {
-  const { data: homepageRes } = useNuxtData<HomepageListResponse>('homepage')
+  const { data: homepageRes } = useNuxtData<PaginatedResponse<HomepageResponse>>('homepage')
 
-  const homepage = computed(() => homepageRes.value?.items?.find(i => i.Is_Active) ?? null)
+  const homepage = computed(() => findActiveItem(homepageRes.value?.items))
 
   const heroImage = computed(() => {
     if (!homepage.value)
       return ''
-    return `https://admin.kontext.site/api/files/${homepage.value.collectionId}/${homepage.value.id}/${homepage.value.Hero_Image}`
+    return getImageUrl(homepage.value, homepage.value.Hero_Image)
   })
 
   const heroTitle = computed(() => homepage.value?.Hero_Title || 'Creative Strategy and Communication')

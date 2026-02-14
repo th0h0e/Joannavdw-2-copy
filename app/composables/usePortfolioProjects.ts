@@ -1,14 +1,9 @@
+import type { PaginatedResponse } from '~/shared/types/api'
 import type { PortfolioProjectsResponse } from '~/shared/types/pocketbase-types'
 import { getImageUrl } from '~/utils/pocketbase'
 
 export function usePortfolioProjects() {
-  const { data: portfolioRes } = useNuxtData<{
-    page: number
-    perPage: number
-    totalItems: number
-    totalPages: number
-    items: PortfolioProjectsResponse<string[]>[]
-  }>('portfolio')
+  const { data: portfolioRes } = useNuxtData<PaginatedResponse<PortfolioProjectsResponse<string[]>>>('portfolio')
 
   const projects = computed(() => {
     const items = portfolioRes.value?.items ?? []
