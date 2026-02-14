@@ -129,6 +129,7 @@ useEdgeGesturePrevention()
       >
         <ProjectPopup
           v-if="showPopup"
+          class="relative z-[9999]"
           :project-title="popupProjectTitle"
           @click.stop
         />
@@ -142,6 +143,7 @@ useEdgeGesturePrevention()
       >
         <AboutPopup
           v-if="showAboutPopup"
+          class="relative z-[9999]"
           @click.stop
         />
       </Transition>
