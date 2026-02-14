@@ -106,7 +106,25 @@ useEdgeGesturePrevention()
         leave-to-class="opacity-0"
       >
         <div
-          v-if="showPopup || showAboutPopup"
+          v-if="showPopup"
+          class="fixed inset-0 z-[9998]"
+          role="button"
+          tabindex="-1"
+          aria-label="Close popup"
+          @click="closePopups"
+          @keydown.enter="closePopups"
+          @keydown.space="closePopups"
+        />
+      </Transition>
+
+      <Transition
+        enter-active-class="transition-opacity duration-300"
+        leave-active-class="transition-opacity duration-200"
+        enter-from-class="opacity-0"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="showAboutPopup"
           class="popup-backdrop fixed inset-0 z-[9998]"
           role="button"
           tabindex="-1"

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useScroll, useElementSize } from '@vueuse/core'
 import type { ProjectImage } from '~/shared/types/project'
 
 const props = withDefaults(defineProps<{
@@ -22,17 +23,55 @@ const { isMobile } = useDevice()
 
 const containerRef = ref<HTMLDivElement | null>(null)
 const projectTitleRef = useTemplateRef('projectTitleRef')
-const scrollProgress = ref(0)
-const currentSlide = ref(0)
-const isOnBlurSlide = ref(false)
+
+const { x: scrollX } = useScroll(containerRef, { behavior: 'smooth' })
+const { width: containerWidth } = useElementSize(containerRef)
+
 const blurIntensity = ref(0)
+
+const maxScroll = computed(() => {
+  const carousel = containerRef.value
+  if (!carousel)
+    return 0
+  return carousel.scrollWidth - containerWidth.value
+})
+
+const scrollProgress = computed(() => {
+  if (maxScroll.value <= 0)
+    return 0
+  return scrollX.value / maxScroll.value
+})
+
+const currentSlide = computed(() => {
+  if (isMobile) {
+    const currentIndex = Math.round(scrollProgress.value * (props.totalSlides - 1))
+    return Math.max(0, Math.min(currentIndex, props.totalSlides - 1))
+  }
+
+  const halfWidth = containerWidth.value * 0.5
+  if (halfWidth <= 0)
+    return 0
+
+  if (scrollX.value >= maxScroll.value - 5) {
+    return props.totalSlides - 1
+  }
+  const slideIndex = Math.round(scrollX.value / halfWidth)
+  return Math.min(slideIndex, props.images.length - 1)
+})
+
+const isOnBlurSlide = computed(() => {
+  if (isMobile) {
+    return currentSlide.value === props.totalSlides - 1
+  }
+  return scrollX.value >= maxScroll.value - 5
+})
 
 const lastImage = computed(() => props.images[props.images.length - 1])
 const titleText = computed(() => isOnBlurSlide.value ? 'NEXT PROJECT' : props.projectTitle)
 const titleHidden = computed(() => props.isPopupVisible || props.isAboutPopupVisible)
 
 const showBottomBar = computed(() => {
-  if (isMobile.value) {
+  if (isMobile) {
     return currentSlide.value > 0 && currentSlide.value <= props.images.length
   }
   return currentSlide.value > 0 && !isOnBlurSlide.value
@@ -40,14 +79,14 @@ const showBottomBar = computed(() => {
 
 const showTopBar = computed(() =>
   props.showTopProgressBar
-  && isMobile.value
+  && isMobile
   && props.images.length > 1
   && currentSlide.value > 0
   && currentSlide.value <= props.images.length,
 )
 
 const showRightChevron = computed(() =>
-  !isMobile.value
+  !isMobile
   && props.images.length > 1
   && currentSlide.value < props.images.length - 1,
 )
@@ -66,48 +105,17 @@ const topProgressBarTransform = computed(() => {
   return 'translateY(-10px)'
 })
 
-function handleScroll() {
+watch(scrollX, () => {
+  if (isMobile) {
+    calculateBlurIntensity()
+  }
+})
+
+function calculateBlurIntensity() {
   const carousel = containerRef.value
   if (!carousel)
     return
 
-  const scrollLeft = carousel.scrollLeft
-  const containerWidth = carousel.offsetWidth
-  const maxScroll = carousel.scrollWidth - containerWidth
-  const rawProgress = maxScroll > 0 ? scrollLeft / maxScroll : 0
-  scrollProgress.value = rawProgress
-
-  if (isMobile.value) {
-    handleMobileScroll(rawProgress, carousel)
-  }
-  else {
-    handleDesktopScroll(scrollLeft, containerWidth, maxScroll)
-  }
-}
-
-function handleMobileScroll(rawProgress: number, carousel: HTMLElement) {
-  const currentIndex = Math.round(rawProgress * (props.totalSlides - 1))
-  const clampedIndex = Math.max(0, Math.min(currentIndex, props.totalSlides - 1))
-  currentSlide.value = clampedIndex
-  isOnBlurSlide.value = clampedIndex === props.totalSlides - 1
-  calculateBlurIntensity(carousel)
-}
-
-function handleDesktopScroll(scrollLeft: number, containerWidth: number, maxScroll: number) {
-  const halfWidth = containerWidth * 0.5
-
-  if (scrollLeft >= maxScroll - 5) {
-    currentSlide.value = props.totalSlides - 1
-    isOnBlurSlide.value = true
-  }
-  else {
-    const slideIndex = Math.round(scrollLeft / halfWidth)
-    currentSlide.value = Math.min(slideIndex, props.images.length - 1)
-    isOnBlurSlide.value = false
-  }
-}
-
-function calculateBlurIntensity(carousel: HTMLElement) {
   const slides = carousel.querySelectorAll('.motion-carousel__slide')
   const blurSlide = slides[slides.length - 1] as HTMLElement
   if (!blurSlide)
@@ -137,7 +145,7 @@ function calculateBlurIntensity(carousel: HTMLElement) {
 }
 
 function handleKeyDown(e: KeyboardEvent) {
-  if (isMobile.value)
+  if (isMobile)
     return
 
   const carousel = containerRef.value
@@ -182,22 +190,13 @@ function handleNextSlide() {
 }
 
 onMounted(() => {
-  const carousel = containerRef.value
-  if (carousel) {
-    carousel.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-  }
-  if (!isMobile.value) {
+  if (!isMobile) {
     window.addEventListener('keydown', handleKeyDown)
   }
 })
 
 onUnmounted(() => {
-  const carousel = containerRef.value
-  if (carousel) {
-    carousel.removeEventListener('scroll', handleScroll)
-  }
-  if (!isMobile.value) {
+  if (!isMobile) {
     window.removeEventListener('keydown', handleKeyDown)
   }
 })
@@ -309,7 +308,7 @@ onUnmounted(() => {
     :style="{ pointerEvents: currentSlide > 0 ? 'auto' : 'none', transform: progressBarTransform }"
   >
     <UProgress
-      v-model="scrollProgress"
+      :model-value="scrollProgress"
       :max="1"
       size="xs"
       :ui="{
@@ -327,7 +326,7 @@ onUnmounted(() => {
     :style="{ pointerEvents: currentSlide > 0 ? 'auto' : 'none', transform: topProgressBarTransform }"
   >
     <UProgress
-      v-model="scrollProgress"
+      :model-value="scrollProgress"
       :max="1"
       size="xs"
       :ui="{
