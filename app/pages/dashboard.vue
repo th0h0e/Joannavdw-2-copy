@@ -20,10 +20,8 @@ const projectToDelete = ref<string | null>(null)
 const heroFileInput = ref<HTMLInputElement | null>(null)
 const heroMobileFileInput = ref<HTMLInputElement | null>(null)
 
-// Drag reorder state
 const draggedProjectId = ref<string | null>(null)
 
-// Fetch data with useAsyncData
 const { data: homepageRaw, refresh: refreshHomepage, error: homepageError } = useAsyncData(
   'admin-homepage',
   () => pb.collection('Homepage').getFirstListItem<HomepageResponse>('Is_Active = true', { requestKey: null }),
@@ -34,14 +32,12 @@ const { data: rawProjects, refresh: refreshProjects, status: projectsStatus, err
   () => pb.collection('Portfolio_Projects').getFullList<PortfolioProjectsResponse<string[]>>({ sort: 'Order', requestKey: null }),
 )
 
-// Local mutable copy of projects for drag reorder UI
 const projects = ref<PortfolioProjectsResponse<string[]>[]>([])
 watch(rawProjects, (val) => {
   if (val)
     projects.value = [...val]
 }, { immediate: true })
 
-// Derived state from homepage data
 const heroImage = computed(() =>
   homepageRaw.value?.Hero_Image ? getImageUrl(homepageRaw.value, homepageRaw.value.Hero_Image) : '',
 )
@@ -50,7 +46,6 @@ const heroImageMobile = computed(() =>
 )
 const homepageId = computed(() => homepageRaw.value?.id || '')
 
-// heroTitle is editable, so keep as a separate mutable ref
 const heroTitle = ref('')
 watch(homepageRaw, (val) => {
   if (val)
@@ -63,7 +58,6 @@ const error = computed(() => {
   return err ? 'Failed to load projects' : null
 })
 
-// Handle auth errors from useAsyncData
 watch([projectsError, homepageError], ([pErr, hErr]) => {
   const err = pErr || hErr
   if (err) {
@@ -176,7 +170,6 @@ async function handleSave() {
   showToast(isCreating ? 'Project created successfully' : 'Project updated successfully', 'success')
 }
 
-// Drag reorder handlers
 function handleDragStart(e: DragEvent, projectId: string) {
   draggedProjectId.value = projectId
   if (e.dataTransfer) {
@@ -245,25 +238,24 @@ async function handlePublishChanges() {
 <template>
   <div
     v-if="loading"
-    class="min-h-screen bg-black flex items-center justify-center"
+    class="min-h-screen bg-inverted flex items-center justify-center"
   >
-    <div class="text-xl text-white">
+    <div class="text-xl text-inverted">
       Loading...
     </div>
   </div>
 
   <div
     v-else
-    class="admin-container min-h-screen bg-black"
+    class="admin-container min-h-screen bg-inverted"
   >
-    <!-- Header -->
-    <header class="border-b border-neutral-800/70 backdrop-blur-sm bg-black/80 sticky top-0 z-10">
+    <header class="border-b border-default backdrop-blur-sm bg-inverted/80 sticky top-0 z-10">
       <div class="max-w-7xl mx-auto px-6 lg:px-8 py-6 flex justify-between items-center">
         <div>
-          <h1 class="text-xl font-medium text-white tracking-tight">
+          <h1 class="text-xl font-medium text-inverted tracking-tight">
             Portfolio
           </h1>
-          <p class="text-xs text-neutral-500 mt-1 tracking-wide">
+          <p class="text-xs text-muted mt-1 tracking-wide">
             {{ projects.length }} {{ projects.length === 1 ? 'project' : 'projects' }}
           </p>
         </div>
@@ -308,7 +300,6 @@ async function handlePublishChanges() {
       </div>
     </header>
 
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-6 lg:px-8 py-12">
       <UAlert
         v-if="error"
@@ -319,23 +310,20 @@ async function handlePublishChanges() {
         class="mb-8"
       />
 
-      <!-- Hero Image Section -->
       <div v-if="heroImage || heroImageMobile" class="mb-12">
         <div class="flex gap-6">
-          <!-- Desktop Preview -->
           <div :style="{ width: showMobilePreview ? '66.67%' : '100%', transition: 'width 0.3s ease-out', flexShrink: 0 }">
             <div
-              class="preview-container relative w-full rounded-sm overflow-hidden bg-neutral-900/30 border border-neutral-800/70 group"
+              class="preview-container relative w-full overflow-hidden bg-elevated border border-default group"
             >
               <img :src="heroImage" alt="Hero Desktop" class="absolute inset-0 w-full h-full object-cover">
 
-              <!-- Hero Title Overlay -->
               <template v-if="heroTitle">
                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div class="text-center px-6">
                     <button
                       :contenteditable="isEditingTitle"
-                      class="admin-title text-white uppercase leading-none text-4xl outline-none pointer-events-auto inline-block" :class="[
+                      class="admin-title text-inverted uppercase leading-none text-4xl outline-none pointer-events-auto inline-block" :class="[
                         isEditingTitle ? 'cursor-text' : 'cursor-pointer hover:opacity-80 transition-opacity',
                       ]"
                       :title="!isEditingTitle ? 'Click to edit' : undefined"
@@ -367,7 +355,6 @@ async function handlePublishChanges() {
                 </div>
               </template>
 
-              <!-- Update Button -->
               <div v-if="!isEditingTitle" class="absolute bottom-0 right-0 p-6 pointer-events-auto group/update">
                 <UButton
                   variant="outline"
@@ -382,7 +369,6 @@ async function handlePublishChanges() {
             </div>
           </div>
 
-          <!-- Mobile Preview -->
           <div
             :style="{
               width: showMobilePreview ? 'calc(33.33% - 24px)' : '0%',
@@ -393,7 +379,7 @@ async function handlePublishChanges() {
             }"
           >
             <div
-              class="preview-container relative w-full rounded-sm overflow-hidden bg-neutral-900/30 border border-neutral-800/70 group"
+              class="preview-container relative w-full overflow-hidden bg-elevated border border-default group"
             >
               <img :src="heroImageMobile" alt="Hero Mobile" class="absolute inset-0 w-full h-full object-cover">
 
@@ -412,7 +398,6 @@ async function handlePublishChanges() {
           </div>
         </div>
 
-        <!-- Toggle mobile preview -->
         <UButton
           variant="ghost"
           color="neutral"
@@ -427,48 +412,43 @@ async function handlePublishChanges() {
         <input id="heroMobileFileInput" ref="heroMobileFileInput" type="file" accept="image/*" class="hidden" aria-label="Update Mobile Hero Image" @change="handleHeroImageMobileUpdate">
       </div>
 
-      <!-- Divider -->
-      <div class="border-t border-white/10 mb-12" />
+      <div class="border-t border-default mb-12" />
 
-      <!-- Projects List -->
       <div class="flex flex-col gap-3">
         <!-- eslint-disable-next-line vue-a11y/no-static-element-interactions -->
         <div
           v-for="project in projects"
           :key="project.id"
           draggable="true"
-          class="project-card group bg-gradient-to-br from-neutral-900/50 to-neutral-900/30 rounded-sm border border-neutral-800/70 hover:border-neutral-700 hover:from-neutral-900/70 hover:to-neutral-900/50 cursor-grab active:cursor-grabbing flex items-stretch gap-0 overflow-hidden backdrop-blur-sm"
+          class="project-card group bg-gradient-to-br from-elevated to-elevated/50 border border-default hover:border-accented hover:from-elevated hover:to-elevated/70 cursor-grab active:cursor-grabbing flex items-stretch gap-0 overflow-hidden backdrop-blur-sm"
           role="button"
           tabindex="0"
           @dragstart="handleDragStart($event, project.id)"
           @dragover="handleDragOver($event, project.id)"
           @dragend="handleDragEnd"
         >
-          <!-- Thumbnail -->
-          <div class="relative w-1/3 bg-neutral-900/80 overflow-hidden flex-shrink-0 border-r border-neutral-800/70 self-stretch">
+          <div class="relative w-1/3 bg-elevated overflow-hidden flex-shrink-0 border-r border-default self-stretch">
             <template v-if="project.Images && project.Images.length > 0">
               <img :src="getImageUrl(project, project.Images[0])" :alt="project.Title" class="w-full h-full object-cover absolute inset-0">
             </template>
-            <div v-else class="w-full h-full flex items-center justify-center bg-neutral-900/50">
-              <span class="text-neutral-600 text-sm">&ndash;</span>
+            <div v-else class="w-full h-full flex items-center justify-center bg-elevated">
+              <span class="text-dimmed text-sm">&ndash;</span>
             </div>
-            <div class="absolute top-2 left-2 bg-black/70 backdrop-blur-md text-white px-2 py-1 rounded-sm text-xs font-medium tracking-wide">
+            <div class="absolute top-2 left-2 bg-inverted/70 backdrop-blur-md text-inverted px-2 py-1 text-xs font-medium tracking-wide">
               {{ project.Images?.length || 0 }} {{ project.Images?.length === 1 ? 'image' : 'images' }}
             </div>
           </div>
 
-          <!-- Content -->
           <div class="flex-1 min-w-0 p-5">
             <div class="mb-2">
-              <h3 class="font-semibold text-base text-white tracking-tight">
+              <h3 class="font-semibold text-base text-inverted tracking-tight">
                 {{ project.Title }}
               </h3>
             </div>
-            <p class="text-sm text-neutral-400 line-clamp-2 leading-relaxed mb-3">
+            <p class="text-sm text-muted line-clamp-2 leading-relaxed mb-3">
               {{ project.Description }}
             </p>
 
-            <!-- Responsibilities -->
             <div
               v-if="(project.Responsibility && project.Responsibility.length > 0) || (project.Responsibility_json && project.Responsibility_json.length > 0)"
               class="flex flex-wrap gap-2 mb-4"
@@ -476,13 +456,12 @@ async function handlePublishChanges() {
               <span
                 v-for="(resp, idx) in (project.Responsibility_json || project.Responsibility || [])"
                 :key="`${resp}-${idx}`"
-                class="px-2.5 py-1 bg-neutral-800/70 border border-neutral-700/60 text-neutral-300 rounded-sm text-xs uppercase tracking-wider font-medium backdrop-blur-sm"
+                class="px-2.5 py-1 bg-elevated border border-default text-toned text-xs uppercase tracking-wider font-medium backdrop-blur-sm"
               >
                 {{ resp }}
               </span>
             </div>
 
-            <!-- Actions -->
             <div class="flex gap-2.5">
               <UButton
                 variant="outline"
@@ -505,26 +484,21 @@ async function handlePublishChanges() {
             </div>
           </div>
 
-          <!-- Drag Handle -->
-          <div class="flex items-center px-4 text-neutral-700 group-hover:text-neutral-500 transition-colors duration-200 border-l border-neutral-800/70">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <circle cx="9" cy="6" r="1.5" /><circle cx="9" cy="12" r="1.5" /><circle cx="9" cy="18" r="1.5" />
-              <circle cx="15" cy="6" r="1.5" /><circle cx="15" cy="12" r="1.5" /><circle cx="15" cy="18" r="1.5" />
-            </svg>
+          <div class="flex items-center px-4 text-muted group-hover:text-toned transition-colors duration-200 border-l border-default">
+            <UIcon name="i-ph-dots-six-vertical" class="size-6" />
           </div>
         </div>
       </div>
 
       <div v-if="projects.length === 0" class="text-center py-20">
-        <p class="text-neutral-600 text-sm uppercase tracking-wider">
+        <p class="text-dimmed text-sm uppercase tracking-wider">
           No projects yet
         </p>
-        <p class="text-neutral-700 text-xs mt-2">
+        <p class="text-dimmed text-xs mt-2">
           Create your first project to get started
         </p>
       </div>
 
-      <!-- Create New Project Button -->
       <div class="mt-12">
         <UButton
           size="md"
@@ -539,7 +513,6 @@ async function handlePublishChanges() {
       </div>
     </main>
 
-    <!-- Project Editor Overlay -->
     <LazyProjectEditor
       v-if="editingProject || showNewProjectForm"
       :project="editingProject"
@@ -548,17 +521,15 @@ async function handlePublishChanges() {
       @show-toast="(msg: string, type: 'success' | 'error') => showToast(msg, type)"
     />
 
-    <!-- Settings Sidebar -->
     <LazySettingsSidebar
       :is-open="showSettings"
       @close="showSettings = false"
       @show-toast="(msg: string, type: 'success' | 'error') => showToast(msg, type)"
     />
 
-    <!-- Delete Confirmation Modal -->
     <UModal v-model:open="isDeleteModalOpen" title="Delete Project">
       <template #body>
-        <p class="text-sm text-neutral-400">
+        <p class="text-sm text-muted">
           Are you sure you want to delete this project? This action cannot be undone.
         </p>
       </template>
@@ -584,7 +555,6 @@ async function handlePublishChanges() {
 </template>
 
 <style scoped>
-/* Admin typography */
 .admin-container {
   font-family: 'EnduroWeb', sans-serif;
 }
@@ -603,15 +573,11 @@ async function handlePublishChanges() {
   display: inline-block;
 }
 
-/* Preview containers */
 .preview-container {
   height: 680px;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
 }
 
-/* Project cards */
 .project-card {
   position: relative;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
 }
 </style>

@@ -2,7 +2,6 @@
 import loginBackground from '~/assets/admin-login-bg.jpg'
 import { pb } from '~/utils/pocketbase'
 
-// Form state
 const formState = reactive({
   email: '',
   password: '',
@@ -36,9 +35,8 @@ async function handleLogin() {
 
 <template>
   <div
-    class="min-h-screen bg-neutral-900 flex items-center justify-center px-6 relative overflow-hidden font-sans"
+    class="min-h-screen bg-inverted flex items-center justify-center px-6 relative overflow-hidden font-sans"
   >
-    <!-- Background Image -->
     <div
       class="absolute inset-0 bg-cover bg-center"
       :style="{
@@ -48,16 +46,14 @@ async function handleLogin() {
       }"
     />
 
-    <!-- Overlay -->
-    <div class="absolute inset-0 bg-black/70" />
+    <div class="absolute inset-0 bg-inverted/70" />
 
-    <!-- Login Form -->
-    <div class="max-w-md w-full bg-black/80 rounded-sm border border-neutral-800/60 p-10 backdrop-blur-xl relative z-10">
+    <div class="max-w-md w-full bg-inverted/80 border border-default p-10 backdrop-blur-xl relative z-10">
       <div class="text-center mb-8">
-        <h1 class="text-xl font-medium text-white tracking-tight">
+        <h1 class="text-xl font-medium text-inverted tracking-tight">
           Admin Login
         </h1>
-        <p class="text-xs text-neutral-400 mt-2 tracking-wide uppercase">
+        <p class="text-xs text-muted mt-2 tracking-wide uppercase">
           Access Dashboard
         </p>
       </div>
@@ -85,7 +81,7 @@ async function handleLogin() {
           />
         </UFormField>
 
-        <div v-if="error" class="bg-error-950/20 border border-error-800/30 text-error-200 px-4 py-3 rounded-sm text-sm">
+        <div v-if="error" class="bg-error-950/20 border border-error-800/30 text-error-200 px-4 py-3 text-sm">
           {{ error }}
         </div>
 
@@ -99,7 +95,7 @@ async function handleLogin() {
       </UForm>
 
       <div class="mt-6 text-center">
-        <NuxtLink to="/" class="text-xs text-neutral-400 hover:text-white transition-colors uppercase tracking-wide">
+        <NuxtLink to="/" class="text-xs text-muted hover:text-inverted transition-colors uppercase tracking-wide">
           &larr; Back to Portfolio
         </NuxtLink>
       </div>

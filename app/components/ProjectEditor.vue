@@ -227,7 +227,7 @@ onUnmounted(() => {
 <template>
   <Teleport to="body">
     <button
-      class="fixed inset-0 bg-neutral-900/70 backdrop-blur-md z-40 transition-opacity duration-300"
+      class="fixed inset-0 bg-inverted/70 backdrop-blur-md z-40 transition-opacity duration-300 appearance-none bg-transparent border-0 p-0 m-0 text-left"
       aria-label="Cancel editing"
       @click="emit('cancel')"
     />
@@ -244,28 +244,28 @@ onUnmounted(() => {
     </div>
 
     <div
-      class="fixed right-0 top-0 w-3/4 md:w-2/3 lg:w-1/2 bg-black/85 backdrop-blur-xl border-l border-neutral-700/60 shadow-2xl z-50 flex flex-col h-screen font-['EnduroWeb',sans-serif]"
+      class="fixed right-0 top-0 w-3/4 md:w-2/3 lg:w-1/2 bg-inverted/85 backdrop-blur-xl border-l border-default shadow-2xl z-50 flex flex-col h-screen font-['EnduroWeb',sans-serif]"
     >
       <UForm :state="formState" class="flex flex-col h-full" @submit="handleSubmit">
-        <div class="flex-shrink-0 p-8 border-b border-neutral-800/60 backdrop-blur-sm">
-          <h2 class="text-xl font-medium text-white tracking-tight">
+        <div class="flex-shrink-0 p-8 border-b border-default backdrop-blur-sm">
+          <h2 class="text-xl font-medium text-inverted tracking-tight">
             {{ project ? 'Edit Project' : 'New Project' }}
           </h2>
-          <p class="text-xs text-neutral-400 mt-1 tracking-wide uppercase">
+          <p class="text-xs text-muted mt-1 tracking-wide uppercase">
             {{ project ? 'Update project details and images' : 'Create a new portfolio project' }}
           </p>
         </div>
 
         <div class="flex-1 overflow-y-auto p-8 space-y-8">
           <div>
-            <span id="images-label" class="block text-xs font-medium text-neutral-300 mb-3 uppercase tracking-wider">
+            <span id="images-label" class="block text-xs font-medium text-toned mb-3 uppercase tracking-wider">
               Images (Drag to reorder)
             </span>
 
             <div
-              class="relative border-2 border-dashed rounded-sm transition-all" :class="[
-                isDraggingFile ? 'border-white/40 bg-white/5' : 'border-neutral-700/60 bg-black/30',
-                images.length === 0 ? 'cursor-pointer hover:border-neutral-600/60 hover:bg-black/40' : '',
+              class="relative border-2 border-dashed transition-all" :class="[
+                isDraggingFile ? 'border-primary bg-primary/5' : 'border-default bg-elevated/50',
+                images.length === 0 ? 'cursor-pointer hover:border-accented hover:bg-elevated' : '',
               ]"
               role="button"
               tabindex="0"
@@ -286,19 +286,16 @@ onUnmounted(() => {
 
               <div v-if="images.length === 0" class="block py-12 px-6 text-center cursor-pointer pointer-events-none">
                 <div class="flex flex-col items-center gap-3">
-                  <svg
-                    class="w-12 h-12 transition-colors" :class="[isDraggingFile ? 'text-white' : 'text-neutral-500']"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" :stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
+                  <UIcon
+                    name="i-ph-upload"
+                    class="size-12 transition-colors"
+                    :class="[isDraggingFile ? 'text-primary' : 'text-muted']"
+                  />
                   <div>
-                    <p class="text-sm font-medium transition-colors uppercase tracking-wide" :class="[isDraggingFile ? 'text-white' : 'text-neutral-300']">
+                    <p class="text-sm font-medium transition-colors uppercase tracking-wide" :class="[isDraggingFile ? 'text-primary' : 'text-toned']">
                       {{ isDraggingFile ? 'Drop images here' : 'Drag & drop images' }}
                     </p>
-                    <p class="text-xs text-neutral-500 mt-1 tracking-wide">
+                    <p class="text-xs text-dimmed mt-1 tracking-wide">
                       or click to browse
                     </p>
                   </div>
@@ -311,8 +308,8 @@ onUnmounted(() => {
                     v-for="(image, index) in images"
                     :key="image.id"
                     draggable="true"
-                    class="relative group cursor-move border rounded-sm overflow-hidden hover:border-neutral-600 transition-all" :class="[
-                      draggedIndex === index ? 'border-neutral-500 opacity-50' : 'border-neutral-700/60',
+                    class="relative group cursor-move border overflow-hidden transition-all" :class="[
+                      draggedIndex === index ? 'border-primary opacity-50' : 'border-default hover:border-accented',
                     ]"
                     role="button"
                     tabindex="0"
@@ -320,10 +317,10 @@ onUnmounted(() => {
                     @dragover="handleDragOver($event, index)"
                     @dragend="handleDragEnd"
                   >
-                    <div class="aspect-square bg-black/50">
+                    <div class="aspect-square bg-elevated">
                       <img :src="image.url" :alt="image.filename" class="w-full h-full object-cover">
                     </div>
-                    <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white px-2 py-1 rounded-sm text-xs font-medium">
+                    <div class="absolute top-2 left-2 bg-inverted/60 backdrop-blur-sm text-inverted px-2 py-1 text-xs font-medium">
                       {{ index + 1 }}
                     </div>
                     <UButton
@@ -337,7 +334,7 @@ onUnmounted(() => {
                     >
                       Delete
                     </UButton>
-                    <div class="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white px-2 py-1.5 text-xs truncate">
+                    <div class="absolute bottom-0 left-0 right-0 bg-inverted/60 backdrop-blur-sm text-inverted px-2 py-1.5 text-xs truncate">
                       {{ image.filename }}
                     </div>
                   </div>
@@ -346,7 +343,7 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <div class="border-t border-white/10" />
+          <div class="border-t border-default" />
 
           <UFormField label="Project Title" required>
             <UInput
@@ -394,7 +391,7 @@ onUnmounted(() => {
           </UFormField>
         </div>
 
-        <div class="flex-shrink-0 p-8 border-t border-neutral-800/60 flex gap-3 backdrop-blur-sm">
+        <div class="flex-shrink-0 p-8 border-t border-default flex gap-3 backdrop-blur-sm">
           <UButton
             type="button"
             variant="outline"

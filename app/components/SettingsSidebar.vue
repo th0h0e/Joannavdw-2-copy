@@ -162,7 +162,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
 <template>
   <template v-if="isOpen">
     <button
-      class="fixed inset-0 bg-neutral-900/70 backdrop-blur-md z-40 transition-opacity duration-300 appearance-none bg-transparent border-0 p-0 m-0 text-left"
+      class="fixed inset-0 bg-inverted/70 backdrop-blur-md z-40 transition-opacity duration-300 appearance-none bg-transparent border-0 p-0 m-0 text-left"
       aria-label="Close settings"
       @click="emit('close')"
     />
@@ -175,21 +175,21 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
       />
     </div>
 
-    <div class="fixed right-0 top-0 h-full w-3/4 md:w-1/2 bg-black/85 backdrop-blur-xl border-l border-neutral-700/60 shadow-2xl z-50 flex flex-col font-['EnduroWeb',sans-serif]">
+    <div class="fixed right-0 top-0 h-full w-3/4 md:w-1/2 bg-inverted/85 backdrop-blur-xl border-l border-default shadow-2xl z-50 flex flex-col font-['EnduroWeb',sans-serif]">
       <UForm :state="{}" class="flex flex-col h-full" @submit="handleSubmit">
-        <div class="flex-shrink-0 p-8 border-b border-neutral-800/60 flex items-center gap-4 backdrop-blur-sm">
+        <div class="flex-shrink-0 p-8 border-b border-default flex items-center gap-4 backdrop-blur-sm">
           <div class="flex-1">
-            <h2 class="text-xl font-medium text-white tracking-tight">
+            <h2 class="text-xl font-medium text-inverted tracking-tight">
               Settings
             </h2>
-            <p class="text-xs text-neutral-400 mt-1 tracking-wide uppercase">
+            <p class="text-xs text-muted mt-1 tracking-wide uppercase">
               Configure site content
             </p>
           </div>
 
           <UButton
             variant="ghost"
-            class="flex-shrink-0 w-12 h-12 rounded-sm overflow-hidden"
+            class="flex-shrink-0 w-12 h-12 overflow-hidden"
             title="Click to update favicon"
             @click="faviconFileInput?.click()"
           >
@@ -203,11 +203,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
               v-else
               class="w-full h-full flex items-center justify-center"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <polyline points="21 15 16 10 5 21" />
-              </svg>
+              <UIcon name="i-ph-image" class="size-6" />
             </div>
           </UButton>
 
@@ -224,7 +220,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
 
         <div class="flex-1 overflow-y-auto p-8 space-y-8">
           <div>
-            <h3 class="text-sm font-medium text-white mb-4 uppercase tracking-wider">
+            <h3 class="text-sm font-medium text-inverted mb-4 uppercase tracking-wider">
               Hero Section
             </h3>
             <UFormField label="Hero Title">
@@ -237,10 +233,10 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
             </UFormField>
           </div>
 
-          <div class="border-t border-neutral-700/60" />
+          <div class="border-t border-default" />
 
           <div>
-            <h3 class="text-sm font-medium text-white mb-4 uppercase tracking-wider">
+            <h3 class="text-sm font-medium text-inverted mb-4 uppercase tracking-wider">
               About Section
             </h3>
             <div class="space-y-4">
@@ -269,17 +265,16 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
                     variant="subtle"
                     :display-value="uppercaseDisplay"
                     :convert-value="handleAddTag"
-                    class="bg-black/30 border-neutral-700/60"
                   />
                 </UFormField>
               </div>
             </div>
           </div>
 
-          <div class="border-t border-neutral-700/60" />
+          <div class="border-t border-default" />
 
           <div>
-            <h3 class="text-sm font-medium text-white mb-4 uppercase tracking-wider">
+            <h3 class="text-sm font-medium text-inverted mb-4 uppercase tracking-wider">
               Global Settings
             </h3>
             <div class="space-y-4">
@@ -293,7 +288,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
                 />
               </UFormField>
               <div>
-                <p class="text-xs font-medium text-neutral-300 mb-2 uppercase tracking-wider">
+                <p class="text-xs font-medium text-toned mb-2 uppercase tracking-wider">
                   Font Sizes (rem)
                 </p>
                 <div class="grid grid-cols-4 gap-2">
@@ -341,7 +336,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
               </div>
               <UFormField>
                 <USwitch v-model="showTopProgressBar" label="Show Top Progress Bar" />
-                <p class="text-xs text-neutral-500 mt-1">
+                <p class="text-xs text-dimmed mt-1">
                   Display progress bar at top of carousel
                 </p>
               </UFormField>
@@ -349,7 +344,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
           </div>
         </div>
 
-        <div class="flex-shrink-0 p-8 border-t border-neutral-800/60 flex gap-3 backdrop-blur-sm">
+        <div class="flex-shrink-0 p-8 border-t border-default flex gap-3 backdrop-blur-sm">
           <UButton
             type="button"
             variant="outline"
