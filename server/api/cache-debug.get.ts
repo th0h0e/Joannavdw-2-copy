@@ -1,0 +1,32 @@
+export default defineEventHandler(async (event) => {
+  const authHeader = getHeader(event, 'authorization')
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw createError({
+      statusCode: 401,
+      message: 'Unauthorized',
+    })
+  }
+
+  const storage = useStorage('cache')
+  const keys = await storage.getKeys('pocketbase:')
+
+  const cacheState: Record<string, { exists: boolean, size?: number }> = {}
+
+  for (const key of keys) {
+    const item = await storage.getItem(key)
+    cacheState[key] = {
+      exists: !!item,
+      size: item ? JSON.stringify(item).length : 0,
+    }
+  }
+
+  console.warn(`[ISR] ${new Date().toISOString()} - DEBUG: Cache state requested`)
+
+  return {
+    timestamp: new Date().toISOString(),
+    cacheKeys: keys,
+    cacheState,
+    totalKeys: keys.length,
+  }
+})
