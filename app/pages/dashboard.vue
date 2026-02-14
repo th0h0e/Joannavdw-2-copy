@@ -254,7 +254,7 @@ async function handlePublishChanges() {
       body: {
         collections: ['About', 'Homepage', 'Portfolio_Projects'],
       },
-      headers: { Authorization: pb.authStore.token },
+      headers: { Authorization: `Bearer ${pb.authStore.token}` },
     })
     showToast('Changes published successfully!', 'success')
   }

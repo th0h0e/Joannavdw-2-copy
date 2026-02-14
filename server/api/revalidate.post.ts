@@ -7,17 +7,10 @@ const COLLECTION_CACHE_KEYS: Record<string, string> = {
 export default defineEventHandler(async (event) => {
   console.warn(`[ISR] ${new Date().toISOString()} - REVALIDATE: Request received`)
 
+  // Use getAuthenticatedPb to validate auth (throws 401 if invalid)
+  getAuthenticatedPb(event)
+
   const body = await readBody(event)
-  const authHeader = getHeader(event, 'authorization')
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    console.warn(`[ISR] ${new Date().toISOString()} - REVALIDATE: Unauthorized`)
-    throw createError({
-      statusCode: 401,
-      message: 'Unauthorized',
-    })
-  }
-
   const collections = body.collections as string[] | undefined
   console.warn(`[ISR] ${new Date().toISOString()} - REVALIDATE: Collections: ${JSON.stringify(collections)}`)
 

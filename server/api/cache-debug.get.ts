@@ -1,12 +1,6 @@
 export default defineEventHandler(async (event) => {
-  const authHeader = getHeader(event, 'authorization')
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw createError({
-      statusCode: 401,
-      message: 'Unauthorized',
-    })
-  }
+  // Use getAuthenticatedPb to validate auth (throws 401 if invalid)
+  getAuthenticatedPb(event)
 
   const storage = useStorage('cache')
   const keys = await storage.getKeys('pocketbase:')
