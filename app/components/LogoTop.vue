@@ -14,22 +14,19 @@ const emit = defineEmits<{
 const { isMobile } = useDevice()
 const hasAnimated = ref(false)
 
-onMounted(() => {
-  // Trigger animation after mount (equivalent to initial -> animate in framer motion)
-  requestAnimationFrame(() => {
-    hasAnimated.value = true
-  })
-})
-
 const containerWidth = computed(() => isMobile ? '160px' : '200px')
 const containerHeight = computed(() => isMobile ? '60px' : '80px')
-
 const isHidden = computed(() => props.showAboutPopup || (props.showPopup && isMobile))
-
 const topPosition = computed(() => {
   if (!hasAnimated.value && props.isHero)
     return 'calc(50% - 18vh)'
   return '60px'
+})
+
+onMounted(() => {
+  requestAnimationFrame(() => {
+    hasAnimated.value = true
+  })
 })
 </script>
 

@@ -20,9 +20,7 @@ function handleContact(aboutData: Record<string, unknown> | null) {
       class="popup-card-image w-full h-auto"
     >
 
-    <!-- About Content Overlay -->
     <div class="absolute inset-0 flex flex-col justify-between px-4 py-8">
-      <!-- Top Logo -->
       <div class="flex justify-center">
         <img
           :src="Asset7Logo"
@@ -31,7 +29,6 @@ function handleContact(aboutData: Record<string, unknown> | null) {
         >
       </div>
 
-      <!-- Content -->
       <div class="flex-1 flex flex-col justify-center">
         <h2 class="popup-text popup-title text-black uppercase">
           {{ aboutData?.Portfolio_Title || 'Story Driven Strategy' }}
@@ -62,7 +59,6 @@ function handleContact(aboutData: Record<string, unknown> | null) {
         </button>
       </div>
 
-      <!-- Bottom Logo -->
       <div class="flex justify-center">
         <img
           :src="Asset11Logo"

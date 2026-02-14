@@ -20,7 +20,6 @@ const projectResponsibility = computed<string[]>(() => project.value?.responsibi
       class="popup-card-image w-full h-auto"
     >
 
-    <!-- Project Content Overlay -->
     <div class="absolute inset-0 flex flex-col justify-center px-4 py-8">
       <h2 class="popup-text popup-title text-black uppercase">
         {{ projectTitle }}

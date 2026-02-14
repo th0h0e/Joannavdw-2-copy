@@ -11,7 +11,6 @@ const emit = defineEmits<{
 const faviconFileInput = ref<HTMLInputElement | null>(null)
 const saving = ref(false)
 
-// Fetch all settings data in parallel when sidebar opens
 const { data: rawData, refresh, status } = useAsyncData(
   'settings-sidebar',
   async () => {
@@ -26,32 +25,24 @@ const { data: rawData, refresh, status } = useAsyncData(
 
 const loading = computed(() => status.value === 'pending' || saving.value)
 
-// Raw record refs for use in mutations
 const aboutData = computed(() => rawData.value?.about || null)
 const homepageData = computed(() => rawData.value?.homepage || null)
 const settingsData = computed(() => rawData.value?.settings || null)
 
-// Form fields - Homepage
 const heroTitle = ref('')
-
-// Form fields - Settings
 const showTopProgressBar = ref(false)
 const mobileFontSize = ref(1.25)
 const tabletFontSize = ref(1.875)
 const desktopFontSize = ref(2.25)
 const largeDesktopFontSize = ref(3)
 const faviconUrl = ref('')
-
-// Form fields - About
 const aboutDescription = ref('')
 const expertiseDescription = ref('')
 const clientList = ref<string[]>([])
 const contactEmail = ref('')
 
-// Display value transformer for uppercase display
 const uppercaseDisplay = (value: string) => value.toUpperCase()
 
-// Populate form fields when data arrives
 watch(rawData, (data) => {
   if (!data)
     return
@@ -60,26 +51,20 @@ watch(rawData, (data) => {
   expertiseDescription.value = data.about.Expertise_Description
   clientList.value = data.about.Client_List_Json || data.about.Client_List || []
   contactEmail.value = data.about.Contact_Email
-
   heroTitle.value = data.homepage.Hero_Title
-
   showTopProgressBar.value = data.settings.Show_Top_Progress_Bar
   mobileFontSize.value = data.fontSizes.mobile
   tabletFontSize.value = data.fontSizes.tablet
   desktopFontSize.value = data.fontSizes.desktop
   largeDesktopFontSize.value = data.fontSizes.largeDesktop
-
-  // Favicon is now stored locally
   faviconUrl.value = `/assets/favicon.ico?v=${data.settings.updated}`
 })
 
-// Refresh data when sidebar opens
 watch(() => props.isOpen, (isOpen) => {
   if (isOpen)
     refresh()
 })
 
-// Convert tag values to uppercase before adding
 function handleAddTag(value: string) {
   return value.toUpperCase()
 }
@@ -98,9 +83,7 @@ async function handleFaviconUpdate(event: Event) {
       body: formData,
     })
 
-    // Update preview URL to show the new favicon
     faviconUrl.value = `/assets/favicon.ico?v=${Date.now()}`
-
     emit('showToast', 'Favicon updated successfully!', 'success')
   }
   catch (err: unknown) {
@@ -171,7 +154,6 @@ async function handleSubmit(e: Event) {
   }
 }
 
-// Create preview data combining form values with existing aboutData
 const previewAboutData = ref<About | null>(null)
 watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEmail], () => {
   if (aboutData.value) {
@@ -188,14 +170,12 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
 
 <template>
   <template v-if="isOpen">
-    <!-- Backdrop -->
     <button
       class="settings-backdrop fixed inset-0 bg-neutral-900/70 backdrop-blur-md z-40 transition-opacity duration-300"
       aria-label="Close settings"
       @click="emit('close')"
     />
 
-    <!-- About Popup Preview -->
     <div class="settings-preview fixed top-1/2">
       <LazyAboutPopup
         :is-visible="true"
@@ -204,10 +184,8 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
       />
     </div>
 
-    <!-- Sidebar -->
     <div class="settings-sidebar fixed right-0 top-0 h-full w-3/4 md:w-1/2 bg-black/85 backdrop-blur-xl border-l border-neutral-700/60 shadow-2xl z-50 flex flex-col">
       <UForm :state="{}" class="flex flex-col h-full" @submit="handleSubmit">
-        <!-- Sticky Header -->
         <div class="flex-shrink-0 p-8 border-b border-neutral-800/60 flex items-center gap-4 backdrop-blur-sm">
           <div class="flex-1">
             <h2 class="text-xl font-medium text-white tracking-tight">
@@ -218,7 +196,6 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
             </p>
           </div>
 
-          <!-- Favicon Avatar -->
           <UButton
             variant="ghost"
             class="flex-shrink-0 w-12 h-12 rounded-sm overflow-hidden"
@@ -254,9 +231,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
           >
         </div>
 
-        <!-- Scrollable Content -->
         <div class="flex-1 overflow-y-auto p-8 space-y-8">
-          <!-- Hero Section -->
           <div>
             <h3 class="text-sm font-medium text-white mb-4 uppercase tracking-wider">
               Hero Section
@@ -271,7 +246,6 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
 
           <div class="border-t border-neutral-700/60" />
 
-          <!-- About Section -->
           <div>
             <h3 class="text-sm font-medium text-white mb-4 uppercase tracking-wider">
               About Section
@@ -307,7 +281,6 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
 
           <div class="border-t border-neutral-700/60" />
 
-          <!-- Global Settings -->
           <div>
             <h3 class="text-sm font-medium text-white mb-4 uppercase tracking-wider">
               Global Settings
@@ -377,7 +350,6 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
           </div>
         </div>
 
-        <!-- Sticky Footer -->
         <div class="flex-shrink-0 p-8 border-t border-neutral-800/60 flex gap-3 backdrop-blur-sm">
           <UButton
             type="button"

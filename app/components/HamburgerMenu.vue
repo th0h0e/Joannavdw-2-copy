@@ -21,11 +21,9 @@ function closeMenu() {
 function handleLinkClick(index: number) {
   closeMenu()
 
-  // Navigate after menu closes to avoid state conflicts
   setTimeout(() => {
     window.location.hash = `#project-${index}`
 
-    // Reset all carousels to first slide after navigation
     setTimeout(() => {
       const carousels = document.querySelectorAll('[data-carousel]')
       carousels.forEach((carousel) => {
@@ -39,7 +37,6 @@ function handleLinkClick(index: number) {
 </script>
 
 <template>
-  <!-- Hamburger Button -->
   <button
     v-if="!isPopupVisible"
     class="hamburger-button fixed top-[80px] right-5 md:top-[89px] md:right-[40px] z-[10000] cursor-pointer"
@@ -52,7 +49,6 @@ function handleLinkClick(index: number) {
     />
   </button>
 
-  <!-- Menu Overlay -->
   <Teleport to="body">
     <Transition name="menu-backdrop">
       <div
@@ -135,6 +131,7 @@ function handleLinkClick(index: number) {
 .menu-backdrop-leave-active {
   transition: opacity 0.3s ease-out;
 }
+
 .menu-backdrop-enter-from,
 .menu-backdrop-leave-to {
   opacity: 0;
@@ -146,6 +143,7 @@ function handleLinkClick(index: number) {
     opacity 0.3s ease-out,
     transform 0.3s ease-out;
 }
+
 .menu-content-enter-from,
 .menu-content-leave-to {
   opacity: 0;

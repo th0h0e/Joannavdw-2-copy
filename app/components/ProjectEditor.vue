@@ -20,7 +20,6 @@ const emit = defineEmits<{
   showToast: [message: string, type: 'success' | 'error']
 }>()
 
-// Form state
 const formState = reactive({
   title: props.project?.Title || '',
   description: props.project?.Description || '',
@@ -35,14 +34,6 @@ const draggedIndex = ref<number | null>(null)
 const isDraggingFile = ref(false)
 const { isMobile } = useDevice()
 
-onMounted(() => {
-  document.body.style.overflow = 'hidden'
-})
-onUnmounted(() => {
-  document.body.style.overflow = ''
-})
-
-// Initialize images from existing project
 watch(() => props.project, (project) => {
   if (project && project.Images) {
     images.value = project.Images.map((filename, index) => ({
@@ -52,7 +43,6 @@ watch(() => props.project, (project) => {
       isExisting: true,
     }))
   }
-  // Update form state when project changes
   if (project) {
     formState.title = project.Title || ''
     formState.description = project.Description || ''
@@ -61,10 +51,8 @@ watch(() => props.project, (project) => {
   }
 }, { immediate: true })
 
-// Display value transformer for uppercase display
 const uppercaseDisplay = (value: string) => value.toUpperCase()
 
-// Convert tag values to uppercase before adding
 function handleAddTag(value: string) {
   return value.toUpperCase()
 }
@@ -136,6 +124,7 @@ function handleDeleteImage(image: ImageItem) {
 function handleDragStart(index: number) {
   draggedIndex.value = index
 }
+
 function handleDragOver(e: DragEvent, index: number) {
   e.preventDefault()
   if (draggedIndex.value === null || draggedIndex.value === index)
@@ -147,6 +136,7 @@ function handleDragOver(e: DragEvent, index: number) {
   images.value = newImages
   draggedIndex.value = index
 }
+
 function handleDragEnd() {
   draggedIndex.value = null
 }
@@ -178,7 +168,6 @@ async function handleSubmit(e?: Event) {
         }
         else if (img.isExisting) {
           try {
-            // Fetch directly from PocketBase URL (no proxy needed)
             const response = await fetch(img.url)
             if (!response.ok)
               throw new Error(`HTTP ${response.status}`)
@@ -234,18 +223,24 @@ async function handleSubmit(e?: Event) {
     loading.value = false
   }
 }
+
+onMounted(() => {
+  document.body.style.overflow = 'hidden'
+})
+
+onUnmounted(() => {
+  document.body.style.overflow = ''
+})
 </script>
 
 <template>
   <Teleport to="body">
-    <!-- Backdrop -->
     <button
       class="fixed inset-0 bg-neutral-900/70 backdrop-blur-md z-40 transition-opacity duration-300"
       aria-label="Cancel editing"
       @click="emit('cancel')"
     />
 
-    <!-- Project Popup Preview (only when editing on desktop) -->
     <div
       v-if="project && !isMobile"
       class="project-editor__preview absolute top-1/2"
@@ -257,12 +252,10 @@ async function handleSubmit(e?: Event) {
       />
     </div>
 
-    <!-- Sidebar -->
     <div
       class="project-editor__sidebar fixed right-0 top-0 w-3/4 md:w-2/3 lg:w-1/2 bg-black/85 backdrop-blur-xl border-l border-neutral-700/60 shadow-2xl z-50 flex flex-col"
     >
       <UForm :state="formState" class="flex flex-col h-full" @submit="handleSubmit">
-        <!-- Sticky Header -->
         <div class="flex-shrink-0 p-8 border-b border-neutral-800/60 backdrop-blur-sm">
           <h2 class="text-xl font-medium text-white tracking-tight">
             {{ project ? 'Edit Project' : 'New Project' }}
@@ -272,16 +265,11 @@ async function handleSubmit(e?: Event) {
           </p>
         </div>
 
-        <!-- Scrollable Content -->
         <div class="flex-1 overflow-y-auto p-8 space-y-8">
-          <!-- Images -->
           <div>
-            <!-- eslint-disable-next-line vue-a11y/label-has-for -->
             <label class="block text-xs font-medium text-neutral-300 mb-3 uppercase tracking-wider">
               Images (Drag to reorder)
 
-              <!-- Drag and Drop Upload Zone with Images -->
-              <!-- eslint-disable-next-line vue-a11y/no-static-element-interactions -->
               <div
                 class="relative border-2 border-dashed rounded-sm transition-all" :class="[
                   isDraggingFile ? 'border-white/40 bg-white/5' : 'border-neutral-700/60 bg-black/30',
@@ -301,7 +289,6 @@ async function handleSubmit(e?: Event) {
                   @change="handleImageUpload"
                 >
 
-                <!-- Empty State -->
                 <div v-if="images.length === 0" class="block py-12 px-6 text-center cursor-pointer pointer-events-none">
                   <div class="flex flex-col items-center gap-3">
                     <svg
@@ -323,10 +310,8 @@ async function handleSubmit(e?: Event) {
                   </div>
                 </div>
 
-                <!-- Image Grid -->
                 <div v-if="images.length > 0" class="p-4">
                   <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    <!-- eslint-disable-next-line vue-a11y/no-static-element-interactions -->
                     <div
                       v-for="(image, index) in images"
                       :key="image.id"
@@ -366,10 +351,8 @@ async function handleSubmit(e?: Event) {
             </label>
           </div>
 
-          <!-- Divider -->
           <div class="border-t border-white/10" />
 
-          <!-- Title -->
           <UFormField label="Project Title" required>
             <UInput
               v-model="formState.title"
@@ -380,7 +363,6 @@ async function handleSubmit(e?: Event) {
             />
           </UFormField>
 
-          <!-- Description -->
           <UFormField label="Description" required>
             <UTextarea
               v-model="formState.description"
@@ -392,7 +374,6 @@ async function handleSubmit(e?: Event) {
             />
           </UFormField>
 
-          <!-- Order -->
           <UFormField label="Position in Portfolio" required>
             <UInputNumber
               v-model="formState.order"
@@ -405,7 +386,6 @@ async function handleSubmit(e?: Event) {
             />
           </UFormField>
 
-          <!-- Responsibilities -->
           <UFormField label="Responsibilities" help="Press Enter to add a responsibility">
             <UInputTags
               v-model="formState.responsibilities"
@@ -419,7 +399,6 @@ async function handleSubmit(e?: Event) {
           </UFormField>
         </div>
 
-        <!-- Sticky Footer -->
         <div class="flex-shrink-0 p-8 border-t border-neutral-800/60 flex gap-3 backdrop-blur-sm">
           <UButton
             type="button"

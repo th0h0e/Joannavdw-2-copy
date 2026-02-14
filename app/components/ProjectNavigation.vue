@@ -8,7 +8,6 @@ const emit = defineEmits<{
 }>()
 
 function handleClick(e: MouseEvent, index: number) {
-  // If there are listeners for linkClick, prevent default and emit
   e.preventDefault()
   emit('linkClick', index)
 }

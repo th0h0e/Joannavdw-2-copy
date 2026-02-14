@@ -16,7 +16,6 @@ defineProps<{
       class="project-popup-preview__card w-full h-auto"
     >
 
-    <!-- Project Content Overlay -->
     <div class="absolute inset-0 flex flex-col justify-center px-4 py-8">
       <h2 class="project-popup-preview__title text-black uppercase text-center leading-tight">
         {{ projectTitle }}
