@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core'
 import Asset7Logo from '~/assets/logo svg/Asset 7.svg'
 
 const props = defineProps<{
@@ -12,48 +13,57 @@ const emit = defineEmits<{
 }>()
 
 const { isMobile } = useDevice()
-const mounted = ref(false)
+const { height: windowHeight } = useWindowSize()
 
 const containerWidth = computed(() => isMobile ? '160px' : '200px')
 const containerHeight = computed(() => isMobile ? '60px' : '80px')
 const isHidden = computed(() => props.showAboutPopup || (props.showPopup && isMobile))
 
-onMounted(() => {
-  mounted.value = true
-})
+const finalTop = 60
+
+const startTop = computed(() => windowHeight.value * 0.32)
+
+const yOffset = computed(() => props.isHero ? startTop.value - finalTop : 0)
+
+const initialVariant = computed(() => ({
+  y: yOffset.value,
+}))
+
+const enterVariant = {
+  y: 0,
+  transition: {
+    type: 'keyframes' as const,
+    duration: 1200,
+    ease: 'easeOut' as const,
+  },
+}
 </script>
 
 <template>
   <button
-    class="logo-top fixed left-1/2 -translate-x-1/2 z-50 cursor-pointer mix-blend-exclusion appearance-none bg-none border-0 p-0 m-0 flex items-center justify-center"
-    :class="[
-      isHidden ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto',
-      mounted && isHero ? 'logo-top--hero' : 'logo-top--positioned',
-    ]"
-    :style="{ width: containerWidth, height: containerHeight }"
+    class="fixed left-1/2 -translate-x-1/2 z-50 cursor-pointer mix-blend-exclusion appearance-none bg-none border-0 p-0 m-0"
+    :style="{
+      top: `${finalTop}px`,
+      width: containerWidth,
+      height: containerHeight,
+      opacity: isHidden ? 0 : 1,
+      pointerEvents: isHidden ? 'none' : 'auto',
+      transition: 'opacity 0.3s ease-out, width 0.3s ease-out, height 0.3s ease-out',
+    }"
     aria-label="Open menu"
     @click="emit('click')"
   >
-    <img
-      :src="Asset7Logo"
-      alt="Joanna Logo Top"
-      class="max-w-[54.15%] max-h-full"
+    <div
+      v-motion
+      :initial="initialVariant"
+      :enter="enterVariant"
+      class="w-full h-full flex items-center justify-center"
     >
+      <img
+        :src="Asset7Logo"
+        alt="Joanna Logo Top"
+        class="max-w-[54.15%] max-h-full"
+      >
+    </div>
   </button>
 </template>
-
-<style scoped>
-.logo-top {
-  transition:
-    top 0.7s ease-out,
-    opacity 0.3s ease-out;
-}
-
-.logo-top--hero {
-  top: calc(50% - 18vh);
-}
-
-.logo-top--positioned {
-  top: 60px;
-}
-</style>
