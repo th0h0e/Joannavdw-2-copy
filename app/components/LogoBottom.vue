@@ -40,6 +40,7 @@ const enterVariant = {
     type: 'keyframes' as const,
     duration: 1200,
     ease: 'easeOut' as const,
+    delay: 100,
   },
 }
 </script>
