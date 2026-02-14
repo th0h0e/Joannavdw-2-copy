@@ -3,13 +3,25 @@
 @import './fonts.css';
 
 /* ============================================
+   Local Font Declaration
+   ============================================ */
+
+@font-face {
+  font-family: 'EnduroWeb';
+  src: url('/fonts/EnduroWeb-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================
    Nuxt UI Theme Configuration
    ============================================ */
 
 @theme {
   /* Font family definitions */
-  --font-display: "EnduroWeb", "sans-serif";
-  --font-sans: "EnduroWeb", system-ui, sans-serif;
+  --font-display: 'EnduroWeb', sans-serif;
+  --font-sans: 'EnduroWeb', system-ui, sans-serif;
 }
 
 /* ============================================
@@ -165,7 +177,7 @@ body {
 }
 
 .popup-text {
-  font-family: 'EnduroWeb, sans-serif';
+  font-family: 'EnduroWeb', sans-serif;
   letter-spacing: 0.03em;
   font-size: 12px;
   text-align: center;

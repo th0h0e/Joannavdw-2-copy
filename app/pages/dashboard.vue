@@ -582,7 +582,7 @@ async function handleDragEnd() {
 <style scoped>
 /* Admin typography */
 .admin-container {
-  font-family: 'EnduroWeb, sans-serif';
+  font-family: 'EnduroWeb', sans-serif;
 }
 
 .admin-title {

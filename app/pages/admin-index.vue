@@ -36,8 +36,7 @@ async function handleLogin() {
 
 <template>
   <div
-    class="min-h-screen bg-neutral-900 flex items-center justify-center px-6 relative overflow-hidden"
-    :style="{ fontFamily: 'EnduroWeb, sans-serif' }"
+    class="min-h-screen bg-neutral-900 flex items-center justify-center px-6 relative overflow-hidden font-sans"
   >
     <!-- Background Image -->
     <div
