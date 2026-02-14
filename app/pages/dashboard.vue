@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Homepage, PortfolioProject } from '~/utils/pocketbase'
+import type { HomepageResponse, PortfolioProjectsResponse } from '~/shared/types/pocketbase-types'
 import { getImageUrl, pb } from '~/utils/pocketbase'
 
 definePageMeta({
@@ -8,7 +8,7 @@ definePageMeta({
 
 const { showToast } = useAppToast()
 
-const editingProject = ref<PortfolioProject | null>(null)
+const editingProject = ref<PortfolioProjectsResponse<string[]> | null>(null)
 const showNewProjectForm = ref(false)
 const showSettings = ref(false)
 const showMobilePreview = ref(false)
@@ -26,16 +26,16 @@ const draggedProjectId = ref<string | null>(null)
 // Fetch data with useAsyncData
 const { data: homepageRaw, refresh: refreshHomepage, error: homepageError } = useAsyncData(
   'admin-homepage',
-  () => pb.collection('Homepage').getFirstListItem<Homepage>('Is_Active = true', { requestKey: null }),
+  () => pb.collection('Homepage').getFirstListItem<HomepageResponse>('Is_Active = true', { requestKey: null }),
 )
 
 const { data: rawProjects, refresh: refreshProjects, status: projectsStatus, error: projectsError } = useAsyncData(
   'admin-projects',
-  () => pb.collection('Portfolio_Projects').getFullList<PortfolioProject>({ sort: 'Order', requestKey: null }),
+  () => pb.collection('Portfolio_Projects').getFullList<PortfolioProjectsResponse<string[]>>({ sort: 'Order', requestKey: null }),
 )
 
 // Local mutable copy of projects for drag reorder UI
-const projects = ref<PortfolioProject[]>([])
+const projects = ref<PortfolioProjectsResponse<string[]>[]>([])
 watch(rawProjects, (val) => {
   if (val)
     projects.value = [...val]

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import type { AboutResponse, HomepageResponse, SettingsResponse } from '~/shared/types/pocketbase-types'
+import { pb } from '~/utils/pocketbase'
+
 const props = defineProps<{
   isOpen: boolean
 }>()
@@ -15,7 +18,9 @@ const { data: rawData, refresh, status } = useAsyncData(
   'settings-sidebar',
   async () => {
     const [about, homepage, settings, fontSizes] = await Promise.all([
-      pb.collection('Settings').getFirstListItem<Settings>(''),
+      pb.collection('About').getFirstListItem<AboutResponse<string[]>>('Is_Active = true'),
+      pb.collection('Homepage').getFirstListItem<HomepageResponse>('Is_Active = true'),
+      pb.collection('Settings').getFirstListItem<SettingsResponse>(''),
       $fetch<{ mobile: number, tablet: number, desktop: number, largeDesktop: number }>('/api/font-sizes'),
     ])
     return { about, homepage, settings, fontSizes }
@@ -47,12 +52,12 @@ watch(rawData, (data) => {
   if (!data)
     return
 
-  aboutDescription.value = data.about.About_Description
-  expertiseDescription.value = data.about.Expertise_Description
-  clientList.value = data.about.Client_List_Json || data.about.Client_List || []
-  contactEmail.value = data.about.Contact_Email
-  heroTitle.value = data.homepage.Hero_Title
-  showTopProgressBar.value = data.settings.Show_Top_Progress_Bar
+  aboutDescription.value = data.about.About_Description ?? ''
+  expertiseDescription.value = data.about.Expertise_Description ?? ''
+  clientList.value = data.about.Client_List_Json ?? []
+  contactEmail.value = data.about.Contact_Email ?? ''
+  heroTitle.value = data.homepage.Hero_Title ?? ''
+  showTopProgressBar.value = data.settings.Show_Top_Progress_Bar ?? false
   mobileFontSize.value = data.fontSizes.mobile
   tabletFontSize.value = data.fontSizes.tablet
   desktopFontSize.value = data.fontSizes.desktop
@@ -154,7 +159,7 @@ async function handleSubmit(e: Event) {
   }
 }
 
-const previewAboutData = ref<About | null>(null)
+const previewAboutData = ref<AboutResponse<string[]> | null>(null)
 watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEmail], () => {
   if (aboutData.value) {
     previewAboutData.value = {

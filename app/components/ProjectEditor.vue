@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PortfolioProject } from '~/utils/pocketbase'
+import type { PortfolioProjectsResponse } from '~/shared/types/pocketbase-types'
 import { getImageUrl, pb } from '~/utils/pocketbase'
 
 interface ImageItem {
@@ -11,7 +11,7 @@ interface ImageItem {
 }
 
 const props = defineProps<{
-  project: PortfolioProject | null
+  project: PortfolioProjectsResponse<string[]> | null
 }>()
 
 const emit = defineEmits<{
@@ -21,10 +21,10 @@ const emit = defineEmits<{
 }>()
 
 const formState = reactive({
-  title: props.project?.Title || '',
-  description: props.project?.Description || '',
-  order: props.project?.Order || 0,
-  responsibilities: props.project?.Responsibility_json || props.project?.Responsibility || [] as string[],
+  title: props.project?.Title ?? '',
+  description: props.project?.Description ?? '',
+  order: props.project?.Order ?? 0,
+  responsibilities: props.project?.Responsibility_json ?? [],
 })
 
 const images = ref<ImageItem[]>([])
@@ -44,10 +44,10 @@ watch(() => props.project, (project) => {
     }))
   }
   if (project) {
-    formState.title = project.Title || ''
-    formState.description = project.Description || ''
-    formState.order = project.Order || 0
-    formState.responsibilities = project.Responsibility_json || project.Responsibility || []
+    formState.title = project.Title ?? ''
+    formState.description = project.Description ?? ''
+    formState.order = project.Order ?? 0
+    formState.responsibilities = project.Responsibility_json ?? []
   }
 }, { immediate: true })
 

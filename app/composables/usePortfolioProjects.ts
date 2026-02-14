@@ -1,20 +1,25 @@
-export function usePortfolioProjects() {
-  const { data: portfolioRes } = useNuxtData('portfolio')
+import type { PortfolioProjectsResponse } from '~/shared/types/pocketbase-types'
+import { getImageUrl } from '~/utils/pocketbase'
 
-  function getImageUrl(collectionId: string, recordId: string, filename: string) {
-    return `https://admin.kontext.site/api/files/${collectionId}/${recordId}/${filename}`
-  }
+export function usePortfolioProjects() {
+  const { data: portfolioRes } = useNuxtData<{
+    page: number
+    perPage: number
+    totalItems: number
+    totalPages: number
+    items: PortfolioProjectsResponse<string[]>[]
+  }>('portfolio')
 
   const projects = computed(() => {
     const items = portfolioRes.value?.items ?? []
     return items
-      .sort((a: Record<string, unknown>, b: Record<string, unknown>) => (a.Order as number) - (b.Order as number))
-      .map((project: Record<string, unknown>) => ({
-        title: project.Title as string,
-        description: project.Description as string,
-        responsibility: project.Responsibility_json as string[],
-        images: (project.Images as string[]).map(filename => ({
-          src: getImageUrl(project.collectionId as string, project.id as string, filename),
+      .sort((a, b) => (a.Order ?? 0) - (b.Order ?? 0))
+      .map(project => ({
+        title: project.Title ?? '',
+        description: project.Description ?? '',
+        responsibility: project.Responsibility_json ?? [],
+        images: (project.Images ?? []).map((filename: string) => ({
+          src: getImageUrl(project, filename),
         })),
       }))
   })
