@@ -14,15 +14,15 @@ function handleClick(e: MouseEvent, index: number) {
 </script>
 
 <template>
-  <div :class="navigationContainerClasses">
-    <ul :class="navigationListClasses">
+  <div class="w-full text-center px-6 md:w-4/5 md:px-0">
+    <ul class="space-y-1">
       <li
         v-for="(title, index) in projectTitles"
         :key="`${title}-${index}`"
       >
         <a
           :href="`#project-${index}`"
-          :class="`${navigationLinkClasses} title-font`"
+          class="title-font block text-black uppercase leading-none no-underline transition-all duration-200 hover:opacity-70"
           @click="handleClick($event, index)"
         >
           {{ title }}

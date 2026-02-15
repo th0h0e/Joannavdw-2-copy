@@ -1,61 +1,71 @@
 /* ============================================
    Frontend Custom Styles
-   Consolidated styles for index.vue and components
+
+   Table of Contents:
+   1. CSS Custom Properties
+   2. Title Font
+   3. Popup System
+   4. Motion Carousel
+   5. Hamburger Menu
+   6. Vue Transitions
    ============================================ */
 
 /* ============================================
-   Title Font (base styles - sizes in fonts.css)
+   1. CSS Custom Properties
+   ============================================ */
+
+:root {
+  /* Typography */
+  --font-display: 'EnduroWeb', sans-serif;
+  --letter-spacing-tight: 0.03em;
+
+  /* Popup dimensions */
+  --popup-width: 280px;
+
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s ease-out;
+  --transition-slow: 1.2s ease-out;
+}
+
+/* ============================================
+   2. Title Font
+
+   Responsive font sizes for project titles.
+   Used across: Hero, ProjectNavigation, MotionCarousel
    ============================================ */
 
 .title-font {
-  font-family: 'EnduroWeb', sans-serif;
-  letter-spacing: 0.03em;
+  font-family: var(--font-display);
+  letter-spacing: var(--letter-spacing-tight);
   text-transform: uppercase;
   line-height: 1;
   display: block;
+  font-size: 1.4rem; /* Mobile */
+}
+
+@media (min-width: 768px) {
+  .title-font {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .title-font {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .title-font {
+    font-size: 3rem;
+  }
 }
 
 /* ============================================
-   Logo Button Styles
-   Shared between LogoTop and LogoBottom
-   ============================================ */
+   3. Popup System
 
-.logo-button {
-  position: fixed;
-  left: 50%;
-  z-index: 50;
-  margin: 0;
-  transform: translateX(-50%);
-  cursor: pointer;
-  appearance: none;
-  border: 0;
-  background: none;
-  padding: 0;
-  mix-blend-mode: exclusion;
-  transition:
-    opacity 0.3s ease-out,
-    width 0.3s ease-out,
-    height 0.3s ease-out;
-}
-
-.logo-button__inner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-}
-
-.logo-button__image {
-  filter: brightness(0) invert(1);
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  display: block;
-}
-
-/* ============================================
-   Popup Card Styles
+   Used by: AboutPopup, ProjectPopup
    ============================================ */
 
 @property --scale {
@@ -68,13 +78,13 @@
   position: fixed;
   top: 50%;
   left: 50%;
-  width: 280px;
+  width: var(--popup-width);
   z-index: 9999;
   transform: translate(-50%, -50%) scale(var(--scale, 1));
 }
 
 .popup-card-image {
-  width: 280px;
+  width: var(--popup-width);
   height: auto;
   filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.15));
 }
@@ -85,32 +95,25 @@
   -webkit-backdrop-filter: blur(12px);
 }
 
-/* Popup Text Styles */
-.text-popup-title {
+.text-popup-title,
+.text-popup-body {
   font-family: var(--font-display);
   font-size: 12px;
-  letter-spacing: 0.03em;
+  letter-spacing: var(--letter-spacing-tight);
   line-height: 1.25;
   text-align: center;
-  text-transform: uppercase;
   color: black;
   margin-bottom: 18px;
 }
 
-.text-popup-body {
-  font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.03em;
-  line-height: 1.25;
-  text-align: center;
-  color: black;
-  margin-bottom: 18px;
+.text-popup-title {
+  text-transform: uppercase;
 }
 
 .text-popup-link {
   font-family: var(--font-display);
   font-size: 12px;
-  letter-spacing: 0.03em;
+  letter-spacing: var(--letter-spacing-tight);
   line-height: 1.25;
   text-align: center;
   color: black;
@@ -118,7 +121,7 @@
   background: none;
   border: 0;
   cursor: pointer;
-  transition: opacity 0.3s;
+  transition: opacity var(--transition-fast);
 }
 
 .text-popup-link:hover {
@@ -126,7 +129,9 @@
 }
 
 /* ============================================
-   Motion Carousel Styles
+   4. Motion Carousel
+
+   Horizontal scroll carousel with snap points
    ============================================ */
 
 .motion-carousel {
@@ -151,16 +156,18 @@
 }
 
 /* ============================================
-   Hamburger Menu Styles
+   5. Hamburger Menu
+
+   Animated diamond/cross toggle icon
    ============================================ */
 
 .hamburger-icon {
   display: block;
   transition:
-    transform 0.3s,
-    background-color 0.3s,
-    width 0.3s,
-    height 0.3s;
+    transform var(--transition-medium),
+    background-color var(--transition-medium),
+    width var(--transition-medium),
+    height var(--transition-medium);
 }
 
 .hamburger-icon--closed {
@@ -186,10 +193,15 @@
   }
 }
 
-/* Menu Transitions */
+/* ============================================
+   6. Vue Transitions
+
+   Named transitions for <Transition name="...">
+   ============================================ */
+
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease-out;
+  transition: opacity var(--transition-medium);
 }
 
 .fade-enter-from,
@@ -200,8 +212,8 @@
 .scale-fade-enter-active,
 .scale-fade-leave-active {
   transition:
-    opacity 0.3s ease-out,
-    transform 0.3s ease-out;
+    opacity var(--transition-medium),
+    transform var(--transition-medium);
 }
 
 .scale-fade-enter-from,
@@ -211,68 +223,7 @@
 }
 
 /* ============================================
-   Hero Section Animation
-   ============================================ */
-
-.hero-image-enter {
-  transition-duration: 1200ms;
-  transition-timing-function: ease-out;
-}
-
-.hero-image-scale-initial {
-  transform: scale(0.3);
-}
-
-.hero-image-scale-final {
-  transform: scale(1);
-}
-
-/* ============================================
-   Project Navigation Styles
-   ============================================ */
-
-.project-navigation-container {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
-}
-
-.project-navigation-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  text-align: center;
-}
-
-.project-navigation-item {
-  margin: 0;
-}
-
-.project-navigation-link {
-  display: block;
-  color: black;
-  text-decoration: none;
-  transition: opacity 0.2s ease;
-}
-
-.project-navigation-link:hover {
-  opacity: 0.7;
-}
-
-/* ============================================
-   Scroll Snap Section
-   ============================================ */
-
-.scroll-snap-section {
-  position: relative;
-  width: 100%;
-  scroll-snap-align: center;
-  scroll-snap-stop: always;
-}
-
-/* ============================================
-   Custom Transition Durations
+   7. Utility Classes
    ============================================ */
 
 .duration-1200 {
