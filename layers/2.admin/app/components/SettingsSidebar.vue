@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { AboutResponse, HomepageResponse, SettingsResponse } from '~/shared/types/pocketbase-types'
-import { pb } from '~/utils/pocketbase'
+import type { AboutResponse, HomepageResponse, SettingsResponse } from '#layers/2.admin/app/shared/types/pocketbase-types'
+import { pb } from '#layers/2.admin/app/utils/pocketbase'
 
 const props = defineProps<{
   isOpen: boolean

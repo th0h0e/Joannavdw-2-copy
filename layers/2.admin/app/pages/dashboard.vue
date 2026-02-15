@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { PortfolioProjectsResponse } from '~/shared/types/pocketbase-types'
+import type { PortfolioProjectsResponse } from '#layers/2.admin/app/shared/types/pocketbase-types'
+import { getImageUrl, pb } from '#layers/2.admin/app/utils/pocketbase'
 import { useSortable } from '@vueuse/integrations/useSortable'
-import { getImageUrl, pb } from '~/utils/pocketbase'
 
 definePageMeta({
   layout: 'admin',

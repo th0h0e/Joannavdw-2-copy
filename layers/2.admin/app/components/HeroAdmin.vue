@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { HomepageResponse } from '~/shared/types/pocketbase-types'
-import { getImageUrl, pb } from '~/utils/pocketbase'
+import type { HomepageResponse } from '#layers/2.admin/app/shared/types/pocketbase-types'
+import { getImageUrl, pb } from '#layers/2.admin/app/utils/pocketbase'
 
 const emit = defineEmits<{
   showToast: [message: string, type: 'success' | 'error']

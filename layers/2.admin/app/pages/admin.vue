@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { pb } from '#layers/2.admin/app/utils/pocketbase'
 import loginBackground from '~/assets/admin-login-bg.jpg'
-import { pb } from '~/utils/pocketbase'
 
 const formState = reactive({
   email: '',
