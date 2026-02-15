@@ -22,7 +22,7 @@ function handleClick(e: MouseEvent, index: number) {
       >
         <a
           :href="`#project-${index}`"
-          class="title-font block text-black uppercase leading-none no-underline transition-all duration-200 hover:opacity-70"
+          class="title-font block text-black uppercase leading-none no-underline hover:underline"
           @click="handleClick($event, index)"
         >
           {{ title }}
