@@ -1,6 +1,6 @@
 <template>
   <UApp>
-    <div class="min-h-screen bg-default">
+    <div class="bg-default min-h-screen">
       <slot />
     </div>
   </UApp>

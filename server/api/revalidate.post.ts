@@ -11,14 +11,16 @@ const COLLECTION_CACHE_KEYS: Record<string, string> = {
 // Body: { collections: string[] } - optional array of collection names to invalidate
 // If no collections specified, invalidates ALL PocketBase cache entries
 export default defineEventHandler(async (event) => {
-  console.warn(`[ISR] ${new Date().toISOString()} - REVALIDATE: Request received`)
+  console.warn(`[ISR] ${new Date()
+    .toISOString()} - REVALIDATE: Request received`)
 
   // Use getAuthenticatedPb to validate auth (throws 401 if invalid)
   getAuthenticatedPb(event)
 
   const body = await readBody(event)
   const collections = body.collections as string[] | undefined
-  console.warn(`[ISR] ${new Date().toISOString()} - REVALIDATE: Collections: ${JSON.stringify(collections)}`)
+  console.warn(`[ISR] ${new Date()
+    .toISOString()} - REVALIDATE: Collections: ${JSON.stringify(collections)}`)
 
   const storage = useStorage('cache')
   const invalidated: string[] = []
@@ -29,7 +31,8 @@ export default defineEventHandler(async (event) => {
       if (key) {
         const cacheKey = `pocketbase:${key}:data.json`
         await storage.removeItem(cacheKey)
-        console.warn(`[ISR] ${new Date().toISOString()} - REVALIDATE: Removed cache key: ${cacheKey}`)
+        console.warn(`[ISR] ${new Date()
+          .toISOString()} - REVALIDATE: Removed cache key: ${cacheKey}`)
         invalidated.push(collection)
       }
     }
@@ -38,12 +41,14 @@ export default defineEventHandler(async (event) => {
     const keys = await storage.getKeys('pocketbase:')
     for (const key of keys) {
       await storage.removeItem(key)
-      console.warn(`[ISR] ${new Date().toISOString()} - REVALIDATE: Removed cache key: ${key}`)
+      console.warn(`[ISR] ${new Date()
+        .toISOString()} - REVALIDATE: Removed cache key: ${key}`)
     }
     invalidated.push('all')
   }
 
-  console.warn(`[ISR] ${new Date().toISOString()} - REVALIDATE: Complete, invalidated: ${JSON.stringify(invalidated)}`)
+  console.warn(`[ISR] ${new Date()
+    .toISOString()} - REVALIDATE: Complete, invalidated: ${JSON.stringify(invalidated)}`)
 
   return {
     revalidated: true,

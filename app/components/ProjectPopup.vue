@@ -25,7 +25,10 @@ const projectResponsibility = computed<string[]>(() => project.value?.responsibi
         {{ projectTitle }}
       </h2>
       <div class="text-popup-title">
-        <span v-for="(responsibility, index) in projectResponsibility" :key="`${responsibility}-${index}`">
+        <span
+          v-for="(responsibility, index) in projectResponsibility"
+          :key="`${responsibility}-${index}`"
+        >
           {{ responsibility }}<br v-if="index < projectResponsibility.length - 1">
         </span>
       </div>

@@ -18,18 +18,15 @@ const { data: rawData, refresh, status } = useAsyncData(
   'settings-sidebar',
   async () => {
     const [about, homepage, settings, fontSizes] = await Promise.all([
-      pb.collection('About').getFirstListItem<AboutResponse<string[]>>('Is_Active = true'),
-      pb.collection('Homepage').getFirstListItem<HomepageResponse>('Is_Active = true'),
-      pb.collection('Settings').getFirstListItem<SettingsResponse>(''),
-      $fetch<{ mobile: number
-        tablet: number
-        desktop: number
-        largeDesktop: number }>('/api/font-sizes'),
+      pb.collection('About')
+        .getFirstListItem<AboutResponse<string[]>>('Is_Active = true'),
+      pb.collection('Homepage')
+        .getFirstListItem<HomepageResponse>('Is_Active = true'),
+      pb.collection('Settings')
+        .getFirstListItem<SettingsResponse>(''),
+      $fetch<{ mobile: number, tablet: number, desktop: number, largeDesktop: number }>('/api/font-sizes'),
     ])
-    return { about,
-      homepage,
-      settings,
-      fontSizes }
+    return { about, homepage, settings, fontSizes }
   },
   { immediate: false },
 )
@@ -110,22 +107,25 @@ async function handleSubmit(e: Event) {
 
   try {
     if (homepageData.value) {
-      await pb.collection('Homepage').update(homepageData.value.id, { Hero_Title: heroTitle.value })
+      await pb.collection('Homepage')
+        .update(homepageData.value.id, { Hero_Title: heroTitle.value })
     }
 
     if (aboutData.value) {
-      await pb.collection('About').update(aboutData.value.id, {
-        About_Description: aboutDescription.value,
-        Expertise_Description: expertiseDescription.value,
-        Client_List_Json: clientList.value,
-        Contact_Email: contactEmail.value,
-      })
+      await pb.collection('About')
+        .update(aboutData.value.id, {
+          About_Description: aboutDescription.value,
+          Expertise_Description: expertiseDescription.value,
+          Client_List_Json: clientList.value,
+          Contact_Email: contactEmail.value,
+        })
     }
 
     if (settingsData.value) {
-      await pb.collection('Settings').update(settingsData.value.id, {
-        Show_Top_Progress_Bar: showTopProgressBar.value,
-      })
+      await pb.collection('Settings')
+        .update(settingsData.value.id, {
+          Show_Top_Progress_Bar: showTopProgressBar.value,
+        })
     }
 
     await $fetch('/api/font-sizes', {
@@ -143,8 +143,7 @@ async function handleSubmit(e: Event) {
   }
   catch (err: unknown) {
     console.error('Error saving settings:', err)
-    const error = err as { data?: { message?: string }
-      message?: string }
+    const error = err as { data?: { message?: string }, message?: string }
     emit('showToast', `Failed to save settings: ${error?.data?.message || error?.message || 'Unknown error'}`, 'error')
   }
   finally {
@@ -169,12 +168,12 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
 <template>
   <template v-if="isOpen">
     <button
-      class="fixed inset-0 bg-default/70 backdrop-blur-md z-40 transition-opacity duration-300 appearance-none bg-transparent border-0 p-0 m-0 text-left"
+      class="bg-default/70 fixed inset-0 z-40 m-0 appearance-none border-0 bg-transparent p-0 text-left backdrop-blur-md transition-opacity duration-300"
       aria-label="Close settings"
       @click="emit('close')"
     />
 
-    <div class="fixed top-1/2 left-[25%] -translate-x-1/2 -translate-y-1/2 z-45">
+    <div class="fixed top-1/2 left-[25%] z-45 -translate-x-1/2 -translate-y-1/2">
       <LazyAboutPopup
         :is-visible="true"
         :about-data="previewAboutData"
@@ -182,21 +181,25 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
       />
     </div>
 
-    <div class="fixed right-0 top-0 h-full w-3/4 md:w-1/2 bg-elevated backdrop-blur-xl border-l border-default shadow-2xl z-50 flex flex-col font-['EnduroWeb',sans-serif]">
-      <UForm :state="{}" class="flex flex-col h-full" @submit="handleSubmit">
-        <div class="flex-shrink-0 p-8 border-b border-default flex items-center gap-4 backdrop-blur-sm">
+    <div class="bg-elevated border-default fixed top-0 right-0 z-50 flex h-full w-3/4 flex-col border-l font-['EnduroWeb',sans-serif] shadow-2xl backdrop-blur-xl md:w-1/2">
+      <UForm
+        :state="{}"
+        class="flex h-full flex-col"
+        @submit="handleSubmit"
+      >
+        <div class="border-default flex flex-shrink-0 items-center gap-4 border-b p-8 backdrop-blur-sm">
           <div class="flex-1">
-            <h2 class="text-xl font-medium text-highlighted tracking-tight">
+            <h2 class="text-highlighted text-xl font-medium tracking-tight">
               Settings
             </h2>
-            <p class="text-xs text-muted mt-1 tracking-wide uppercase">
+            <p class="text-muted mt-1 text-xs tracking-wide uppercase">
               Configure site content
             </p>
           </div>
 
           <UButton
             variant="ghost"
-            class="flex-shrink-0 w-12 h-12 overflow-hidden"
+            class="h-12 w-12 flex-shrink-0 overflow-hidden"
             title="Click to update favicon"
             @click="faviconFileInput?.click()"
           >
@@ -204,13 +207,16 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
               v-if="faviconUrl"
               :src="faviconUrl"
               alt="Favicon"
-              class="w-full h-full object-cover"
+              class="h-full w-full object-cover"
             >
             <div
               v-else
-              class="w-full h-full flex items-center justify-center"
+              class="flex h-full w-full items-center justify-center"
             >
-              <UIcon name="i-ph-image" class="size-6" />
+              <UIcon
+                name="i-ph-image"
+                class="size-6"
+              />
             </div>
           </UButton>
 
@@ -225,9 +231,9 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
           >
         </div>
 
-        <div class="flex-1 overflow-y-auto p-8 space-y-8">
+        <div class="flex-1 space-y-8 overflow-y-auto p-8">
           <div>
-            <h3 class="text-sm font-medium text-highlighted mb-4 uppercase tracking-wider">
+            <h3 class="text-highlighted mb-4 text-sm font-medium tracking-wider uppercase">
               Hero Section
             </h3>
             <UFormField label="Hero Title">
@@ -240,10 +246,10 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
             </UFormField>
           </div>
 
-          <div class="border-t border-default" />
+          <div class="border-default border-t" />
 
           <div>
-            <h3 class="text-sm font-medium text-highlighted mb-4 uppercase tracking-wider">
+            <h3 class="text-highlighted mb-4 text-sm font-medium tracking-wider uppercase">
               About Section
             </h3>
             <div class="space-y-4">
@@ -264,7 +270,10 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
                 />
               </UFormField>
               <div>
-                <UFormField label="Client List" help="Press Enter to add a client">
+                <UFormField
+                  label="Client List"
+                  help="Press Enter to add a client"
+                >
                   <UInputTags
                     v-model="clientList"
                     placeholder="e.g., NIKE"
@@ -278,10 +287,10 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
             </div>
           </div>
 
-          <div class="border-t border-default" />
+          <div class="border-default border-t" />
 
           <div>
-            <h3 class="text-sm font-medium text-highlighted mb-4 uppercase tracking-wider">
+            <h3 class="text-highlighted mb-4 text-sm font-medium tracking-wider uppercase">
               Global Settings
             </h3>
             <div class="space-y-4">
@@ -295,7 +304,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
                 />
               </UFormField>
               <div>
-                <p class="text-xs font-medium text-toned mb-2 uppercase tracking-wider">
+                <p class="text-toned mb-2 text-xs font-medium tracking-wider uppercase">
                   Font Sizes (rem)
                 </p>
                 <div class="grid grid-cols-4 gap-2">
@@ -342,8 +351,11 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
                 </div>
               </div>
               <UFormField>
-                <USwitch v-model="showTopProgressBar" label="Show Top Progress Bar" />
-                <p class="text-xs text-dimmed mt-1">
+                <USwitch
+                  v-model="showTopProgressBar"
+                  label="Show Top Progress Bar"
+                />
+                <p class="text-dimmed mt-1 text-xs">
                   Display progress bar at top of carousel
                 </p>
               </UFormField>
@@ -351,7 +363,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
           </div>
         </div>
 
-        <div class="flex-shrink-0 p-8 border-t border-default flex gap-3 backdrop-blur-sm">
+        <div class="border-default flex flex-shrink-0 gap-3 border-t p-8 backdrop-blur-sm">
           <UButton
             type="button"
             variant="outline"

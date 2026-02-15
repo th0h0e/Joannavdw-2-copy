@@ -44,7 +44,7 @@ const enterVariant = {
 
 <template>
   <button
-    class="fixed left-1/2 -translate-x-1/2 z-50 cursor-pointer mix-blend-exclusion appearance-none bg-none border-0 p-0 m-0"
+    class="fixed left-1/2 z-50 m-0 -translate-x-1/2 cursor-pointer appearance-none border-0 bg-none p-0 mix-blend-exclusion"
     :style="{
       top: `calc(100vh - 60px - ${containerHeightPx}px)`,
       width: containerWidth,
@@ -60,12 +60,12 @@ const enterVariant = {
       v-motion
       :initial="initialVariant"
       :enter="enterVariant"
-      class="w-full h-full flex items-center justify-center"
+      class="flex h-full w-full items-center justify-center"
     >
       <img
         :src="Asset11Logo"
         alt="Van Der Weg Logo Bottom"
-        class="max-w-full max-h-[83.33%]"
+        class="max-h-[83.33%] max-w-full"
       >
     </div>
   </button>

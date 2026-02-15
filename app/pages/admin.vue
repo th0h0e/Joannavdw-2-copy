@@ -21,13 +21,13 @@ async function handleLogin() {
   loading.value = true
 
   try {
-    await pb.collection('users').authWithPassword(formState.email, formState.password)
+    await pb.collection('users')
+      .authWithPassword(formState.email, formState.password)
     await navigateTo('/dashboard')
   }
   catch (err: unknown) {
     console.error('Login error:', err)
-    const typedErr = err as { response?: { message?: string }
-      message?: string }
+    const typedErr = err as { response?: { message?: string }, message?: string }
     error.value = typedErr?.response?.message || typedErr?.message || 'Failed to login. Please check your credentials.'
     loading.value = false
   }
@@ -36,7 +36,7 @@ async function handleLogin() {
 
 <template>
   <div
-    class="min-h-screen bg-default flex items-center justify-center px-6 relative overflow-hidden font-sans"
+    class="bg-default relative flex min-h-screen items-center justify-center overflow-hidden px-6 font-sans"
   >
     <div
       class="absolute inset-0 bg-cover bg-center"
@@ -47,20 +47,27 @@ async function handleLogin() {
       }"
     />
 
-    <div class="absolute inset-0 bg-default/70" />
+    <div class="bg-default/70 absolute inset-0" />
 
-    <div class="max-w-md w-full bg-elevated border border-default p-10 backdrop-blur-xl relative z-10">
-      <div class="text-center mb-8">
-        <h1 class="text-xl font-medium text-highlighted tracking-tight">
+    <div class="bg-elevated border-default relative z-10 w-full max-w-md border p-10 backdrop-blur-xl">
+      <div class="mb-8 text-center">
+        <h1 class="text-highlighted text-xl font-medium tracking-tight">
           Admin Login
         </h1>
-        <p class="text-xs text-muted mt-2 tracking-wide uppercase">
+        <p class="text-muted mt-2 text-xs tracking-wide uppercase">
           Access Dashboard
         </p>
       </div>
 
-      <UForm :state="formState" class="space-y-6" @submit="handleLogin">
-        <UFormField label="Email" required>
+      <UForm
+        :state="formState"
+        class="space-y-6"
+        @submit="handleLogin"
+      >
+        <UFormField
+          label="Email"
+          required
+        >
           <UInput
             v-model="formState.email"
             type="email"
@@ -71,7 +78,10 @@ async function handleLogin() {
           />
         </UFormField>
 
-        <UFormField label="Password" required>
+        <UFormField
+          label="Password"
+          required
+        >
           <UInput
             v-model="formState.password"
             type="password"
@@ -82,7 +92,10 @@ async function handleLogin() {
           />
         </UFormField>
 
-        <div v-if="error" class="bg-error-950/20 border border-error-800/30 text-error-200 px-4 py-3 text-sm">
+        <div
+          v-if="error"
+          class="bg-error-950/20 border-error-800/30 text-error-200 border px-4 py-3 text-sm"
+        >
           {{ error }}
         </div>
 
@@ -96,7 +109,10 @@ async function handleLogin() {
       </UForm>
 
       <div class="mt-6 text-center">
-        <NuxtLink to="/" class="text-xs text-muted hover:text-highlighted transition-colors uppercase tracking-wide">
+        <NuxtLink
+          to="/"
+          class="text-muted hover:text-highlighted text-xs tracking-wide uppercase transition-colors"
+        >
           &larr; Back to Portfolio
         </NuxtLink>
       </div>

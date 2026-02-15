@@ -68,7 +68,7 @@ useEdgeGesturePrevention()
     />
 
     <main
-      class="overflow-y-scroll snap-y snap-mandatory"
+      class="snap-y snap-mandatory overflow-y-scroll"
       :style="{
         height: '100lvh',
         scrollBehavior: 'smooth',

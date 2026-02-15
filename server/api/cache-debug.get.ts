@@ -9,8 +9,7 @@ export default defineEventHandler(async (event) => {
   const storage = useStorage('cache')
   const keys = await storage.getKeys('pocketbase:')
 
-  const cacheState: Record<string, { exists: boolean
-    size?: number }> = {}
+  const cacheState: Record<string, { exists: boolean, size?: number }> = {}
 
   for (const key of keys) {
     const item = await storage.getItem(key)
@@ -20,10 +19,12 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  console.warn(`[ISR] ${new Date().toISOString()} - DEBUG: Cache state requested`)
+  console.warn(`[ISR] ${new Date()
+    .toISOString()} - DEBUG: Cache state requested`)
 
   return {
-    timestamp: new Date().toISOString(),
+    timestamp: new Date()
+      .toISOString(),
     cacheKeys: keys,
     cacheState,
     totalKeys: keys.length,

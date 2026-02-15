@@ -90,13 +90,14 @@ function handleImageUpload(e: Event) {
   if (!files)
     return
 
-  const newImages: ImageItem[] = Array.from(files).map((file, index) => ({
-    id: `new-${Date.now()}-${index}`,
-    file,
-    url: URL.createObjectURL(file),
-    filename: file.name,
-    isExisting: false,
-  }))
+  const newImages: ImageItem[] = Array.from(files)
+    .map((file, index) => ({
+      id: `new-${Date.now()}-${index}`,
+      file,
+      url: URL.createObjectURL(file),
+      filename: file.name,
+      isExisting: false,
+    }))
 
   images.value = [...images.value, ...newImages]
 }
@@ -161,19 +162,19 @@ async function handleSubmit(e?: Event) {
     }
 
     if (props.project) {
-      await pb.collection('Portfolio_Projects').update(props.project.id, formData)
+      await pb.collection('Portfolio_Projects')
+        .update(props.project.id, formData)
     }
     else {
-      await pb.collection('Portfolio_Projects').create(formData)
+      await pb.collection('Portfolio_Projects')
+        .create(formData)
     }
 
     emit('save')
   }
   catch (err: unknown) {
     console.error('Error saving project:', err)
-    const error = err as { status?: number
-      data?: { message?: string }
-      message?: string }
+    const error = err as { status?: number, data?: { message?: string }, message?: string }
     if (error?.status === 401 || error?.status === 403) {
       emit('showToast', 'Your session has expired. Please login again.', 'error')
       pb.authStore.clear()
@@ -191,14 +192,14 @@ async function handleSubmit(e?: Event) {
 <template>
   <Teleport to="body">
     <button
-      class="fixed inset-0 bg-default/70 backdrop-blur-md z-40 transition-opacity duration-300 appearance-none bg-transparent border-0 p-0 m-0 text-left"
+      class="bg-default/70 fixed inset-0 z-40 m-0 appearance-none border-0 bg-transparent p-0 text-left backdrop-blur-md transition-opacity duration-300"
       aria-label="Cancel editing"
       @click="emit('cancel')"
     />
 
     <div
       v-if="project && !isMobile"
-      class="absolute top-1/2 left-[25%] -translate-x-1/2 -translate-y-1/2 z-45 pointer-events-none"
+      class="pointer-events-none absolute top-1/2 left-[25%] z-45 -translate-x-1/2 -translate-y-1/2"
     >
       <LazyProjectPopupPreview
         :project-title="formState.title"
@@ -208,29 +209,37 @@ async function handleSubmit(e?: Event) {
     </div>
 
     <div
-      class="fixed right-0 top-0 w-3/4 md:w-2/3 lg:w-1/2 bg-elevated backdrop-blur-xl border-l border-default shadow-2xl z-50 flex flex-col h-screen font-['EnduroWeb',sans-serif]"
+      class="bg-elevated border-default fixed top-0 right-0 z-50 flex h-screen w-3/4 flex-col border-l font-['EnduroWeb',sans-serif] shadow-2xl backdrop-blur-xl md:w-2/3 lg:w-1/2"
     >
-      <UForm :state="formState" class="flex flex-col h-full" @submit="handleSubmit">
-        <div class="flex-shrink-0 p-8 border-b border-default backdrop-blur-sm">
-          <h2 class="text-xl font-medium text-highlighted tracking-tight">
+      <UForm
+        :state="formState"
+        class="flex h-full flex-col"
+        @submit="handleSubmit"
+      >
+        <div class="border-default flex-shrink-0 border-b p-8 backdrop-blur-sm">
+          <h2 class="text-highlighted text-xl font-medium tracking-tight">
             {{ project ? 'Edit Project' : 'New Project' }}
           </h2>
-          <p class="text-xs text-muted mt-1 tracking-wide uppercase">
+          <p class="text-muted mt-1 text-xs tracking-wide uppercase">
             {{ project ? 'Update project details and images' : 'Create a new portfolio project' }}
           </p>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-8 space-y-8">
+        <div class="flex-1 space-y-8 overflow-y-auto p-8">
           <div>
-            <span id="images-label" class="block text-xs font-medium text-toned mb-3 uppercase tracking-wider">
+            <span
+              id="images-label"
+              class="text-toned mb-3 block text-xs font-medium tracking-wider uppercase"
+            >
               Images (Drag to reorder)
             </span>
 
             <div
               ref="dropZoneRef"
-              class="relative border-2 border-dashed transition-all" :class="[
+              class="relative border-2 border-dashed transition-all"
+              :class="[
                 isDraggingFile ? 'border-primary bg-primary/5' : 'border-default bg-elevated/50',
-                images.length === 0 ? 'cursor-pointer hover:border-accented hover:bg-elevated' : '',
+                images.length === 0 ? 'hover:border-accented hover:bg-elevated cursor-pointer' : '',
               ]"
               role="button"
               tabindex="0"
@@ -240,12 +249,15 @@ async function handleSubmit(e?: Event) {
                 multiple
                 accept="image/*"
                 aria-labelledby="images-label"
-                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                class="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
                 :style="{ pointerEvents: images.length > 0 ? 'none' : 'auto' }"
                 @change="handleImageUpload"
               >
 
-              <div v-if="images.length === 0" class="block py-12 px-6 text-center cursor-pointer pointer-events-none">
+              <div
+                v-if="images.length === 0"
+                class="pointer-events-none block cursor-pointer px-6 py-12 text-center"
+              >
                 <div class="flex flex-col items-center gap-3">
                   <UIcon
                     name="i-ph-upload"
@@ -253,29 +265,42 @@ async function handleSubmit(e?: Event) {
                     :class="[isDraggingFile ? 'text-primary' : 'text-muted']"
                   />
                   <div>
-                    <p class="text-sm font-medium transition-colors uppercase tracking-wide" :class="[isDraggingFile ? 'text-primary' : 'text-toned']">
+                    <p
+                      class="text-sm font-medium tracking-wide uppercase transition-colors"
+                      :class="[isDraggingFile ? 'text-primary' : 'text-toned']"
+                    >
                       {{ isDraggingFile ? 'Drop images here' : 'Drag & drop images' }}
                     </p>
-                    <p class="text-xs text-dimmed mt-1 tracking-wide">
+                    <p class="text-dimmed mt-1 text-xs tracking-wide">
                       or click to browse
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div v-if="images.length > 0" class="p-4">
-                <div ref="imageGridRef" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div
+                v-if="images.length > 0"
+                class="p-4"
+              >
+                <div
+                  ref="imageGridRef"
+                  class="grid grid-cols-2 gap-3 md:grid-cols-3"
+                >
                   <div
                     v-for="(image, index) in images"
                     :key="image.id"
-                    class="image-item relative group cursor-move border overflow-hidden transition-all border-default hover:border-accented"
+                    class="image-item group border-default hover:border-accented relative cursor-move overflow-hidden border transition-all"
                     role="button"
                     tabindex="0"
                   >
-                    <div class="aspect-square bg-elevated">
-                      <img :src="image.url" :alt="image.filename" class="w-full h-full object-cover">
+                    <div class="bg-elevated aspect-square">
+                      <img
+                        :src="image.url"
+                        :alt="image.filename"
+                        class="h-full w-full object-cover"
+                      >
                     </div>
-                    <div class="absolute top-2 left-2 bg-default/60 backdrop-blur-sm text-highlighted px-2 py-1 text-xs font-medium">
+                    <div class="bg-default/60 text-highlighted absolute top-2 left-2 px-2 py-1 text-xs font-medium backdrop-blur-sm">
                       {{ index + 1 }}
                     </div>
                     <UButton
@@ -284,12 +309,12 @@ async function handleSubmit(e?: Event) {
                       variant="soft"
                       size="xs"
                       icon="i-ph-trash"
-                      class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all"
+                      class="absolute top-2 right-2 opacity-0 transition-all group-hover:opacity-100"
                       @click="handleDeleteImage(image)"
                     >
                       Delete
                     </UButton>
-                    <div class="absolute bottom-0 left-0 right-0 bg-default/60 backdrop-blur-sm text-highlighted px-2 py-1.5 text-xs truncate">
+                    <div class="bg-default/60 text-highlighted absolute right-0 bottom-0 left-0 truncate px-2 py-1.5 text-xs backdrop-blur-sm">
                       {{ image.filename }}
                     </div>
                   </div>
@@ -298,9 +323,12 @@ async function handleSubmit(e?: Event) {
             </div>
           </div>
 
-          <div class="border-t border-default" />
+          <div class="border-default border-t" />
 
-          <UFormField label="Project Title" required>
+          <UFormField
+            label="Project Title"
+            required
+          >
             <UInput
               v-model="formState.title"
               placeholder="e.g., Maria Bodil for Nike"
@@ -310,7 +338,10 @@ async function handleSubmit(e?: Event) {
             />
           </UFormField>
 
-          <UFormField label="Description" required>
+          <UFormField
+            label="Description"
+            required
+          >
             <UTextarea
               v-model="formState.description"
               :rows="6"
@@ -321,7 +352,10 @@ async function handleSubmit(e?: Event) {
             />
           </UFormField>
 
-          <UFormField label="Position in Portfolio" required>
+          <UFormField
+            label="Position in Portfolio"
+            required
+          >
             <UInputNumber
               v-model="formState.order"
               :min="0"
@@ -333,7 +367,10 @@ async function handleSubmit(e?: Event) {
             />
           </UFormField>
 
-          <UFormField label="Responsibilities" help="Press Enter to add a responsibility">
+          <UFormField
+            label="Responsibilities"
+            help="Press Enter to add a responsibility"
+          >
             <UInputTags
               v-model="formState.responsibilities"
               placeholder="e.g., CREATIVE PRODUCTION"
@@ -346,7 +383,7 @@ async function handleSubmit(e?: Event) {
           </UFormField>
         </div>
 
-        <div class="flex-shrink-0 p-8 border-t border-default flex gap-3 backdrop-blur-sm">
+        <div class="border-default flex flex-shrink-0 gap-3 border-t p-8 backdrop-blur-sm">
           <UButton
             type="button"
             variant="outline"

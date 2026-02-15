@@ -9,7 +9,7 @@ export default withNuxt(antfu({
     a11y: true,
     overrides: {
       'vue/multi-word-component-names': 'off',
-      'vue/max-attributes-per-line': 'off',
+      'vue/max-attributes-per-line': ['error', { singleline: 1, multiline: 1 }],
     },
   },
 
@@ -36,17 +36,19 @@ export default withNuxt(antfu({
     '**/.pocketbase/**',
     '**/VUE_MIGRATION_PLAN.md',
     'src/**',
+    '**/.nuxt/**',
+    'docs/**',
   ],
 
   // Disable formats you don't use
   jsonc: false,
   yaml: false,
   markdown: false,
-})).override('antfu/stylistic/rules', {
-  rules: {
-    'style/function-paren-newline': ['error', 'multiline'],
-    'style/newline-per-chained-call': ['error', { ignoreChainWithDepth: 2 }],
-    'style/object-property-newline': ['error', { allowAllPropertiesOnSameLine: false }],
-    'antfu/consistent-list-newline': 'off',
-  },
-})
+}))
+  .override('antfu/stylistic/rules', {
+    rules: {
+      'style/function-paren-newline': ['error', 'multiline'],
+      'style/newline-per-chained-call': ['error', { ignoreChainWithDepth: 1 }],
+      'antfu/consistent-list-newline': 'error',
+    },
+  })

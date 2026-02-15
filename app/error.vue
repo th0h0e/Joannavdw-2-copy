@@ -36,10 +36,13 @@ function getErrorMessage(): string {
 
 <template>
   <UApp>
-    <div class="min-h-screen bg-default flex flex-col">
-      <header class="border-b border-default backdrop-blur-sm bg-default/80 sticky top-0 z-10">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex justify-between items-center">
-          <NuxtLink to="/" class="text-xl font-medium text-highlighted tracking-tight">
+    <div class="bg-default flex min-h-screen flex-col">
+      <header class="border-default bg-default/80 sticky top-0 z-10 border-b backdrop-blur-sm">
+        <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
+          <NuxtLink
+            to="/"
+            class="text-highlighted text-xl font-medium tracking-tight"
+          >
             Joanna van der Werf
           </NuxtLink>
           <div class="flex items-center gap-3">
@@ -64,14 +67,14 @@ function getErrorMessage(): string {
         </div>
       </header>
 
-      <main class="flex-1 flex flex-col items-center justify-center text-center px-6">
-        <p class="text-base font-semibold text-primary">
+      <main class="flex flex-1 flex-col items-center justify-center px-6 text-center">
+        <p class="text-primary text-base font-semibold">
           {{ error.statusCode }}
         </p>
-        <h1 class="mt-2 text-4xl sm:text-5xl font-bold text-highlighted text-balance">
+        <h1 class="text-highlighted mt-2 text-4xl font-bold text-balance sm:text-5xl">
           {{ isAuthError ? 'Authentication Required' : isNotFoundError ? 'Page Not Found' : 'Something went wrong' }}
         </h1>
-        <p class="mt-4 text-lg text-muted text-balance max-w-md">
+        <p class="text-muted mt-4 max-w-md text-lg text-balance">
           {{ getErrorMessage() }}
         </p>
 
@@ -96,9 +99,9 @@ function getErrorMessage(): string {
         </div>
       </main>
 
-      <footer class="border-t border-default py-6">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
-          <p class="text-xs text-muted uppercase tracking-wide">
+      <footer class="border-default border-t py-6">
+        <div class="mx-auto max-w-7xl px-6 text-center lg:px-8">
+          <p class="text-muted text-xs tracking-wide uppercase">
             &copy; {{ new Date().getFullYear() }} Joanna van der Werf
           </p>
         </div>

@@ -24,11 +24,11 @@ function handleContact() {
         <img
           :src="Asset7Logo"
           alt="Joanna Logo"
-          class="w-[4.5rem] h-auto brightness-0"
+          class="h-auto w-[4.5rem] brightness-0"
         >
       </div>
 
-      <div class="flex-1 flex flex-col justify-center">
+      <div class="flex flex-1 flex-col justify-center">
         <h2 class="text-popup-title">
           {{ aboutData?.Portfolio_Title || 'Story Driven Strategy' }}
         </h2>
@@ -62,7 +62,7 @@ function handleContact() {
         <img
           :src="Asset11Logo"
           alt="Van Der Weg Logo"
-          class="w-32 h-auto brightness-0"
+          class="h-auto w-32 brightness-0"
         >
       </div>
     </div>

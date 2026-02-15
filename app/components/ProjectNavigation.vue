@@ -16,7 +16,10 @@ function handleClick(e: MouseEvent, index: number) {
 <template>
   <div :class="navigationContainerClasses">
     <ul :class="navigationListClasses">
-      <li v-for="(title, index) in projectTitles" :key="`${title}-${index}`">
+      <li
+        v-for="(title, index) in projectTitles"
+        :key="`${title}-${index}`"
+      >
         <a
           :href="`#project-${index}`"
           :class="`${navigationLinkClasses} title-font`"

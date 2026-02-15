@@ -9,7 +9,7 @@ function handleLinkClick(index: number) {
 <template>
   <section
     id="project-index"
-    class="w-full h-[100lvh] snap-center bg-white flex items-center justify-center"
+    class="flex h-[100lvh] w-full snap-center items-center justify-center bg-white"
   >
     <ProjectNavigation
       :project-titles="projectTitles"

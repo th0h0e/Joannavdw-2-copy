@@ -43,7 +43,7 @@ const enterVariant = {
 
 <template>
   <button
-    class="fixed left-1/2 -translate-x-1/2 z-50 cursor-pointer mix-blend-exclusion appearance-none bg-none border-0 p-0 m-0"
+    class="fixed left-1/2 z-50 m-0 -translate-x-1/2 cursor-pointer appearance-none border-0 bg-none p-0 mix-blend-exclusion"
     :style="{
       top: '60px',
       width: containerWidth,
@@ -59,12 +59,12 @@ const enterVariant = {
       v-motion
       :initial="initialVariant"
       :enter="enterVariant"
-      class="w-full h-full flex items-center justify-center"
+      class="flex h-full w-full items-center justify-center"
     >
       <img
         :src="Asset7Logo"
         alt="Joanna Logo Top"
-        class="max-w-[54.15%] max-h-full"
+        class="max-h-full max-w-[54.15%]"
       >
     </div>
   </button>

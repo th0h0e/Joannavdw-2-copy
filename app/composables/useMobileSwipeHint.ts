@@ -31,23 +31,18 @@ export function useMobileSwipeHint(projectCount: Ref<number>) {
             const firstSlide = slides[0] as HTMLElement
             const secondSlide = slides[1] as HTMLElement
 
-            secondSlide.scrollIntoView({ behavior: 'smooth',
-              block: 'nearest',
-              inline: 'center' })
+            secondSlide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
 
             setTimeout(() => {
               setTimeout(() => {
-                firstSlide.scrollIntoView({ behavior: 'smooth',
-                  block: 'nearest',
-                  inline: 'center' })
+                firstSlide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
               }, 300)
             }, 200)
           }, 1000)
         }
       })
     },
-    { threshold: 0.5,
-      rootMargin: '0px' },
+    { threshold: 0.5, rootMargin: '0px' },
   )
 
   return { setup: () => {} }

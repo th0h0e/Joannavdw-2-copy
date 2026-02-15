@@ -20,7 +20,7 @@ onMounted(() => {
 <template>
   <section
     id="hero-section"
-    class="relative w-full snap-center bg-white flex items-center justify-center overflow-hidden"
+    class="relative flex w-full snap-center items-center justify-center overflow-hidden bg-white"
     :class="isMobile ? 'h-[100lvh]' : 'h-screen'"
   >
     <div
@@ -37,16 +37,19 @@ onMounted(() => {
     >
       <div
         v-if="showTitle"
-        class="absolute top-1/2 left-1/2 z-10 text-center w-full -translate-x-1/2 -translate-y-1/2"
+        class="absolute top-1/2 left-1/2 z-10 w-full -translate-x-1/2 -translate-y-1/2 text-center"
       >
-        <h1 class="text-white title-font">
+        <h1 class="title-font text-white">
           {{ heroTitle }}
         </h1>
       </div>
     </Transition>
 
-    <div class="absolute bottom-8 left-1/2 -translate-x-3 z-10 text-white">
-      <UIcon name="i-lucide-chevron-down" class="size-6 text-white" />
+    <div class="absolute bottom-8 left-1/2 z-10 -translate-x-3 text-white">
+      <UIcon
+        name="i-lucide-chevron-down"
+        class="size-6 text-white"
+      />
     </div>
   </section>
 </template>
