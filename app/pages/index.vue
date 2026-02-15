@@ -1,21 +1,9 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default' })
 
-const { error: aboutError } = await useFetch('/api/data/about', { key: 'about' })
-const { error: homepageError } = await useFetch('/api/data/homepage', { key: 'homepage' })
-const { error: portfolioError } = await useFetch('/api/data/portfolio', { key: 'portfolio' })
-
-if (aboutError.value || homepageError.value || portfolioError.value) {
-  const error = aboutError.value || homepageError.value || portfolioError.value
-  throw createError({
-    statusCode: error.statusCode || 500,
-    statusMessage: error.statusMessage || 'Failed to load data',
-    message: 'Unable to load portfolio data. Please try again later.',
-    fatal: true,
-  })
-}
-
 const { projects: projectsData } = usePortfolioProjects()
+const { heroImage: _heroImage, heroTitle: _heroTitle } = useHomepageData()
+const { aboutData: _aboutData } = useAboutData()
 
 const projectCount = computed(() => projectsData.value.length)
 
