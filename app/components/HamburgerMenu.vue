@@ -40,7 +40,7 @@ function handleLinkClick(index: number) {
 <template>
   <button
     v-if="!isPopupVisible"
-    class="fixed top-[80px] right-5 md:top-[89px] md:right-[40px] z-[10000] cursor-pointer bg-none border-0 p-0"
+    class="fixed top-[80px] right-5 md:top-[89px] md:right-[40px] z-10000 cursor-pointer bg-none border-0 p-0"
     aria-label="Toggle menu"
     @click="toggleMenu"
   >
@@ -54,7 +54,7 @@ function handleLinkClick(index: number) {
     <Transition name="fade">
       <div
         v-if="isOpen"
-        class="fixed inset-0 bg-white z-[9998] cursor-pointer h-[100lvh]"
+        class="fixed inset-0 bg-white z-9998 cursor-pointer h-[100lvh]"
         role="button"
         tabindex="0"
         aria-label="Close menu"
@@ -68,7 +68,7 @@ function handleLinkClick(index: number) {
     <Transition name="scale-fade">
       <div
         v-if="isOpen"
-        class="fixed inset-0 z-[9999] flex items-center justify-center h-[100lvh]"
+        class="fixed inset-0 z-9999 flex items-center justify-center h-[100lvh]"
       >
         <div class="w-full flex items-center justify-center">
           <ProjectNavigation

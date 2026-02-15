@@ -9,7 +9,8 @@ export default defineEventHandler(async (event) => {
   const storage = useStorage('cache')
   const keys = await storage.getKeys('pocketbase:')
 
-  const cacheState: Record<string, { exists: boolean, size?: number }> = {}
+  const cacheState: Record<string, { exists: boolean
+    size?: number }> = {}
 
   for (const key of keys) {
     const item = await storage.getItem(key)

@@ -30,7 +30,8 @@ const { data: homepageRaw, refresh: refreshHomepage, error: homepageError } = us
 
 const { data: rawProjects, refresh: refreshProjects, status: projectsStatus, error: projectsError } = useAsyncData(
   'admin-projects',
-  () => pb.collection('Portfolio_Projects').getFullList<PortfolioProjectsResponse<string[]>>({ sort: 'Order', requestKey: null }),
+  () => pb.collection('Portfolio_Projects').getFullList<PortfolioProjectsResponse<string[]>>({ sort: 'Order',
+    requestKey: null }),
 )
 
 const projects = ref<PortfolioProjectsResponse<string[]>[]>([])
@@ -54,7 +55,8 @@ useSortable(projectListRef, projects, {
     }
     catch (err: unknown) {
       await refreshProjects()
-      const typedErr = err as { data?: { message?: string }, message?: string }
+      const typedErr = err as { data?: { message?: string }
+        message?: string }
       showToast(`Failed to reorder projects: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
     }
     finally {
@@ -64,11 +66,9 @@ useSortable(projectListRef, projects, {
 })
 
 const heroImage = computed(() =>
-  homepageRaw.value?.Hero_Image ? getImageUrl(homepageRaw.value, homepageRaw.value.Hero_Image) : '',
-)
+  homepageRaw.value?.Hero_Image ? getImageUrl(homepageRaw.value, homepageRaw.value.Hero_Image) : '')
 const heroImageMobile = computed(() =>
-  homepageRaw.value?.Hero_Image_Mobile ? getImageUrl(homepageRaw.value, homepageRaw.value.Hero_Image_Mobile) : '',
-)
+  homepageRaw.value?.Hero_Image_Mobile ? getImageUrl(homepageRaw.value, homepageRaw.value.Hero_Image_Mobile) : '')
 const homepageId = computed(() => homepageRaw.value?.id || '')
 
 const heroTitle = ref('')
@@ -106,7 +106,8 @@ async function handleHeroImageUpdate(event: Event) {
     await refreshHomepage()
   }
   catch (err: unknown) {
-    const typedErr = err as { data?: { message?: string }, message?: string }
+    const typedErr = err as { data?: { message?: string }
+      message?: string }
     showToast(`Failed to update hero image: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
   }
 }
@@ -122,7 +123,8 @@ async function handleHeroImageMobileUpdate(event: Event) {
     await refreshHomepage()
   }
   catch (err: unknown) {
-    const typedErr = err as { data?: { message?: string }, message?: string }
+    const typedErr = err as { data?: { message?: string }
+      message?: string }
     showToast(`Failed to update mobile hero image: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
   }
 }
@@ -148,7 +150,8 @@ async function handleTitleSave() {
     isEditingTitle.value = false
   }
   catch (err: unknown) {
-    const typedErr = err as { data?: { message?: string }, message?: string }
+    const typedErr = err as { data?: { message?: string }
+      message?: string }
     showToast(`Failed to update hero title: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
     isEditingTitle.value = false
   }
@@ -175,7 +178,9 @@ async function confirmDelete() {
     showToast('Project deleted successfully', 'success')
   }
   catch (err: unknown) {
-    const typedErr = err as { status?: number, data?: { message?: string }, message?: string }
+    const typedErr = err as { status?: number
+      data?: { message?: string }
+      message?: string }
     if (typedErr?.status === 401 || typedErr?.status === 403) {
       pb.authStore.clear()
       navigateTo('/admin')
@@ -207,7 +212,8 @@ async function handlePublishChanges() {
     showToast('Changes published successfully!', 'success')
   }
   catch (err: unknown) {
-    const typedErr = err as { data?: { message?: string }, message?: string }
+    const typedErr = err as { data?: { message?: string }
+      message?: string }
     showToast(`Failed to publish: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
   }
 }

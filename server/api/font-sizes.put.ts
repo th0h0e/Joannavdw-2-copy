@@ -44,7 +44,8 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
 
   if (!body || typeof body !== 'object') {
-    throw createError({ statusCode: 400, message: 'Request body must be a JSON object' })
+    throw createError({ statusCode: 400,
+      message: 'Request body must be a JSON object' })
   }
 
   const keys = ['mobile', 'tablet', 'desktop', 'largeDesktop'] as const
@@ -52,7 +53,8 @@ export default defineEventHandler(async (event) => {
 
   for (const key of keys) {
     if (typeof body[key] !== 'number' || body[key] <= 0) {
-      throw createError({ statusCode: 400, message: `"${key}" must be a positive number` })
+      throw createError({ statusCode: 400,
+        message: `"${key}" must be a positive number` })
     }
     fontSizes[key] = body[key]
   }
@@ -60,5 +62,6 @@ export default defineEventHandler(async (event) => {
   await dataStorage.setItem('font-sizes.json', fontSizes)
   await cssStorage.setItemRaw('fonts.css', generateCss(fontSizes))
 
-  return { success: true, fontSizes }
+  return { success: true,
+    fontSizes }
 })

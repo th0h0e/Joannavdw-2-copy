@@ -171,7 +171,9 @@ async function handleSubmit(e?: Event) {
   }
   catch (err: unknown) {
     console.error('Error saving project:', err)
-    const error = err as { status?: number, data?: { message?: string }, message?: string }
+    const error = err as { status?: number
+      data?: { message?: string }
+      message?: string }
     if (error?.status === 401 || error?.status === 403) {
       emit('showToast', 'Your session has expired. Please login again.', 'error')
       pb.authStore.clear()
@@ -196,7 +198,7 @@ async function handleSubmit(e?: Event) {
 
     <div
       v-if="project && !isMobile"
-      class="absolute top-1/2 left-[25%] -translate-x-1/2 -translate-y-1/2 z-[45] pointer-events-none"
+      class="absolute top-1/2 left-[25%] -translate-x-1/2 -translate-y-1/2 z-45 pointer-events-none"
     >
       <LazyProjectPopupPreview
         :project-title="formState.title"

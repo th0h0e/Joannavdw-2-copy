@@ -83,14 +83,12 @@ const showTopBar = computed(() =>
   && isMobile
   && props.images.length > 1
   && currentSlide.value > 0
-  && currentSlide.value <= props.images.length,
-)
+  && currentSlide.value <= props.images.length)
 
 const showRightChevron = computed(() =>
   !isMobile
   && props.images.length > 1
-  && currentSlide.value < props.images.length - 1,
-)
+  && currentSlide.value < props.images.length - 1)
 
 const progressBarTransform = computed(() => {
   if (showBottomBar.value) {
@@ -164,7 +162,8 @@ if (!isMobile) {
 function scrollToNextSection() {
   const main = document.querySelector('main')
   if (main) {
-    main.scrollBy({ top: window.innerHeight, behavior: 'smooth' })
+    main.scrollBy({ top: window.innerHeight,
+      behavior: 'smooth' })
   }
 }
 
@@ -190,11 +189,11 @@ function handleNextSlide() {
     :style="{ backgroundImage: `url(${lastImage.src})` }"
   >
     <div
-      class="absolute inset-0 bg-cover bg-center z-[5]"
+      class="absolute inset-0 bg-cover bg-center z-5"
       :style="{ backgroundImage: `url(${lastImage.src})` }"
     />
 
-    <div class="relative h-full w-full flex z-[10]">
+    <div class="relative h-full w-full flex z-10">
       <template v-if="isMobile">
         <div
           v-for="(image, idx) in images.slice(0, -1)"
@@ -206,21 +205,21 @@ function handleNextSlide() {
         />
 
         <div
-          class="relative h-full w-full flex-shrink-0 min-w-full snap-center snap-always bg-cover bg-center bg-no-repeat bg-transparent z-[15] opacity-0 motion-carousel__slide"
+          class="relative h-full w-full flex-shrink-0 min-w-full snap-center snap-always bg-cover bg-center bg-no-repeat bg-transparent z-15 opacity-0 motion-carousel__slide"
           role="group"
           :aria-label="`Slide ${images.length}`"
           :style="{ backgroundImage: `url(${lastImage.src})` }"
         />
 
         <button
-          class="block bg-transparent z-[15] cursor-pointer appearance-none border-0 p-0 m-0 text-left relative h-full w-full flex-shrink-0 min-w-full snap-center snap-always motion-carousel__slide"
+          class="block bg-transparent z-15 cursor-pointer appearance-none border-0 p-0 m-0 text-left relative h-full w-full flex-shrink-0 min-w-full snap-center snap-always motion-carousel__slide"
           aria-label="Go to next project"
           @click="scrollToNextSection"
           @keydown.down.prevent="scrollToNextSection"
         >
-          <div class="absolute inset-0 z-[1] pointer-events-none">
+          <div class="absolute inset-0 z-1 pointer-events-none">
             <div
-              class="absolute inset-0 z-[1]"
+              class="absolute inset-0 z-1"
               :style="{
                 background: `rgba(0, 0, 0, ${0.25 * blurIntensity ** 2})`,
                 backdropFilter: `blur(${8 * blurIntensity ** 2}px)`,
@@ -229,7 +228,7 @@ function handleNextSlide() {
               }"
             >
               <div
-                class="absolute bottom-5 left-1/2 z-[100] cursor-pointer hover:opacity-70 transition-opacity duration-300 pointer-events-auto"
+                class="absolute bottom-5 left-1/2 z-100 cursor-pointer hover:opacity-70 transition-opacity duration-300 pointer-events-auto"
                 :style="{ opacity: blurIntensity ** 2, transform: 'translateX(-50%) translateZ(0)', willChange: 'transform, opacity' }"
               >
                 <UIcon name="i-lucide-chevron-down" class="size-6 text-white" />
@@ -250,13 +249,13 @@ function handleNextSlide() {
         />
 
         <button
-          class="block min-w-[100vw]! w-[100vw]! bg-transparent z-[15] cursor-pointer appearance-none border-0 p-0 m-0 text-left relative h-full flex-shrink-0 snap-center snap-always"
+          class="block min-w-[100vw]! w-[100vw]! bg-transparent z-15 cursor-pointer appearance-none border-0 p-0 m-0 text-left relative h-full flex-shrink-0 snap-center snap-always"
           aria-label="Go to next project"
           @click="scrollToNextSection"
           @keydown.down.prevent="scrollToNextSection"
         >
           <div
-            class="absolute inset-0 z-[1] bg-black/30 backdrop-blur-xl"
+            class="absolute inset-0 z-1 bg-black/30 backdrop-blur-xl"
             style="backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);"
           />
         </button>
@@ -266,7 +265,7 @@ function handleNextSlide() {
 
   <div
     ref="projectTitleRef"
-    class="absolute top-1/2 left-1/2 z-[200] text-center w-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+    class="absolute top-1/2 left-1/2 z-200 text-center w-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"
   >
     <button
       class="block w-full pointer-events-auto cursor-pointer appearance-none bg-none border-0 p-0 m-0 text-center text-white title-font transition-[opacity,visibility] duration-300 ease-in-out"
@@ -335,7 +334,7 @@ function handleNextSlide() {
 
   <button
     v-if="showRightChevron"
-    class="absolute right-6 top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer z-[250] transition-opacity duration-150 hover:opacity-70"
+    class="absolute right-6 top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer z-250 transition-opacity duration-150 hover:opacity-70"
     aria-label="Next slide"
     @click="handleNextSlide"
   >

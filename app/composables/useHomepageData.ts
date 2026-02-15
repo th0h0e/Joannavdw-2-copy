@@ -16,5 +16,6 @@ export function useHomepageData() {
 
   const heroTitle = computed(() => homepage.value?.Hero_Title || 'Creative Strategy and Communication')
 
-  return { heroImage, heroTitle }
+  return { heroImage,
+    heroTitle }
 }

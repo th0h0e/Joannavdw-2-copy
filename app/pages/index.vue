@@ -107,7 +107,7 @@ useEdgeGesturePrevention()
       >
         <div
           v-if="showPopup"
-          class="fixed inset-0 z-[9998]"
+          class="fixed inset-0 z-9998"
           role="button"
           tabindex="-1"
           aria-label="Close popup"
@@ -125,7 +125,7 @@ useEdgeGesturePrevention()
       >
         <div
           v-if="showAboutPopup"
-          class="popup-backdrop fixed inset-0 z-[9998]"
+          class="popup-backdrop fixed inset-0 z-9998"
           role="button"
           tabindex="-1"
           aria-label="Close popup"
@@ -143,7 +143,7 @@ useEdgeGesturePrevention()
       >
         <ProjectPopup
           v-if="showPopup"
-          class="relative z-[9999]"
+          class="relative z-9999"
           :project-title="popupProjectTitle"
           @click.stop
         />
@@ -157,7 +157,7 @@ useEdgeGesturePrevention()
       >
         <AboutPopup
           v-if="showAboutPopup"
-          class="relative z-[9999]"
+          class="relative z-9999"
           @click.stop
         />
       </Transition>

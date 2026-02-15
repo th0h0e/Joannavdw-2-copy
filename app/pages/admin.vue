@@ -26,7 +26,8 @@ async function handleLogin() {
   }
   catch (err: unknown) {
     console.error('Login error:', err)
-    const typedErr = err as { response?: { message?: string }, message?: string }
+    const typedErr = err as { response?: { message?: string }
+      message?: string }
     error.value = typedErr?.response?.message || typedErr?.message || 'Failed to login. Please check your credentials.'
     loading.value = false
   }

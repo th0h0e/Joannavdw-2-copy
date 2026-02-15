@@ -21,9 +21,15 @@ const { data: rawData, refresh, status } = useAsyncData(
       pb.collection('About').getFirstListItem<AboutResponse<string[]>>('Is_Active = true'),
       pb.collection('Homepage').getFirstListItem<HomepageResponse>('Is_Active = true'),
       pb.collection('Settings').getFirstListItem<SettingsResponse>(''),
-      $fetch<{ mobile: number, tablet: number, desktop: number, largeDesktop: number }>('/api/font-sizes'),
+      $fetch<{ mobile: number
+        tablet: number
+        desktop: number
+        largeDesktop: number }>('/api/font-sizes'),
     ])
-    return { about, homepage, settings, fontSizes }
+    return { about,
+      homepage,
+      settings,
+      fontSizes }
   },
   { immediate: false },
 )
@@ -137,7 +143,8 @@ async function handleSubmit(e: Event) {
   }
   catch (err: unknown) {
     console.error('Error saving settings:', err)
-    const error = err as { data?: { message?: string }, message?: string }
+    const error = err as { data?: { message?: string }
+      message?: string }
     emit('showToast', `Failed to save settings: ${error?.data?.message || error?.message || 'Unknown error'}`, 'error')
   }
   finally {
@@ -167,7 +174,7 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
       @click="emit('close')"
     />
 
-    <div class="fixed top-1/2 left-[25%] -translate-x-1/2 -translate-y-1/2 z-[45]">
+    <div class="fixed top-1/2 left-[25%] -translate-x-1/2 -translate-y-1/2 z-45">
       <LazyAboutPopup
         :is-visible="true"
         :about-data="previewAboutData"

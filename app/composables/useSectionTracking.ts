@@ -50,8 +50,11 @@ export function useSectionTracking(
         }
       })
     },
-    { threshold: 0.5, root: computed(() => document.querySelector('main')) },
+    { threshold: 0.5,
+      root: computed(() => document.querySelector('main')) },
   )
 
-  return { currentSectionIndex, setupSectionTracking: () => {}, stop }
+  return { currentSectionIndex,
+    setupSectionTracking: () => {},
+    stop }
 }

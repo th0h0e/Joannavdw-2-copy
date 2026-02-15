@@ -6,7 +6,8 @@ import PocketBase from 'pocketbase'
 export function getAuthenticatedPb(event: H3Event): PocketBase {
   const token = getHeader(event, 'authorization') || ''
   if (!token) {
-    throw createError({ statusCode: 401, message: 'Authorization token is required' })
+    throw createError({ statusCode: 401,
+      message: 'Authorization token is required' })
   }
 
   const pb = new PocketBase('https://admin.kontext.site')

@@ -53,7 +53,9 @@ export function useAppToast() {
   const showToast = (message: string, type: 'success' | 'error') => {
     // Create toast object
     const id = Date.now().toString()
-    toasts.value.push({ id, message, type })
+    toasts.value.push({ id,
+      message,
+      type })
 
     // Show NuxtUI toast
     toast.add({

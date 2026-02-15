@@ -6,12 +6,10 @@ const props = defineProps<{
 }>()
 
 const isAuthError = computed(() =>
-  props.error.statusCode === 401 || props.error.statusCode === 403,
-)
+  props.error.statusCode === 401 || props.error.statusCode === 403)
 
 const isNotFoundError = computed(() =>
-  props.error.statusCode === 404,
-)
+  props.error.statusCode === 404)
 
 function handleError() {
   if (isAuthError.value) {

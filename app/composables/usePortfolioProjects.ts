@@ -21,5 +21,6 @@ export function usePortfolioProjects() {
 
   const projectTitles = computed(() => projects.value.map(p => p.title))
 
-  return { projects, projectTitles }
+  return { projects,
+    projectTitles }
 }
