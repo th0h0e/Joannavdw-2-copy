@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
 @import './fonts.css';
+@import './custom.css';
 
 /* ============================================
    Local Font Declaration
@@ -96,7 +97,7 @@
 }
 
 /* ============================================
-   Base Styles
+   Base Styles (Required for scroll-snap)
    ============================================ */
 
 /* Prevent browser back/forward navigation gestures */
@@ -175,104 +176,4 @@ body {
   background-color: #0a0a0a; /* neutral-950 */
 
   /* DO NOT add transform here - it breaks position: fixed for portals/overlays */
-}
-
-/* ============================================
-   Popup Card Styles (SVG Card Content)
-   ============================================ */
-
-.text-popup-title {
-  font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.03em;
-  line-height: 1.25;
-  text-align: center;
-  text-transform: uppercase;
-  color: black;
-  margin-bottom: 18px;
-}
-
-.text-popup-body {
-  font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.03em;
-  line-height: 1.25;
-  text-align: center;
-  color: black;
-  margin-bottom: 18px;
-}
-
-.text-popup-link {
-  font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.03em;
-  line-height: 1.25;
-  text-align: center;
-  color: black;
-  text-decoration: underline;
-  background: none;
-  border: 0;
-  cursor: pointer;
-  transition: opacity 0.3s;
-}
-
-.text-popup-link:hover {
-  opacity: 0.7;
-}
-
-/* ============================================
-   Shared Component Styles
-   ============================================ */
-
-@property --scale {
-  syntax: '<number>';
-  inherits: false;
-  initial-value: 1;
-}
-
-.popup-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 280px;
-  z-index: 9999;
-  transform: translate(-50%, -50%) scale(var(--scale, 1));
-}
-
-.popup-card-image {
-  width: 280px;
-  height: auto;
-  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.15));
-}
-
-.popup-backdrop {
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-/* Logo Shared Styles */
-.logo-container {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  mix-blend-mode: exclusion;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition:
-    top 1.2s ease-out,
-    opacity 0.3s ease-out,
-    width 0.3s ease-out,
-    height 0.3s ease-out;
-}
-
-.logo-image {
-  filter: brightness(0) invert(1);
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  display: block;
 }

@@ -1,0 +1,284 @@
+/* ============================================
+   Frontend Custom Styles
+   Consolidated styles for index.vue and components
+   ============================================ */
+
+/* ============================================
+   Title Font (base styles - sizes in fonts.css)
+   ============================================ */
+
+.title-font {
+  font-family: 'EnduroWeb', sans-serif;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1;
+  display: block;
+}
+
+/* ============================================
+   Logo Button Styles
+   Shared between LogoTop and LogoBottom
+   ============================================ */
+
+.logo-button {
+  position: fixed;
+  left: 50%;
+  z-index: 50;
+  margin: 0;
+  transform: translateX(-50%);
+  cursor: pointer;
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  mix-blend-mode: exclusion;
+  transition:
+    opacity 0.3s ease-out,
+    width 0.3s ease-out,
+    height 0.3s ease-out;
+}
+
+.logo-button__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.logo-button__image {
+  filter: brightness(0) invert(1);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* ============================================
+   Popup Card Styles
+   ============================================ */
+
+@property --scale {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 1;
+}
+
+.popup-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 280px;
+  z-index: 9999;
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+}
+
+.popup-card-image {
+  width: 280px;
+  height: auto;
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.15));
+}
+
+.popup-backdrop {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Popup Text Styles */
+.text-popup-title {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+  text-align: center;
+  text-transform: uppercase;
+  color: black;
+  margin-bottom: 18px;
+}
+
+.text-popup-body {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+  text-align: center;
+  color: black;
+  margin-bottom: 18px;
+}
+
+.text-popup-link {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+  text-align: center;
+  color: black;
+  text-decoration: underline;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.text-popup-link:hover {
+  opacity: 0.7;
+}
+
+/* ============================================
+   Motion Carousel Styles
+   ============================================ */
+
+.motion-carousel {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-align: none;
+}
+
+.motion-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.motion-carousel__slide {
+  position: relative;
+  height: 100%;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  background-color: black;
+  background-size: cover;
+  background-position: center;
+}
+
+/* ============================================
+   Hamburger Menu Styles
+   ============================================ */
+
+.hamburger-icon {
+  display: block;
+  transition:
+    transform 0.3s,
+    background-color 0.3s,
+    width 0.3s,
+    height 0.3s;
+}
+
+.hamburger-icon--closed {
+  mix-blend-mode: exclusion;
+  background-color: #ffffff;
+  width: 17.32px;
+  height: 17.32px;
+  transform: rotate(0deg);
+}
+
+.hamburger-icon--open {
+  mix-blend-mode: normal;
+  background-color: #000000;
+  width: 18px;
+  height: 18px;
+  transform: rotate(45deg);
+}
+
+@media (min-width: 768px) {
+  .hamburger-icon--closed {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Menu Transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.scale-fade-enter-active,
+.scale-fade-leave-active {
+  transition:
+    opacity 0.3s ease-out,
+    transform 0.3s ease-out;
+}
+
+.scale-fade-enter-from,
+.scale-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+/* ============================================
+   Hero Section Animation
+   ============================================ */
+
+.hero-image-enter {
+  transition-duration: 1200ms;
+  transition-timing-function: ease-out;
+}
+
+.hero-image-scale-initial {
+  transform: scale(0.3);
+}
+
+.hero-image-scale-final {
+  transform: scale(1);
+}
+
+/* ============================================
+   Project Navigation Styles
+   ============================================ */
+
+.project-navigation-container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-navigation-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+.project-navigation-item {
+  margin: 0;
+}
+
+.project-navigation-link {
+  display: block;
+  color: black;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.project-navigation-link:hover {
+  opacity: 0.7;
+}
+
+/* ============================================
+   Scroll Snap Section
+   ============================================ */
+
+.scroll-snap-section {
+  position: relative;
+  width: 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+/* ============================================
+   Custom Transition Durations
+   ============================================ */
+
+.duration-1200 {
+  transition-duration: 1200ms;
+}
+
+.scale-30 {
+  transform: scale(0.3);
+}
