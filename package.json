@@ -8,11 +8,11 @@
     "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
+    "prepare": "nuxt prepare",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "convert-images": "node scripts/convert-images.cjs",
-    "setup": "bun install && nuxt prepare"
+    "setup": "bun install"
   },
   "dependencies": {
     "@sentry/nuxt": "^10.38.0",

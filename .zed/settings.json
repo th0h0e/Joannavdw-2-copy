@@ -3,25 +3,4 @@
   "formatter": [
     { "code_action": "source.fixAll.eslint" }
   ],
-  "lsp": {
-    "tailwindcss-language-server": {
-      "settings": {
-        "tailwindCSS": {
-          "lint": {
-            "cssConflict": "warning",
-            "invalidApply": "error",
-            "invalidConfigPath": "error",
-            "invalidScreen": "error",
-            "invalidTailwindDirective": "error",
-            "invalidVariant": "error",
-            "recommendedVariantOrder": "ignore",
-            "suggestCanonicalClasses": "ignore"
-          }
-        }
-      }
-    },
-    "vscode-css-language-server": {
-      "enable": false
-    }
-  }
 }

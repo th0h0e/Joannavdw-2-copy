@@ -296,7 +296,7 @@ function handleNextSlide() {
         base: 'bg-gray-500/50 backdrop-blur-sm',
         indicator: 'bg-gray-50',
       }"
-      class="w-full max-w-md"
+      class="w-[80vw]"
     />
   </div>
 
@@ -314,7 +314,7 @@ function handleNextSlide() {
         base: 'bg-gray-500/50 backdrop-blur-sm',
         indicator: 'bg-gray-50',
       }"
-      class="w-full max-w-md"
+      class="w-[80vw]"
     />
   </div>
 
