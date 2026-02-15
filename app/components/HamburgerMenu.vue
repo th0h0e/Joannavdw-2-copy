@@ -40,7 +40,8 @@ function handleLinkClick(index: number) {
 <template>
   <button
     v-if="!isPopupVisible"
-    class="fixed top-[80px] right-5 z-10001 cursor-pointer border-0 bg-none p-0 md:top-[89px] md:right-[40px]"
+    class="hamburger-button"
+    :class="{ 'hamburger-button--open': isOpen }"
     aria-label="Toggle menu"
     @click="toggleMenu"
   >
@@ -54,7 +55,7 @@ function handleLinkClick(index: number) {
     <Transition name="fade">
       <div
         v-if="isOpen"
-        class="fixed inset-0 z-9998 h-[100lvh] cursor-pointer bg-white"
+        class="menu-backdrop"
         role="button"
         tabindex="0"
         aria-label="Close menu"
@@ -68,7 +69,7 @@ function handleLinkClick(index: number) {
     <Transition name="scale-fade">
       <div
         v-if="isOpen"
-        class="pointer-events-none fixed inset-0 z-9999 flex h-[100lvh] items-center justify-center"
+        class="menu-content"
       >
         <div class="pointer-events-auto flex w-full items-center justify-center">
           <ProjectNavigation
@@ -82,6 +83,48 @@ function handleLinkClick(index: number) {
 </template>
 
 <style scoped>
+.hamburger-button {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 10001;
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+}
+
+.hamburger-button--open {
+  z-index: 10002;
+}
+
+@media (min-width: 768px) {
+  .hamburger-button {
+    top: 89px;
+    right: 40px;
+  }
+}
+
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  height: 100lvh;
+  cursor: pointer;
+  background: white;
+}
+
+.menu-content {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  height: 100lvh;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
 .hamburger-icon {
   display: block;
   transition:
