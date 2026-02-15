@@ -1,13 +1,12 @@
 /* ============================================
    Frontend Custom Styles
-
+   
    Table of Contents:
    1. CSS Custom Properties
    2. Title Font
    3. Popup System
    4. Motion Carousel
-   5. Hamburger Menu
-   6. Vue Transitions
+   5. Vue Transitions
    ============================================ */
 
 /* ============================================
@@ -18,10 +17,10 @@
   /* Typography */
   --font-display: 'EnduroWeb', sans-serif;
   --letter-spacing-tight: 0.03em;
-
+  
   /* Popup dimensions */
   --popup-width: 280px;
-
+  
   /* Transitions */
   --transition-fast: 0.2s ease;
   --transition-medium: 0.3s ease-out;
@@ -45,21 +44,15 @@
 }
 
 @media (min-width: 768px) {
-  .title-font {
-    font-size: 2.5rem;
-  }
+  .title-font { font-size: 2.5rem; }
 }
 
 @media (min-width: 1024px) {
-  .title-font {
-    font-size: 2.25rem;
-  }
+  .title-font { font-size: 2.25rem; }
 }
 
 @media (min-width: 1280px) {
-  .title-font {
-    font-size: 3rem;
-  }
+  .title-font { font-size: 3rem; }
 }
 
 /* ============================================
@@ -156,45 +149,7 @@
 }
 
 /* ============================================
-   5. Hamburger Menu
-
-   Animated diamond/cross toggle icon
-   ============================================ */
-
-.hamburger-icon {
-  display: block;
-  transition:
-    transform var(--transition-medium),
-    background-color var(--transition-medium),
-    width var(--transition-medium),
-    height var(--transition-medium);
-}
-
-.hamburger-icon--closed {
-  mix-blend-mode: exclusion;
-  background-color: #ffffff;
-  width: 17.32px;
-  height: 17.32px;
-  transform: rotate(0deg);
-}
-
-.hamburger-icon--open {
-  mix-blend-mode: normal;
-  background-color: #000000;
-  width: 18px;
-  height: 18px;
-  transform: rotate(45deg);
-}
-
-@media (min-width: 768px) {
-  .hamburger-icon--closed {
-    width: 18px;
-    height: 18px;
-  }
-}
-
-/* ============================================
-   6. Vue Transitions
+   5. Vue Transitions
 
    Named transitions for <Transition name="...">
    ============================================ */
@@ -223,7 +178,7 @@
 }
 
 /* ============================================
-   7. Utility Classes
+   6. Utility Classes
    ============================================ */
 
 .duration-1200 {
