@@ -1,4 +1,7 @@
 export default defineNuxtConfig({
+  // Client-side only rendering
+  ssr: false,
+
   // Nuxt 4 compatibility date — controls behavioral defaults
   compatibilityDate: '2025-01-01',
 
@@ -56,16 +59,6 @@ export default defineNuxtConfig({
       pbUrl: 'https://admin.kontext.site',
       sentry: {
         dsn: 'https://4981600ff5cc02441de606ca9943a126@o4510808141398016.ingest.de.sentry.io/4510808149983312',
-      },
-    },
-  },
-
-  // Nitro configuration for ISR caching
-  nitro: {
-    storage: {
-      cache: {
-        driver: 'fs',
-        base: './.cache/nitro/cache',
       },
     },
   },

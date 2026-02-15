@@ -25,13 +25,6 @@ export function usePortfolioProjects() {
     `${config.public.pbUrl}/api/collections/Portfolio_Projects/records`,
     {
       key: 'portfolio',
-      transform: (data) => {
-        return data.items.sort((a, b) => (a.Order ?? 0) - (b.Order ?? 0))
-      },
-      getCachedData(key) {
-        const nuxtApp = useNuxtApp()
-        return nuxtApp.payload.data[key] || nuxtApp.static.data[key]
-      },
     },
   )
 
@@ -39,7 +32,9 @@ export function usePortfolioProjects() {
     if (!response.value)
       return []
 
-    return response.value.map(project => ({
+    const sorted = [...response.value.items].sort((a, b) => (a.Order ?? 0) - (b.Order ?? 0))
+
+    return sorted.map(project => ({
       title: project.Title ?? '',
       description: project.Description ?? '',
       responsibility: project.Responsibility_json ?? [],

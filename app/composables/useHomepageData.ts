@@ -22,10 +22,6 @@ export function useHomepageData() {
     `${config.public.pbUrl}/api/collections/Homepage/records`,
     {
       key: 'homepage',
-      getCachedData(key) {
-        const nuxtApp = useNuxtApp()
-        return nuxtApp.payload.data[key] || nuxtApp.static.data[key]
-      },
     },
   )
 

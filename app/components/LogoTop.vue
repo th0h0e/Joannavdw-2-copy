@@ -15,7 +15,7 @@ const { isMobile, isTablet } = useDevice()
 
 const containerWidth = computed(() => isMobile ? '160px' : '200px')
 const containerHeight = computed(() => isMobile ? '60px' : '80px')
-const isHidden = computed(() => props.showAboutPopup || (props.showPopup && isMobile))
+const isHidden = computed(() => props.showAboutPopup || props.showPopup)
 
 const yOffset = computed(() => {
   if (!props.isHero)

@@ -26,10 +26,6 @@ export function useAboutData() {
     `${config.public.pbUrl}/api/collections/About/records`,
     {
       key: 'about',
-      getCachedData(key) {
-        const nuxtApp = useNuxtApp()
-        return nuxtApp.payload.data[key] || nuxtApp.static.data[key]
-      },
     },
   )
 
