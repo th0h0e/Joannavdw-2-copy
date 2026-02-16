@@ -70,7 +70,7 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
     },
     cell: ({ row }) => {
       if (row.original.Images && row.original.Images.length > 0) {
-        return h('div', { class: 'bg-elevated relative size-12 overflow-hidden' }, [
+        return h('div', { class: 'bg-elevated relative size-12 overflow-hidden rounded-[var(--ui-radius)]' }, [
           h('img', {
             src: getImageUrl(row.original, row.original.Images[0]),
             alt: row.original.Title,
@@ -78,7 +78,7 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
           }),
         ])
       }
-      return h('div', { class: 'bg-elevated flex size-12 items-center justify-center' }, [
+      return h('div', { class: 'bg-elevated flex size-12 items-center justify-center rounded-[var(--ui-radius)]' }, [
         h('span', { class: 'text-dimmed text-xs' }, '–'),
       ])
     },
@@ -168,6 +168,7 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
     :data="localProjects"
     :columns="columns"
     :ui="{
+      root: 'border-default border rounded-lg',
       tbody: 'project-table-tbody',
     }"
     class="flex-1"
