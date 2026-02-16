@@ -195,34 +195,19 @@ const previewAboutData = computed(() => {
         ? 'h-[90vh] max-h-[90vh] rounded-t-2xl'
         : 'h-full w-full md:w-1/2 max-w-none',
       body: 'p-0 overflow-y-auto',
-      header: 'p-6 border-b border-default flex-shrink-0',
+      header: 'p-4 border-b border-default flex-shrink-0',
     }"
   >
     <template #header>
-      <div class="flex items-center gap-4">
-        <UButton
-          variant="ghost"
-          color="neutral"
-          class="h-10 w-10 flex-shrink-0 overflow-hidden"
+      <div class="flex items-center gap-3">
+        <UAvatar
+          :src="faviconUrl"
+          icon="i-ph-image"
+          size="sm"
+          class="cursor-pointer"
           title="Click to update favicon"
           @click="faviconFileInput?.click()"
-        >
-          <img
-            v-if="faviconUrl"
-            :src="faviconUrl"
-            alt="Favicon"
-            class="h-full w-full object-cover"
-          >
-          <div
-            v-else
-            class="flex h-full w-full items-center justify-center"
-          >
-            <UIcon
-              name="i-ph-image"
-              class="size-5"
-            />
-          </div>
-        </UButton>
+        />
 
         <input
           id="faviconFileInput"

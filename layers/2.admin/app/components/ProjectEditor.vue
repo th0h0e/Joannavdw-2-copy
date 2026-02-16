@@ -175,7 +175,7 @@ function handleAddTag(value: string) {
         ? 'h-[90vh] max-h-[90vh] rounded-t-2xl'
         : 'h-full w-full md:w-2/3 lg:w-1/2 max-w-none',
       body: 'p-0 overflow-y-auto',
-      header: 'p-6 border-b border-default flex-shrink-0',
+      header: 'p-4 border-b border-default flex-shrink-0',
     }"
   >
     <template #body>
