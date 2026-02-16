@@ -1,0 +1,4 @@
+const ProjectCardSVG = "data:image/svg+xml,%3csvg%20viewBox='0%200%20320%20600'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20d='m300%20600h-280c0-11-9-20-20-20v-560c11%200%2020-9%2020-20h280c0%2011%209%2020%2020%2020v560c-11%200-20%209-20%2020z'%20fill='%23fff'/%3e%3c/svg%3e";
+
+export { ProjectCardSVG as P };
+//# sourceMappingURL=JVDW WEB LIGHT BOX copy-sd8M1dxc.mjs.map
