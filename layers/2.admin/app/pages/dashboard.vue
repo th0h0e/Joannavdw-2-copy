@@ -111,6 +111,27 @@ async function handleSave() {
   showToast(isCreating ? 'Project created successfully' : 'Project updated successfully', 'success')
 }
 
+async function handleReorder(reorderedProjects: PortfolioProjectsResponse<string[]>[]) {
+  isReordering.value = true
+  projects.value = reorderedProjects
+
+  try {
+    for (const [index, project] of reorderedProjects.entries()) {
+      await pb.collection('Portfolio_Projects')
+        .update(project.id, { Order: index + 1 })
+    }
+    showToast('Project order updated', 'success')
+  }
+  catch (err: unknown) {
+    await refreshProjects()
+    const typedErr = err as { data?: { message?: string }, message?: string }
+    showToast(`Failed to reorder projects: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
+  }
+  finally {
+    isReordering.value = false
+  }
+}
+
 async function handlePublishChanges() {
   try {
     await $fetch('/api/revalidate', {
@@ -324,6 +345,26 @@ async function handlePublishChanges() {
           New Project
         </UButton>
       </div>
+
+      <div class="border-default my-12 border-t" />
+
+      <div class="mb-4">
+        <h2 class="text-highlighted text-lg font-medium">
+          Table Version (Preview)
+        </h2>
+        <p class="text-muted text-xs tracking-wide uppercase">
+          Testing new table layout
+        </p>
+      </div>
+
+      <ProjectTable
+        :projects="projects"
+        :is-reordering="isReordering"
+        @edit="editingProject = $event"
+        @delete="handleDelete"
+        @reorder="handleReorder"
+        @refresh="refreshProjects"
+      />
     </main>
 
     <LazyProjectEditor
