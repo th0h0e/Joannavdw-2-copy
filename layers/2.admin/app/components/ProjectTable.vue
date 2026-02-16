@@ -165,7 +165,7 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
       :columns="columns"
       sticky
       :ui="{
-        root: 'border-0',
+        root: 'border-0 max-h-96',
         tbody: 'project-table-tbody',
         tr: 'hover:bg-elevated/50 transition-colors',
       }"
