@@ -183,26 +183,21 @@ function handleAddTag(value: string) {
         <!-- Image Carousel -->
         <div
           v-if="carouselItems.length > 0"
-          class="border-default border-b p-6"
+          class="border-default border-b"
         >
-          <p class="text-toned mb-3 text-xs font-medium tracking-wider uppercase">
-            Project Images ({{ carouselItems.length }})
-          </p>
           <UCarousel
             :items="carouselItems"
-            arrows
-            dots
-            class="w-full rounded-lg"
+            class="w-full"
             :ui="{
-              item: 'basis-full',
-              container: 'rounded-lg overflow-hidden',
+              item: 'basis-full snap-center',
+              viewport: 'aspect-square',
             }"
           >
             <template #default="{ item }">
               <img
                 :src="item.src"
                 :alt="item.filename"
-                class="h-48 w-full object-cover md:h-64"
+                class="size-full object-cover"
               >
             </template>
           </UCarousel>
