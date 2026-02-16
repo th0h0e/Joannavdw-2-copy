@@ -29,13 +29,27 @@ export function useMobileSwipeHint(projectCount: Ref<number>) {
             if (!carousel)
               return
 
-            const nudgeAmount = 80
+            const nudgeAmount = 60
+            const duration = 800
+            const startTime = performance.now()
+            const startScroll = carousel.scrollLeft
 
-            carousel.scrollBy({ left: nudgeAmount, behavior: 'smooth' })
+            function animate(currentTime: number) {
+              const elapsed = currentTime - startTime
+              const progress = Math.min(elapsed / duration, 1)
 
-            setTimeout(() => {
-              carousel.scrollBy({ left: -nudgeAmount, behavior: 'smooth' })
-            }, 250)
+              // Smooth sine wave: 0 -> peak -> 0
+              const wave = Math.sin(progress * Math.PI)
+              const offset = wave * nudgeAmount
+
+              carousel.scrollLeft = startScroll + offset
+
+              if (progress < 1) {
+                requestAnimationFrame(animate)
+              }
+            }
+
+            requestAnimationFrame(animate)
           }, 1000)
         }
       })
