@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { HomepageResponse } from '#layers/2.admin/app/shared/types/pocketbase-types'
 import { getImageUrl, pb } from '#layers/2.admin/app/utils/pocketbase'
-import { useSwipe } from '@vueuse/core'
+import { usePointerSwipe } from '@vueuse/core'
 
 const emit = defineEmits<{
   showToast: [message: string, type: 'success' | 'error']
@@ -26,14 +26,14 @@ const heroImageMobile = computed(() =>
   homepageRaw.value?.Hero_Image_Mobile ? getImageUrl(homepageRaw.value, homepageRaw.value.Hero_Image_Mobile) : '')
 const homepageId = computed(() => homepageRaw.value?.id || '')
 
-useSwipe(heroContainerRef, {
-  onSwipeLeft: () => {
-    if (!isEditingTitle.value && heroImageMobile.value) {
+usePointerSwipe(heroContainerRef, {
+  onSwipeEnd: (_e, direction) => {
+    if (isEditingTitle.value)
+      return
+    if (direction === 'left' && heroImageMobile.value) {
       showMobilePreview.value = true
     }
-  },
-  onSwipeRight: () => {
-    if (!isEditingTitle.value) {
+    else if (direction === 'right') {
       showMobilePreview.value = false
     }
   },
