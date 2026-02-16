@@ -12,6 +12,7 @@ const emit = defineEmits<{
   edit: [project: PortfolioProjectsResponse<string[]>]
   delete: [projectId: string]
   reorder: [projects: PortfolioProjectsResponse<string[]>[]]
+  openSettings: []
 }>()
 
 const UButton = resolveComponent('UButton')
@@ -155,5 +156,28 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
       tr: 'hover:bg-elevated/50 transition-colors',
     }"
     class="flex-1"
-  />
+  >
+    <template #footer>
+      <div class="flex items-center justify-end gap-3 px-4 py-3">
+        <UButton
+          to="/"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          class="text-xs tracking-wide uppercase"
+        >
+          View Portfolio
+        </UButton>
+        <UButton
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          icon="i-ph-gear"
+          aria-label="Settings"
+          @click="emit('openSettings')"
+        />
+        <UColorModeButton />
+      </div>
+    </template>
+  </UTable>
 </template>

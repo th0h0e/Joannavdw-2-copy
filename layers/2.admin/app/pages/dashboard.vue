@@ -162,7 +162,6 @@ async function handlePublishChanges() {
           </p>
         </div>
         <div class="flex items-center gap-3">
-          <UColorModeButton />
           <UButton
             variant="outline"
             color="neutral"
@@ -173,23 +172,6 @@ async function handlePublishChanges() {
           >
             Publish Changes
           </UButton>
-          <UButton
-            to="/"
-            variant="ghost"
-            color="neutral"
-            size="sm"
-            class="text-xs tracking-wide uppercase"
-          >
-            View Portfolio
-          </UButton>
-          <UButton
-            variant="ghost"
-            color="neutral"
-            size="sm"
-            icon="i-ph-gear"
-            aria-label="Settings"
-            @click="showSettings = true"
-          />
           <UButton
             variant="outline"
             color="neutral"
@@ -349,6 +331,7 @@ async function handlePublishChanges() {
         @edit="editingProject = $event"
         @delete="handleDelete"
         @reorder="handleReorder"
+        @open-settings="showSettings = true"
       />
     </main>
 
