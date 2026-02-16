@@ -153,7 +153,6 @@ function handleAddTag(value: string) {
     :open="isOpen"
     direction="right"
     :handle="false"
-    :dismissible="false"
     :ui="{
       content: 'h-full w-3/4 md:w-2/3 lg:w-1/2 max-w-none',
       body: 'p-0',
@@ -268,7 +267,7 @@ function handleAddTag(value: string) {
 
   <div
     v-if="isOpen && project && !isMobile"
-    class="pointer-events-none fixed top-1/2 left-[25%] z-45 -translate-x-1/2 -translate-y-1/2"
+    class="pointer-events-none fixed top-1/2 left-[25%] z-[60] -translate-x-1/2 -translate-y-1/2"
   >
     <LazyProjectPopupPreview
       :project-title="formState.title"

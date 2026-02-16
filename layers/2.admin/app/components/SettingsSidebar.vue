@@ -404,7 +404,7 @@ const previewAboutData = computed(() => {
 
   <div
     v-if="isOpen"
-    class="pointer-events-none fixed top-1/2 left-[25%] z-45 -translate-x-1/2 -translate-y-1/2"
+    class="pointer-events-none fixed top-1/2 left-[25%] z-[60] -translate-x-1/2 -translate-y-1/2"
   >
     <LazyAboutPopup
       :is-visible="isOpen"
