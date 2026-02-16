@@ -2,6 +2,13 @@
 import { pb } from '#layers/2.admin/app/utils/pocketbase'
 import loginBackground from '~/assets/admin-login-bg.jpg'
 
+definePageMeta({
+  pageTransition: {
+    name: 'swipe',
+    mode: 'out-in',
+  },
+})
+
 const formState = reactive({
   email: '',
   password: '',

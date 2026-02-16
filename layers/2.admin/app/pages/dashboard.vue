@@ -4,6 +4,10 @@ import { pb } from '#layers/2.admin/app/utils/pocketbase'
 
 definePageMeta({
   layout: 'admin',
+  pageTransition: {
+    name: 'swipe',
+    mode: 'out-in',
+  },
 })
 
 const { showToast } = useAppToast()

@@ -36,4 +36,20 @@ useHead({
 .page-leave-to {
   opacity: 0;
 }
+
+/* Swipe transition for admin pages */
+.swipe-enter-active,
+.swipe-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.swipe-enter-from {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.swipe-leave-to {
+  opacity: 0;
+  transform: translateX(-30%);
+}
 </style>
