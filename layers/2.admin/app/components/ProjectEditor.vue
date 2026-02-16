@@ -265,14 +265,16 @@ function handleAddTag(value: string) {
     </template>
   </UDrawer>
 
-  <div
-    v-if="isOpen && project && !isMobile"
-    class="pointer-events-none fixed top-1/2 left-[25%] z-[60] -translate-x-1/2 -translate-y-1/2"
-  >
-    <LazyProjectPopupPreview
-      :project-title="formState.title"
-      :project-description="formState.description"
-      :project-responsibility="formState.responsibilities"
-    />
-  </div>
+  <Teleport to="body">
+    <div
+      v-if="isOpen && project && !isMobile"
+      class="pointer-events-none fixed top-1/2 left-[25%] z-[60] -translate-x-1/2 -translate-y-1/2"
+    >
+      <LazyProjectPopupPreview
+        :project-title="formState.title"
+        :project-description="formState.description"
+        :project-responsibility="formState.responsibilities"
+      />
+    </div>
+  </Teleport>
 </template>
