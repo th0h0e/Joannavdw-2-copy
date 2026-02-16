@@ -29,20 +29,13 @@ export function useMobileSwipeHint(projectCount: Ref<number>) {
             if (!carousel)
               return
 
-            const slides = carousel.querySelectorAll('.motion-carousel__slide')
-            if (slides.length < 2)
-              return
+            const nudgeAmount = 80
 
-            const firstSlide = slides[0] as HTMLElement
-            const secondSlide = slides[1] as HTMLElement
-
-            secondSlide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+            carousel.scrollBy({ left: nudgeAmount, behavior: 'smooth' })
 
             setTimeout(() => {
-              setTimeout(() => {
-                firstSlide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
-              }, 300)
-            }, 200)
+              carousel.scrollBy({ left: -nudgeAmount, behavior: 'smooth' })
+            }, 250)
           }, 1000)
         }
       })
