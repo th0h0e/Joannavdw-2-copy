@@ -36,5 +36,9 @@ export function useAboutData() {
     return response.value?.items.find(item => item.Is_Active) ?? null
   })
 
+  onMounted(() => {
+    refresh()
+  })
+
   return { aboutData, loading, hasError, error, refresh }
 }

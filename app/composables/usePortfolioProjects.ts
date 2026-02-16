@@ -49,5 +49,9 @@ export function usePortfolioProjects() {
 
   const projectTitles = computed(() => projects.value.map(p => p.title))
 
+  onMounted(() => {
+    refresh()
+  })
+
   return { projects, projectTitles, loading, hasError, error, refresh }
 }

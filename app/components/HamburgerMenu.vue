@@ -22,6 +22,8 @@ function closeMenu() {
 
 function handleLinkClick(index: number) {
   closeMenu()
+  if (import.meta.server)
+    return
 
   const id1 = window.setTimeout(() => {
     window.location.hash = `#project-${index}`

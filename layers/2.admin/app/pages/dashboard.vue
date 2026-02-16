@@ -92,14 +92,6 @@ async function handlePublishChanges() {
       await pb.collection('Portfolio_Projects')
         .update(project.id, { Order: index + 1 })
     }
-
-    await $fetch('/api/revalidate', {
-      method: 'POST',
-      body: {
-        collections: ['About', 'Homepage', 'Portfolio_Projects'],
-      },
-      headers: { Authorization: `Bearer ${pb.authStore.token}` },
-    })
     showToast('Changes published successfully!', 'success')
   }
   catch (err: unknown) {

@@ -29,6 +29,9 @@ export function useCarouselReset(projectCount: Ref<number>) {
    * - Skips the current section (no need to reset the one user is viewing)
    */
   function resetInactiveCarousels(currentSectionId: string) {
+    if (import.meta.server)
+      return
+
     // Delay reset to allow scroll animation to complete
     setTimeout(() => {
       // Iterate through all project sections

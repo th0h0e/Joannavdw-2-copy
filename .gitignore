@@ -18,6 +18,7 @@ dist-ssr
 *.local
 .env
 .env.*
+!.env.example
 
 # Nuxt
 .nuxt/
@@ -29,6 +30,7 @@ dist-ssr
 .vscode/*
 !.vscode/extensions.json
 .idea
+.zed/
 .DS_Store
 **/.DS_Store
 *.suo
@@ -37,7 +39,11 @@ dist-ssr
 *.sln
 *.sw?
 
-# Project documentation
+# AI tool configs
+.claude/
+.kilocode/
+.agents/
+opencode.json
 CLAUDE.md
 
 # Claude Code configuration

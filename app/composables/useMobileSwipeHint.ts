@@ -5,6 +5,8 @@ export function useMobileSwipeHint(projectCount: Ref<number>) {
   const hasShownMobileHint = ref(false)
 
   const target = computed(() => {
+    if (import.meta.server)
+      return null
     if (projectCount.value === 0)
       return null
     return document.getElementById('project-0')
@@ -19,6 +21,9 @@ export function useMobileSwipeHint(projectCount: Ref<number>) {
           stop()
 
           setTimeout(() => {
+            if (import.meta.server)
+              return
+
             const firstProjectSection = document.getElementById('project-0')
             const carousel = firstProjectSection?.querySelector('.motion-carousel') as HTMLDivElement
             if (!carousel)

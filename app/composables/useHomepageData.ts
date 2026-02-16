@@ -40,5 +40,9 @@ export function useHomepageData() {
 
   const heroTitle = computed(() => homepage.value?.Hero_Title || 'Creative Strategy and Communication')
 
+  onMounted(() => {
+    refresh()
+  })
+
   return { heroImage, heroTitle, loading, hasError, error, refresh }
 }

@@ -2,6 +2,8 @@
 const { projectTitles } = usePortfolioProjects()
 
 function handleLinkClick(index: number) {
+  if (import.meta.server)
+    return
   window.location.hash = `#project-${index}`
 }
 </script>

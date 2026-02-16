@@ -165,6 +165,8 @@ if (!isMobile) {
 }
 
 function scrollToNextSection() {
+  if (import.meta.server)
+    return
   const main = document.querySelector('main')
   if (main) {
     main.scrollBy({ top: window.innerHeight, behavior: 'smooth' })

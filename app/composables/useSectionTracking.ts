@@ -7,6 +7,9 @@ export function useSectionTracking(
   const currentSectionIndex = ref(0)
 
   const targets = computed(() => {
+    if (import.meta.server)
+      return []
+
     const elements: HTMLElement[] = []
     const heroSection = document.getElementById('hero-section')
     if (heroSection)
@@ -50,7 +53,11 @@ export function useSectionTracking(
         }
       })
     },
-    { threshold: 0.5, root: computed(() => document.querySelector('main')) },
+    { threshold: 0.5, root: computed(() => {
+      if (import.meta.server)
+        return null
+      return document.querySelector('main')
+    }) },
   )
 
   return { currentSectionIndex, setupSectionTracking: () => {}, stop }
