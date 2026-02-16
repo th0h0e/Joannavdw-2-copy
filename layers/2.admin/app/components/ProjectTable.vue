@@ -70,7 +70,7 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
     },
     cell: ({ row }) => {
       if (row.original.Images && row.original.Images.length > 0) {
-        return h('div', { class: 'bg-elevated relative size-12 overflow-hidden rounded' }, [
+        return h('div', { class: 'bg-elevated relative size-12 overflow-hidden' }, [
           h('img', {
             src: getImageUrl(row.original, row.original.Images[0]),
             alt: row.original.Title,
@@ -78,7 +78,7 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
           }),
         ])
       }
-      return h('div', { class: 'bg-elevated flex size-12 items-center justify-center rounded' }, [
+      return h('div', { class: 'bg-elevated flex size-12 items-center justify-center' }, [
         h('span', { class: 'text-dimmed text-xs' }, '–'),
       ])
     },
@@ -87,16 +87,6 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
     accessorKey: 'Title',
     header: 'Title',
     cell: ({ row }) => h('span', { class: 'text-highlighted font-medium' }, row.original.Title),
-  },
-  {
-    accessorKey: 'Description',
-    header: 'Description',
-    meta: {
-      class: {
-        td: 'max-w-sm',
-      },
-    },
-    cell: ({ row }) => h('p', { class: 'text-muted line-clamp-3 text-sm leading-relaxed' }, row.original.Description),
   },
   {
     id: 'images',
