@@ -25,6 +25,7 @@ export function usePortfolioProjects() {
     `${config.public.pbUrl}/api/collections/Portfolio_Projects/records`,
     {
       key: 'portfolio',
+      getCachedData: () => undefined,
     },
   )
 
@@ -48,10 +49,6 @@ export function usePortfolioProjects() {
   })
 
   const projectTitles = computed(() => projects.value.map(p => p.title))
-
-  onMounted(() => {
-    refresh()
-  })
 
   return { projects, projectTitles, loading, hasError, error, refresh }
 }

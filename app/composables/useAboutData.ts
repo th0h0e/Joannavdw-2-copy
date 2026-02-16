@@ -26,6 +26,7 @@ export function useAboutData() {
     `${config.public.pbUrl}/api/collections/About/records`,
     {
       key: 'about',
+      getCachedData: () => undefined,
     },
   )
 
@@ -34,10 +35,6 @@ export function useAboutData() {
 
   const aboutData = computed(() => {
     return response.value?.items.find(item => item.Is_Active) ?? null
-  })
-
-  onMounted(() => {
-    refresh()
   })
 
   return { aboutData, loading, hasError, error, refresh }

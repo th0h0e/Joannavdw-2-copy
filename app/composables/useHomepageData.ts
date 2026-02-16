@@ -22,6 +22,7 @@ export function useHomepageData() {
     `${config.public.pbUrl}/api/collections/Homepage/records`,
     {
       key: 'homepage',
+      getCachedData: () => undefined,
     },
   )
 
@@ -39,10 +40,6 @@ export function useHomepageData() {
   })
 
   const heroTitle = computed(() => homepage.value?.Hero_Title || 'Creative Strategy and Communication')
-
-  onMounted(() => {
-    refresh()
-  })
 
   return { heroImage, heroTitle, loading, hasError, error, refresh }
 }
