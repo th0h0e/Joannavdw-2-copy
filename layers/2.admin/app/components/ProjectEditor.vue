@@ -166,6 +166,8 @@ function handleAddTag(value: string) {
 <template>
   <UDrawer
     v-model:open="open"
+    :title="project ? 'Edit Project' : 'New Project'"
+    :description="project ? 'Update project details and images' : 'Create a new portfolio project'"
     :direction="isMobile ? 'bottom' : 'right'"
     :handle="isMobile"
     :ui="{
@@ -176,15 +178,6 @@ function handleAddTag(value: string) {
       header: 'p-6 border-b border-default flex-shrink-0',
     }"
   >
-    <template #header>
-      <h2 class="text-highlighted text-xl font-medium tracking-tight">
-        {{ project ? 'Edit Project' : 'New Project' }}
-      </h2>
-      <p class="text-muted mt-1 text-xs tracking-wide uppercase">
-        {{ project ? 'Update project details and images' : 'Create a new portfolio project' }}
-      </p>
-    </template>
-
     <template #body>
       <div class="flex flex-col">
         <!-- Image Carousel -->

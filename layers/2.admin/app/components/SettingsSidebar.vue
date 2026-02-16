@@ -186,6 +186,8 @@ const previewAboutData = computed(() => {
 <template>
   <UDrawer
     v-model:open="open"
+    title="Settings"
+    description="Configure site content"
     :direction="isMobile ? 'bottom' : 'right'"
     :handle="isMobile"
     :ui="{
@@ -198,19 +200,10 @@ const previewAboutData = computed(() => {
   >
     <template #header>
       <div class="flex items-center gap-4">
-        <div class="flex-1">
-          <h2 class="text-highlighted text-xl font-medium tracking-tight">
-            Settings
-          </h2>
-          <p class="text-muted mt-1 text-xs tracking-wide uppercase">
-            Configure site content
-          </p>
-        </div>
-
         <UButton
           variant="ghost"
           color="neutral"
-          class="h-12 w-12 flex-shrink-0 overflow-hidden"
+          class="h-10 w-10 flex-shrink-0 overflow-hidden"
           title="Click to update favicon"
           @click="faviconFileInput?.click()"
         >
@@ -226,7 +219,7 @@ const previewAboutData = computed(() => {
           >
             <UIcon
               name="i-ph-image"
-              class="size-6"
+              class="size-5"
             />
           </div>
         </UButton>
