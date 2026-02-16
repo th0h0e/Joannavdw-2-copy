@@ -192,13 +192,7 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
           aria-label="Settings"
           @click="emit('openSettings')"
         />
-        <USwitch
-          :model-value="$colorMode.value === 'dark'"
-          on-icon="i-ph-moon"
-          off-icon="i-ph-sun"
-          size="sm"
-          @update:model-value="$colorMode.preference = $event ? 'dark' : 'light'"
-        />
+        <UColorModeSwitch />
       </div>
     </div>
   </div>
