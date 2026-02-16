@@ -187,7 +187,7 @@ async function handleSubmit(e?: Event) {
     if (error?.status === 401 || error?.status === 403) {
       emit('showToast', 'Your session has expired. Please login again.', 'error')
       pb.authStore.clear()
-      window.location.href = '/admin'
+      navigateTo('/admin')
       return
     }
     emit('showToast', `Failed to save project: ${error?.data?.message || error?.message || 'Unknown error'}`, 'error')
