@@ -172,7 +172,7 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
       class="flex-1"
     />
 
-    <div class="border-default flex items-center justify-end gap-3 border-t px-4 py-3">
+    <div class="border-default flex items-center justify-between border-t px-4 py-3">
       <UButton
         to="/"
         variant="ghost"
@@ -182,15 +182,24 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
       >
         View Portfolio
       </UButton>
-      <UButton
-        variant="ghost"
-        color="neutral"
-        size="sm"
-        icon="i-ph-gear"
-        aria-label="Settings"
-        @click="emit('openSettings')"
-      />
-      <UColorModeButton />
+
+      <div class="flex items-center gap-3">
+        <UButton
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          icon="i-ph-gear"
+          aria-label="Settings"
+          @click="emit('openSettings')"
+        />
+        <USwitch
+          :model-value="$colorMode.value === 'dark'"
+          on-icon="i-ph-moon"
+          off-icon="i-ph-sun"
+          size="sm"
+          @update:model-value="$colorMode.preference = $event ? 'dark' : 'light'"
+        />
+      </div>
     </div>
   </div>
 </template>
