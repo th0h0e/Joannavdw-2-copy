@@ -16,6 +16,7 @@ const emit = defineEmits<{
 }>()
 
 const UButton = resolveComponent('UButton')
+const UBadge = resolveComponent('UBadge')
 const UIcon = resolveComponent('UIcon')
 
 const localProjects = ref<PortfolioProjectsResponse<string[]>[]>([])
@@ -63,23 +64,35 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
       },
     },
     cell: ({ row }) => {
-      const imageCount = row.original.Images?.length || 0
-      if (imageCount > 0) {
+      if (row.original.Images && row.original.Images.length > 0) {
         return h('div', { class: 'bg-elevated relative size-12 overflow-hidden' }, [
           h('img', {
             src: getImageUrl(row.original, row.original.Images[0]),
             alt: row.original.Title,
             class: 'size-full object-cover',
           }),
-          h('div', {
-            class: 'bg-default/70 text-highlighted absolute right-1 bottom-1 px-1.5 py-0.5 text-[10px] font-medium backdrop-blur-sm',
-          }, imageCount),
         ])
       }
       return h('div', { class: 'bg-elevated flex size-12 items-center justify-center' }, [
         h('span', { class: 'text-dimmed text-xs' }, '–'),
       ])
     },
+  },
+  {
+    id: 'images',
+    header: 'Images',
+    enableSorting: false,
+    meta: {
+      class: {
+        th: 'w-20 text-center',
+        td: 'w-20 text-center',
+      },
+    },
+    cell: ({ row }) => h(UBadge, {
+      color: 'neutral',
+      variant: 'subtle',
+      size: 'sm',
+    }, () => `${row.original.Images?.length || 0}`),
   },
   {
     accessorKey: 'Title',
@@ -146,38 +159,38 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
 </script>
 
 <template>
-  <UTable
-    :data="localProjects"
-    :columns="columns"
-    sticky
-    :ui="{
-      root: 'border-default border',
-      tbody: 'project-table-tbody',
-      tr: 'hover:bg-elevated/50 transition-colors',
-    }"
-    class="flex-1"
-  >
-    <template #footer>
-      <div class="flex items-center justify-end gap-3 px-4 py-3">
-        <UButton
-          to="/"
-          variant="ghost"
-          color="neutral"
-          size="sm"
-          class="text-xs tracking-wide uppercase"
-        >
-          View Portfolio
-        </UButton>
-        <UButton
-          variant="ghost"
-          color="neutral"
-          size="sm"
-          icon="i-ph-gear"
-          aria-label="Settings"
-          @click="emit('openSettings')"
-        />
-        <UColorModeButton />
-      </div>
-    </template>
-  </UTable>
+  <div class="border-default border">
+    <UTable
+      :data="localProjects"
+      :columns="columns"
+      sticky
+      :ui="{
+        root: 'border-0',
+        tbody: 'project-table-tbody',
+        tr: 'hover:bg-elevated/50 transition-colors',
+      }"
+      class="flex-1"
+    />
+
+    <div class="border-default flex items-center justify-end gap-3 border-t px-4 py-3">
+      <UButton
+        to="/"
+        variant="ghost"
+        color="neutral"
+        size="sm"
+        class="text-xs tracking-wide uppercase"
+      >
+        View Portfolio
+      </UButton>
+      <UButton
+        variant="ghost"
+        color="neutral"
+        size="sm"
+        icon="i-ph-gear"
+        aria-label="Settings"
+        @click="emit('openSettings')"
+      />
+      <UColorModeButton />
+    </div>
+  </div>
 </template>

@@ -155,18 +155,13 @@ function handleDeleteImage(image: ImageItem) {
             </div>
             <UButton
               type="button"
-              color="error"
-              variant="soft"
+              color="primary"
+              variant="ghost"
               size="xs"
-              icon="i-ph-trash"
+              icon="i-ph-x"
               class="absolute top-2 right-2 opacity-0 transition-all group-hover:opacity-100"
               @click="handleDeleteImage(image)"
-            >
-              Delete
-            </UButton>
-            <div class="bg-default/60 text-highlighted absolute right-0 bottom-0 left-0 truncate px-2 py-1.5 text-xs backdrop-blur-sm">
-              {{ image.filename }}
-            </div>
+            />
           </div>
         </div>
       </div>
