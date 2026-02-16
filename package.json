@@ -53,7 +53,14 @@
   },
   "optionalDependencies": {
     "@img/sharp-linux-x64": "^0.33.5",
+    "@oxc-minify/binding-darwin-arm64": "^0.96.0",
+    "@oxc-minify/binding-darwin-x64": "^0.96.0",
+    "@oxc-minify/binding-linux-arm-gnueabihf": "^0.96.0",
+    "@oxc-minify/binding-linux-arm64-gnu": "^0.96.0",
+    "@oxc-minify/binding-linux-arm64-musl": "^0.96.0",
     "@oxc-minify/binding-linux-x64-gnu": "^0.96.0",
+    "@oxc-minify/binding-linux-x64-musl": "^0.96.0",
+    "@oxc-minify/binding-win32-x64-msvc": "^0.96.0",
     "@oxc-parser/binding-darwin-arm64": "^0.96.0",
     "@oxc-parser/binding-darwin-x64": "^0.96.0",
     "@oxc-parser/binding-linux-arm-gnueabihf": "^0.96.0",
@@ -66,8 +73,22 @@
     "@oxc-parser/binding-linux-x64-musl": "^0.96.0",
     "@oxc-parser/binding-win32-arm64-msvc": "^0.96.0",
     "@oxc-parser/binding-win32-x64-msvc": "^0.96.0",
+    "@oxc-resolver/binding-darwin-arm64": "^11.16.2",
+    "@oxc-resolver/binding-darwin-x64": "^11.16.2",
+    "@oxc-resolver/binding-linux-arm-gnueabihf": "^11.16.2",
+    "@oxc-resolver/binding-linux-arm64-gnu": "^11.16.2",
+    "@oxc-resolver/binding-linux-arm64-musl": "^11.16.2",
     "@oxc-resolver/binding-linux-x64-gnu": "^11.16.2",
-    "@oxc-transform/binding-linux-x64-gnu": "^0.96.0"
+    "@oxc-resolver/binding-linux-x64-musl": "^11.16.2",
+    "@oxc-resolver/binding-win32-x64-msvc": "^11.16.2",
+    "@oxc-transform/binding-darwin-arm64": "^0.96.0",
+    "@oxc-transform/binding-darwin-x64": "^0.96.0",
+    "@oxc-transform/binding-linux-arm-gnueabihf": "^0.96.0",
+    "@oxc-transform/binding-linux-arm64-gnu": "^0.96.0",
+    "@oxc-transform/binding-linux-arm64-musl": "^0.96.0",
+    "@oxc-transform/binding-linux-x64-gnu": "^0.96.0",
+    "@oxc-transform/binding-linux-x64-musl": "^0.96.0",
+    "@oxc-transform/binding-win32-x64-msvc": "^0.96.0"
   },
   "overrides": {
     "chokidar": "5.0.0",
@@ -75,6 +96,18 @@
   },
   "trustedDependencies": [
     "@parcel/watcher",
-    "unrs-resolver"
+    "unrs-resolver",
+    "@oxc-parser/binding-darwin-arm64",
+    "@oxc-parser/binding-darwin-x64",
+    "@oxc-parser/binding-linux-arm-gnueabihf",
+    "@oxc-parser/binding-linux-arm-musleabihf",
+    "@oxc-parser/binding-linux-arm64-gnu",
+    "@oxc-parser/binding-linux-arm64-musl",
+    "@oxc-parser/binding-linux-riscv64-gnu",
+    "@oxc-parser/binding-linux-s390x-gnu",
+    "@oxc-parser/binding-linux-x64-gnu",
+    "@oxc-parser/binding-linux-x64-musl",
+    "@oxc-parser/binding-win32-arm64-msvc",
+    "@oxc-parser/binding-win32-x64-msvc"
   ]
 }
