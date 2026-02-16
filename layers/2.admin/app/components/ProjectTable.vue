@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { PortfolioProjectsResponse } from '#layers/2.admin/app/shared/types/pocketbase-types'
 import type { TableColumn } from '@nuxt/ui'
-import { getImageUrl } from '#layers/2.admin/app/utils/pocketbase'
 import { useSortable } from '@vueuse/integrations/useSortable'
 
 const props = defineProps<{
@@ -16,8 +15,6 @@ const emit = defineEmits<{
 }>()
 
 const UButton = resolveComponent('UButton')
-const UBadge = resolveComponent('UBadge')
-const UIcon = resolveComponent('UIcon')
 
 const localProjects = ref<PortfolioProjectsResponse<string[]>[]>([])
 
@@ -47,52 +44,15 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
     cell: () => h('div', {
       class: 'drag-handle text-muted hover:text-toned flex cursor-grab items-center justify-center py-2 transition-colors active:cursor-grabbing',
     }, [
-      h(UIcon, {
-        name: 'i-ph-dots-six-vertical',
+      h('svg', {
         class: 'size-5',
-      }),
+        xmlns: 'http://www.w3.org/2000/svg',
+        viewBox: '0 0 24 24',
+        fill: 'currentColor',
+      }, [
+        h('path', { d: 'M9 4h2v2H9zm4 0h2v2h-2zM9 8h2v2H9zm4 0h2v2h-2zm-4 4h2v2H9zm4 0h2v2h-2zm-4 4h2v2H9zm4 0h2v2h-2z' }),
+      ]),
     ]),
-  },
-  {
-    id: 'thumbnail',
-    header: 'Image',
-    enableSorting: false,
-    meta: {
-      class: {
-        th: 'w-20',
-        td: 'w-20',
-      },
-    },
-    cell: ({ row }) => {
-      if (row.original.Images && row.original.Images.length > 0) {
-        return h('div', { class: 'bg-elevated relative size-12 overflow-hidden' }, [
-          h('img', {
-            src: getImageUrl(row.original, row.original.Images[0]),
-            alt: row.original.Title,
-            class: 'size-full object-cover',
-          }),
-        ])
-      }
-      return h('div', { class: 'bg-elevated flex size-12 items-center justify-center' }, [
-        h('span', { class: 'text-dimmed text-xs' }, '–'),
-      ])
-    },
-  },
-  {
-    id: 'images',
-    header: 'Images',
-    enableSorting: false,
-    meta: {
-      class: {
-        th: 'w-20 text-center',
-        td: 'w-20 text-center',
-      },
-    },
-    cell: ({ row }) => h(UBadge, {
-      color: 'neutral',
-      variant: 'subtle',
-      size: 'sm',
-    }, () => `${row.original.Images?.length || 0}`),
   },
   {
     accessorKey: 'Title',
@@ -160,17 +120,19 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
 
 <template>
   <div class="border-default border">
-    <UTable
-      :data="localProjects"
-      :columns="columns"
-      sticky
-      :ui="{
-        root: 'border-0 max-h-96',
-        tbody: 'project-table-tbody',
-        tr: 'hover:bg-elevated/50 transition-colors',
-      }"
-      class="flex-1"
-    />
+    <div class="overflow-x-auto">
+      <UTable
+        :data="localProjects"
+        :columns="columns"
+        sticky
+        :ui="{
+          root: 'border-0 min-w-[600px]',
+          tbody: 'project-table-tbody',
+          tr: 'hover:bg-elevated/50 transition-colors',
+        }"
+        class="flex-1"
+      />
+    </div>
 
     <div class="border-default flex items-center justify-between border-t px-4 py-3">
       <UButton

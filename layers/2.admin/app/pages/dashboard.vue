@@ -4,7 +4,6 @@ import { pb } from '#layers/2.admin/app/utils/pocketbase'
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'auth',
 })
 
 const { showToast } = useAppToast()
@@ -42,9 +41,7 @@ watch(projectsError, (err) => {
 })
 
 function handleLogout() {
-  console.warn('[Dashboard] Logging out, clearing auth store')
   pb.authStore.clear()
-  console.warn('[Dashboard] Auth cleared, redirecting to /admin')
   navigateTo('/')
 }
 
@@ -123,25 +120,25 @@ async function handleReorder(reorderedProjects: PortfolioProjectsResponse<string
     class="admin-container bg-default min-h-screen"
   >
     <header class="border-default bg-default/80 sticky top-0 z-10 border-b backdrop-blur-sm">
-      <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 lg:px-8">
+      <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 lg:px-8 lg:py-6">
         <div>
-          <h1 class="text-highlighted text-xl font-medium tracking-tight">
+          <h1 class="text-highlighted text-lg font-medium tracking-tight lg:text-xl">
             Portfolio
           </h1>
           <p class="text-muted mt-1 text-xs tracking-wide">
             {{ projects.length }} {{ projects.length === 1 ? 'project' : 'projects' }}
           </p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 lg:gap-3">
           <UButton
             variant="outline"
             color="neutral"
             size="sm"
             icon="i-ph-plus"
-            class="text-xs tracking-wide uppercase"
+            class="lg:gap-2"
             @click="showNewProjectForm = true"
           >
-            New Project
+            <span class="hidden lg:inline text-xs tracking-wide uppercase">New Project</span>
           </UButton>
           <UButton
             variant="outline"
@@ -156,7 +153,7 @@ async function handleReorder(reorderedProjects: PortfolioProjectsResponse<string
       </div>
     </header>
 
-    <main class="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+    <main class="mx-auto max-w-7xl px-4 py-8 lg:px-8 lg:py-12">
       <UAlert
         v-if="error"
         color="error"

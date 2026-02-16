@@ -11,6 +11,8 @@ const emit = defineEmits<{
   showToast: [message: string, type: 'success' | 'error']
 }>()
 
+const { isMobile } = useDevice()
+
 const open = computed({
   get: () => props.isOpen,
   set: (value) => {
@@ -148,6 +150,7 @@ async function handleSubmit(e: Event) {
       headers: { Authorization: `Bearer ${pb.authStore.token}` },
     })
 
+    await refresh()
     emit('showToast', 'Settings saved successfully!', 'success')
     open.value = false
   }
@@ -183,12 +186,14 @@ const previewAboutData = computed(() => {
 <template>
   <UDrawer
     v-model:open="open"
-    direction="right"
-    :handle="false"
+    :direction="isMobile ? 'bottom' : 'right'"
+    :handle="isMobile"
     :ui="{
-      content: 'h-full w-3/4 md:w-1/2 max-w-none',
-      body: 'p-0',
-      header: 'p-6 border-b border-default',
+      content: isMobile
+        ? 'h-[90vh] max-h-[90vh] rounded-t-2xl'
+        : 'h-full w-full md:w-1/2 max-w-none',
+      body: 'p-0 overflow-y-auto',
+      header: 'p-6 border-b border-default flex-shrink-0',
     }"
   >
     <template #header>
@@ -323,7 +328,7 @@ const previewAboutData = computed(() => {
                 <p class="text-toned mb-2 text-xs font-medium tracking-wider uppercase">
                   Font Sizes (rem)
                 </p>
-                <div class="grid grid-cols-4 gap-2">
+                <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
                   <UFormField label="Mobile">
                     <UInputNumber
                       v-model="mobileFontSize"
@@ -383,6 +388,7 @@ const previewAboutData = computed(() => {
           <UButton
             type="button"
             variant="outline"
+            color="neutral"
             class="flex-1"
             @click="open = false"
           >
@@ -402,9 +408,10 @@ const previewAboutData = computed(() => {
     </template>
   </UDrawer>
 
+  <!-- Preview only on desktop -->
   <Teleport to="body">
     <div
-      v-if="isOpen"
+      v-if="isOpen && !isMobile"
       class="pointer-events-none fixed top-1/2 left-[25%] z-[60] -translate-x-1/2 -translate-y-1/2"
     >
       <LazyAboutPopup

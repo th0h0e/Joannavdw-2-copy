@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import type { HomepageResponse } from '#layers/2.admin/app/shared/types/pocketbase-types'
 import { getImageUrl, pb } from '#layers/2.admin/app/utils/pocketbase'
-import { usePointerSwipe } from '@vueuse/core'
 
 const emit = defineEmits<{
   showToast: [message: string, type: 'success' | 'error']
 }>()
+
+const { isMobile } = useDevice()
 
 const showMobilePreview = ref(false)
 const isEditingTitle = ref(false)
 const tempTitle = ref('')
 const heroFileInput = ref<HTMLInputElement | null>(null)
 const heroMobileFileInput = ref<HTMLInputElement | null>(null)
-const heroContainerRef = ref<HTMLElement | null>(null)
 
 const { data: homepageRaw, refresh: refreshHomepage, error: homepageError } = useAsyncData(
   'admin-homepage',
@@ -25,19 +25,6 @@ const heroImage = computed(() =>
 const heroImageMobile = computed(() =>
   homepageRaw.value?.Hero_Image_Mobile ? getImageUrl(homepageRaw.value, homepageRaw.value.Hero_Image_Mobile) : '')
 const homepageId = computed(() => homepageRaw.value?.id || '')
-
-usePointerSwipe(heroContainerRef, {
-  onSwipeEnd: (_e, direction) => {
-    if (isEditingTitle.value)
-      return
-    if (direction === 'left' && heroImageMobile.value) {
-      showMobilePreview.value = true
-    }
-    else if (direction === 'right') {
-      showMobilePreview.value = false
-    }
-  },
-})
 
 const heroTitle = ref('')
 watch(homepageRaw, (val) => {
@@ -117,7 +104,7 @@ async function handleTitleSave() {
   try {
     await pb.collection('Homepage')
       .update(homepageId.value, { Hero_Title: tempTitle.value.trim() })
-    heroTitle.value = tempTitle.value.trim()
+    await refreshHomepage()
     isEditingTitle.value = false
     emit('showToast', 'Hero title updated successfully', 'success')
   }
@@ -143,133 +130,222 @@ function handleTitleCancel() {
 <template>
   <div
     v-if="heroImage || heroImageMobile"
-    ref="heroContainerRef"
     class="mb-12"
   >
-    <div class="flex gap-6">
-      <div :style="{ width: showMobilePreview ? '66.67%' : '100%', transition: 'width 0.3s ease-out', flexShrink: 0 }">
-        <div
-          class="preview-container bg-elevated border-default group relative w-full overflow-hidden border"
+    <!-- Mobile: Stacked layout with tab switcher -->
+    <template v-if="isMobile">
+      <div class="mb-3 flex gap-2">
+        <UButton
+          :variant="showMobilePreview ? 'outline' : 'solid'"
+          color="neutral"
+          size="sm"
+          @click="showMobilePreview = false"
         >
-          <img
-            :src="heroImage"
-            alt="Hero Desktop"
-            class="absolute inset-0 h-full w-full object-cover"
-          >
+          Desktop
+        </UButton>
+        <UButton
+          :variant="showMobilePreview ? 'solid' : 'outline'"
+          color="neutral"
+          size="sm"
+          :disabled="!heroImageMobile"
+          @click="showMobilePreview = true"
+        >
+          Mobile
+        </UButton>
+      </div>
 
-          <template v-if="heroTitle">
-            <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <div class="px-6 text-center">
-                <button
-                  :contenteditable="isEditingTitle"
-                  class="admin-title pointer-events-auto inline-block text-4xl leading-none text-white uppercase outline-none"
-                  :class="[
-                    isEditingTitle ? 'cursor-text' : 'cursor-pointer transition-opacity hover:opacity-80',
-                  ]"
-                  :title="!isEditingTitle ? 'Click to edit' : undefined"
-                  @click="!isEditingTitle && handleTitleClick()"
-                  @keydown.enter.prevent="handleTitleSave"
-                  @keydown.escape.prevent="handleTitleCancel"
-                >
-                  {{ heroTitle }}
-                </button>
-              </div>
-            </div>
-            <div
-              v-if="isEditingTitle"
-              class="pointer-events-none absolute right-6 bottom-6 z-10 flex gap-2"
-            >
-              <UButton
-                color="neutral"
-                variant="outline"
-                size="sm"
-                icon="i-ph-x"
-                class="pointer-events-auto"
-                title="Cancel"
-                @click="handleTitleCancel"
-              />
-              <UButton
-                variant="outline"
-                color="neutral"
-                size="sm"
-                icon="i-ph-check"
-                class="pointer-events-auto"
-                title="Save"
-                @click="handleTitleSave"
-              />
-            </div>
-          </template>
+      <!-- Single preview based on active tab -->
+      <div class="preview-container-mobile relative overflow-hidden border border-default bg-elevated">
+        <img
+          :src="showMobilePreview ? heroImageMobile : heroImage"
+          :alt="showMobilePreview ? 'Hero Mobile' : 'Hero Desktop'"
+          class="size-full object-cover"
+        >
 
+        <!-- Title overlay -->
+        <template v-if="heroTitle && !showMobilePreview">
+          <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div class="px-6 text-center">
+              <button
+                :contenteditable="isEditingTitle"
+                class="admin-title pointer-events-auto inline-block text-2xl leading-none text-white uppercase outline-none"
+                :class="[
+                  isEditingTitle ? 'cursor-text' : 'cursor-pointer transition-opacity hover:opacity-80',
+                ]"
+                :title="!isEditingTitle ? 'Click to edit' : undefined"
+                @click="!isEditingTitle && handleTitleClick()"
+                @keydown.enter.prevent="handleTitleSave"
+                @keydown.escape.prevent="handleTitleCancel"
+              >
+                {{ heroTitle }}
+              </button>
+            </div>
+          </div>
           <div
-            v-if="!isEditingTitle"
-            class="group/update pointer-events-auto absolute right-0 bottom-0 p-6"
+            v-if="isEditingTitle"
+            class="pointer-events-none absolute right-4 bottom-4 z-10 flex gap-2"
           >
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="sm"
+              icon="i-ph-x"
+              class="pointer-events-auto"
+              title="Cancel"
+              @click="handleTitleCancel"
+            />
             <UButton
               variant="outline"
               color="neutral"
               size="sm"
-              icon="i-ph-image"
-              class="opacity-0 transition-all group-hover/update:opacity-100"
-              title="Update Desktop Hero"
-              @click="heroFileInput?.click()"
+              icon="i-ph-check"
+              class="pointer-events-auto"
+              title="Save"
+              @click="handleTitleSave"
             />
+          </div>
+        </template>
+
+        <!-- Edit button always visible on mobile -->
+        <div class="absolute bottom-4 right-4">
+          <UButton
+            variant="outline"
+            color="neutral"
+            size="sm"
+            icon="i-ph-image"
+            @click="showMobilePreview ? heroMobileFileInput?.click() : heroFileInput?.click()"
+          />
+        </div>
+      </div>
+    </template>
+
+    <!-- Desktop: Side-by-side layout -->
+    <template v-else>
+      <div class="flex gap-6">
+        <div :style="{ width: showMobilePreview ? '66.67%' : '100%', transition: 'width 0.3s ease-out', flexShrink: 0 }">
+          <div
+            class="preview-container bg-elevated border-default group relative w-full overflow-hidden border"
+          >
+            <img
+              :src="heroImage"
+              alt="Hero Desktop"
+              class="absolute inset-0 h-full w-full object-cover"
+            >
+
+            <template v-if="heroTitle">
+              <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+                <div class="px-6 text-center">
+                  <button
+                    :contenteditable="isEditingTitle"
+                    class="admin-title pointer-events-auto inline-block text-4xl leading-none text-white uppercase outline-none"
+                    :class="[
+                      isEditingTitle ? 'cursor-text' : 'cursor-pointer transition-opacity hover:opacity-80',
+                    ]"
+                    :title="!isEditingTitle ? 'Click to edit' : undefined"
+                    @click="!isEditingTitle && handleTitleClick()"
+                    @keydown.enter.prevent="handleTitleSave"
+                    @keydown.escape.prevent="handleTitleCancel"
+                  >
+                    {{ heroTitle }}
+                  </button>
+                </div>
+              </div>
+              <div
+                v-if="isEditingTitle"
+                class="pointer-events-none absolute right-6 bottom-6 z-10 flex gap-2"
+              >
+                <UButton
+                  color="neutral"
+                  variant="outline"
+                  size="sm"
+                  icon="i-ph-x"
+                  class="pointer-events-auto"
+                  title="Cancel"
+                  @click="handleTitleCancel"
+                />
+                <UButton
+                  variant="outline"
+                  color="neutral"
+                  size="sm"
+                  icon="i-ph-check"
+                  class="pointer-events-auto"
+                  title="Save"
+                  @click="handleTitleSave"
+                />
+              </div>
+            </template>
+
+            <div
+              v-if="!isEditingTitle"
+              class="group/update pointer-events-auto absolute right-0 bottom-0 p-6"
+            >
+              <UButton
+                variant="outline"
+                color="neutral"
+                size="sm"
+                icon="i-ph-image"
+                class="opacity-0 transition-all group-hover/update:opacity-100"
+                title="Update Desktop Hero"
+                @click="heroFileInput?.click()"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div
+          :style="{
+            width: showMobilePreview ? 'calc(33.33% - 24px)' : '0%',
+            opacity: showMobilePreview ? 1 : 0,
+            overflow: 'hidden',
+            transition: 'width 0.3s ease-out, opacity 0.3s ease-out',
+            flexShrink: 0,
+          }"
+        >
+          <div
+            class="preview-container bg-elevated border-default group relative w-full overflow-hidden border"
+          >
+            <img
+              :src="heroImageMobile"
+              alt="Hero Mobile"
+              class="absolute inset-0 h-full w-full object-cover"
+            >
+
+            <div
+              v-if="!isEditingTitle"
+              class="group/update pointer-events-auto absolute right-0 bottom-0 p-6"
+            >
+              <UButton
+                variant="outline"
+                color="neutral"
+                size="sm"
+                icon="i-ph-image"
+                class="opacity-0 transition-all group-hover/update:opacity-100"
+                title="Update Mobile Hero"
+                @click="heroMobileFileInput?.click()"
+              />
+            </div>
           </div>
         </div>
       </div>
 
       <div
-        :style="{
-          width: showMobilePreview ? 'calc(33.33% - 24px)' : '0%',
-          opacity: showMobilePreview ? 1 : 0,
-          overflow: 'hidden',
-          transition: 'width 0.3s ease-out, opacity 0.3s ease-out',
-          flexShrink: 0,
-        }"
+        v-if="heroImageMobile"
+        class="mt-3 flex items-center gap-3"
       >
-        <div
-          class="preview-container bg-elevated border-default group relative w-full overflow-hidden border"
+        <UButton
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          class="text-xs tracking-wide uppercase"
+          @click="showMobilePreview = !showMobilePreview"
         >
-          <img
-            :src="heroImageMobile"
-            alt="Hero Mobile"
-            class="absolute inset-0 h-full w-full object-cover"
-          >
-
-          <div
-            v-if="!isEditingTitle"
-            class="group/update pointer-events-auto absolute right-0 bottom-0 p-6"
-          >
-            <UButton
-              variant="outline"
-              color="neutral"
-              size="sm"
-              icon="i-ph-image"
-              class="opacity-0 transition-all group-hover/update:opacity-100"
-              title="Update Mobile Hero"
-              @click="heroMobileFileInput?.click()"
-            />
-          </div>
-        </div>
+          {{ showMobilePreview ? 'Hide mobile preview' : 'Show mobile preview' }}
+        </UButton>
+        <span class="text-dimmed text-xs">
+          (or swipe left/right)
+        </span>
       </div>
-    </div>
-
-    <div
-      v-if="heroImageMobile"
-      class="mt-3 flex items-center gap-3"
-    >
-      <UButton
-        variant="ghost"
-        color="neutral"
-        size="sm"
-        class="text-xs tracking-wide uppercase"
-        @click="showMobilePreview = !showMobilePreview"
-      >
-        {{ showMobilePreview ? 'Hide mobile preview' : 'Show mobile preview' }}
-      </UButton>
-      <span class="text-dimmed text-xs">
-        (or swipe left/right)
-      </span>
-    </div>
+    </template>
 
     <input
       id="heroFileInput"
@@ -309,5 +385,9 @@ function handleTitleCancel() {
 
 .preview-container {
   height: 680px;
+}
+
+.preview-container-mobile {
+  height: 240px;
 }
 </style>

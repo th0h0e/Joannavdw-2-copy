@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import type { PortfolioProjectsResponse } from '#layers/2.admin/app/shared/types/pocketbase-types'
-import type { ImageItem } from './ImageDropZone.vue'
 import { getImageUrl, pb } from '#layers/2.admin/app/utils/pocketbase'
+
+interface NewImage {
+  id: string
+  file: File
+  url: string
+  filename: string
+}
 
 const props = defineProps<{
   project: PortfolioProjectsResponse<string[]> | null
@@ -16,6 +22,15 @@ const emit = defineEmits<{
 
 const { isMobile } = useDevice()
 
+// Local open state that syncs with prop
+const open = computed({
+  get: () => props.isOpen,
+  set: (value) => {
+    if (!value)
+      emit('cancel')
+  },
+})
+
 const formState = reactive({
   title: '',
   description: '',
@@ -23,50 +38,72 @@ const formState = reactive({
   responsibilities: [] as string[],
 })
 
-const images = ref<ImageItem[]>([])
-const imagesToDelete = ref<string[]>([])
+const newImages = ref<NewImage[]>([])
 const loading = ref(false)
+
+// Carousel items - combines existing project images with newly uploaded ones
+const carouselItems = computed(() => {
+  const existing = props.project?.Images?.map((filename, index) => ({
+    id: `existing-${index}`,
+    src: getImageUrl(props.project!, filename),
+    filename,
+    isNew: false,
+  })) || []
+
+  const newItems = newImages.value.map(img => ({
+    id: img.id,
+    src: img.url,
+    filename: img.filename,
+    isNew: true,
+  }))
+
+  return [...existing, ...newItems]
+})
 
 watch(() => props.project, (project) => {
   if (project) {
-    images.value = project.Images?.map((filename, index) => ({
-      id: `existing-${index}`,
-      url: getImageUrl(project, filename),
-      filename,
-      isExisting: true,
-    })) ?? []
     formState.title = project.Title ?? ''
     formState.description = project.Description ?? ''
     formState.order = project.Order ?? 0
     formState.responsibilities = project.Responsibility_json ?? []
   }
   else {
-    images.value = []
-    imagesToDelete.value = []
-    formState.title = ''
-    formState.description = ''
-    formState.order = 0
-    formState.responsibilities = []
+    resetForm()
   }
 }, { immediate: true })
 
-function handleImageDelete(image: ImageItem) {
-  if (image.isExisting) {
-    imagesToDelete.value.push(image.filename)
-  }
+function resetForm() {
+  newImages.value = []
+  formState.title = ''
+  formState.description = ''
+  formState.order = 0
+  formState.responsibilities = []
 }
 
 function handleClose() {
-  images.value.forEach((img) => {
-    if (!img.isExisting) {
-      URL.revokeObjectURL(img.url)
-    }
+  // Clean up object URLs
+  newImages.value.forEach((img) => {
+    URL.revokeObjectURL(img.url)
   })
+  resetForm()
   emit('cancel')
 }
 
-async function handleSubmit(e?: Event) {
-  e?.preventDefault()
+function handleFilesAdded(files: File[] | File) {
+  const fileArray = Array.isArray(files) ? files : [files]
+  const imageFiles = fileArray.filter(file => file.type.startsWith('image/'))
+
+  const imagesToAdd: NewImage[] = imageFiles.map((file, index) => ({
+    id: `new-${Date.now()}-${index}`,
+    file,
+    url: URL.createObjectURL(file),
+    filename: file.name,
+  }))
+
+  newImages.value = [...newImages.value, ...imagesToAdd]
+}
+
+async function handleSubmit() {
   loading.value = true
 
   try {
@@ -75,44 +112,21 @@ async function handleSubmit(e?: Event) {
     formData.append('Description', formState.description)
     formData.append('Order', formState.order.toString())
 
-    formState.responsibilities.forEach((resp: string) => {
+    formState.responsibilities.forEach((resp) => {
       formData.append('Responsibility_json', resp)
     })
 
-    if (props.project && images.value.length > 0) {
-      if (props.project.Images && props.project.Images.length > 0) {
-        props.project.Images.forEach((filename) => {
-          formData.append('Images-', filename)
-        })
-      }
-
-      for (const img of images.value) {
-        if (img.file) {
-          formData.append('Images', img.file)
-        }
-        else if (img.isExisting) {
-          try {
-            const response = await fetch(img.url)
-            if (!response.ok)
-              throw new Error(`HTTP ${response.status}`)
-            const blob = await response.blob()
-            const file = new File([blob], img.filename, { type: blob.type })
-            formData.append('Images', file)
-          }
-          catch (error) {
-            console.error('Error downloading existing image:', error)
-            throw new Error(`Failed to download image: ${img.filename}`)
-          }
-        }
-      }
-    }
-    else {
-      images.value.forEach((img) => {
-        if (img.file) {
-          formData.append('Images', img.file)
-        }
+    // Keep existing images (PocketBase uses Images- prefix to keep existing)
+    if (props.project?.Images && props.project.Images.length > 0) {
+      props.project.Images.forEach((filename) => {
+        formData.append('Images-', filename)
       })
     }
+
+    // Add new images
+    newImages.value.forEach((img) => {
+      formData.append('Images', img.file)
+    })
 
     if (props.project) {
       await pb.collection('Portfolio_Projects')
@@ -124,6 +138,7 @@ async function handleSubmit(e?: Event) {
     }
 
     emit('save')
+    resetForm()
   }
   catch (err: unknown) {
     console.error('Error saving project:', err)
@@ -150,15 +165,16 @@ function handleAddTag(value: string) {
 
 <template>
   <UDrawer
-    :open="isOpen"
-    direction="right"
-    :handle="false"
+    v-model:open="open"
+    :direction="isMobile ? 'bottom' : 'right'"
+    :handle="isMobile"
     :ui="{
-      content: 'h-full w-3/4 md:w-2/3 lg:w-1/2 max-w-none',
-      body: 'p-0',
-      header: 'p-6 border-b border-default',
+      content: isMobile
+        ? 'h-[90vh] max-h-[90vh] rounded-t-2xl'
+        : 'h-full w-full md:w-2/3 lg:w-1/2 max-w-none',
+      body: 'p-0 overflow-y-auto',
+      header: 'p-6 border-b border-default flex-shrink-0',
     }"
-    @close="handleClose"
   >
     <template #header>
       <h2 class="text-highlighted text-xl font-medium tracking-tight">
@@ -170,19 +186,41 @@ function handleAddTag(value: string) {
     </template>
 
     <template #body>
-      <UForm
-        :state="formState"
-        class="flex h-full flex-col"
-        @submit="handleSubmit"
-      >
-        <div class="flex-1 space-y-6 overflow-y-auto p-6">
-          <ImageDropZone
-            v-model="images"
-            @delete="handleImageDelete"
-          />
+      <div class="flex flex-col">
+        <!-- Image Carousel -->
+        <div
+          v-if="carouselItems.length > 0"
+          class="border-default border-b p-6"
+        >
+          <p class="text-toned mb-3 text-xs font-medium tracking-wider uppercase">
+            Project Images ({{ carouselItems.length }})
+          </p>
+          <UCarousel
+            :items="carouselItems"
+            arrows
+            dots
+            class="w-full rounded-lg"
+            :ui="{
+              item: 'basis-full',
+              container: 'rounded-lg overflow-hidden',
+            }"
+          >
+            <template #default="{ item }">
+              <img
+                :src="item.src"
+                :alt="item.filename"
+                class="h-48 w-full object-cover md:h-64"
+              >
+            </template>
+          </UCarousel>
+        </div>
 
-          <div class="border-default border-t" />
-
+        <!-- Form -->
+        <UForm
+          :state="formState"
+          class="flex-1 space-y-6 p-6"
+          @submit="handleSubmit"
+        >
           <UFormField
             label="Project Title"
             required
@@ -202,7 +240,7 @@ function handleAddTag(value: string) {
           >
             <UTextarea
               v-model="formState.description"
-              :rows="6"
+              :rows="4"
               placeholder="Project description..."
               color="neutral"
               variant="subtle"
@@ -239,8 +277,30 @@ function handleAddTag(value: string) {
               class="w-full"
             />
           </UFormField>
-        </div>
 
+          <!-- Image Upload -->
+          <div>
+            <p class="text-toned mb-3 text-xs font-medium tracking-wider uppercase">
+              Add More Images
+            </p>
+            <UFileUpload
+              :model-value="null"
+              accept="image/*"
+              multiple
+              variant="button"
+              label="Upload Images"
+              icon="i-ph-upload"
+              color="neutral"
+              class="w-full"
+              @update:model-value="handleFilesAdded"
+            />
+            <p class="text-dimmed mt-2 text-xs">
+              New images will be added at the end
+            </p>
+          </div>
+        </UForm>
+
+        <!-- Actions -->
         <div class="border-default flex flex-shrink-0 gap-3 border-t p-6">
           <UButton
             type="button"
@@ -257,24 +317,12 @@ function handleAddTag(value: string) {
             color="neutral"
             :loading="loading"
             class="flex-1"
+            @click="handleSubmit"
           >
-            {{ loading ? 'Saving...' : project ? 'Update Project' : 'Create Project' }}
+            {{ loading ? 'Saving...' : project ? 'Update' : 'Create' }}
           </UButton>
         </div>
-      </UForm>
+      </div>
     </template>
   </UDrawer>
-
-  <Teleport to="body">
-    <div
-      v-if="isOpen && project && !isMobile"
-      class="pointer-events-auto fixed top-1/2 left-[25%] z-[60] -translate-x-1/2 -translate-y-1/2"
-    >
-      <LazyProjectPopupPreview
-        :project-title="formState.title"
-        :project-description="formState.description"
-        :project-responsibility="formState.responsibilities"
-      />
-    </div>
-  </Teleport>
 </template>
