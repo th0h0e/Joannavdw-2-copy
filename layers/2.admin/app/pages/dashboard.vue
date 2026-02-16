@@ -4,6 +4,7 @@ import { pb } from '#layers/2.admin/app/utils/pocketbase'
 
 definePageMeta({
   layout: 'admin',
+  middleware: 'auth',
 })
 
 const { showToast } = useAppToast()
@@ -41,7 +42,9 @@ watch(projectsError, (err) => {
 })
 
 function handleLogout() {
+  console.warn('[Dashboard] Logging out, clearing auth store')
   pb.authStore.clear()
+  console.warn('[Dashboard] Auth cleared, redirecting to /admin')
   navigateTo('/')
 }
 
@@ -82,21 +85,25 @@ async function handleSave() {
   showToast(isCreating ? 'Project created successfully' : 'Project updated successfully', 'success')
 }
 
-function handleReorder(reorderedProjects: PortfolioProjectsResponse<string[]>[]) {
+async function handleReorder(reorderedProjects: PortfolioProjectsResponse<string[]>[]) {
   projects.value = reorderedProjects
-}
-
-async function handlePublishChanges() {
   try {
-    for (const [index, project] of projects.value.entries()) {
+    for (const [index, project] of reorderedProjects.entries()) {
       await pb.collection('Portfolio_Projects')
         .update(project.id, { Order: index + 1 })
     }
-    showToast('Changes published successfully!', 'success')
+    await refreshProjects()
+    showToast('Order updated', 'success')
   }
   catch (err: unknown) {
-    const typedErr = err as { data?: { message?: string }, message?: string }
-    showToast(`Failed to publish: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
+    const typedErr = err as { status?: number, data?: { message?: string }, message?: string }
+    if (typedErr?.status === 401 || typedErr?.status === 403) {
+      pb.authStore.clear()
+      navigateTo('/admin')
+      return
+    }
+    showToast(`Failed to update order: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
+    await refreshProjects()
   }
 }
 </script>
@@ -135,16 +142,6 @@ async function handlePublishChanges() {
             @click="showNewProjectForm = true"
           >
             New Project
-          </UButton>
-          <UButton
-            variant="outline"
-            color="neutral"
-            size="sm"
-            icon="i-ph-cloud-arrow-up"
-            class="text-xs tracking-wide uppercase"
-            @click="handlePublishChanges"
-          >
-            Publish Changes
           </UButton>
           <UButton
             variant="outline"

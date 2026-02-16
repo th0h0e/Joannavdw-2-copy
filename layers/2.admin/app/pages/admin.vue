@@ -11,7 +11,13 @@ const error = ref('')
 const loading = ref(false)
 
 onMounted(() => {
+  console.warn('[Login Page] Checking auth state:', {
+    isValid: pb.authStore.isValid,
+    hasToken: !!pb.authStore.token,
+  })
+
   if (pb.authStore.isValid) {
+    console.warn('[Login Page] Already authenticated, redirecting to dashboard')
     navigateTo('/dashboard')
   }
 })
@@ -21,14 +27,21 @@ async function handleLogin() {
   loading.value = true
 
   try {
+    console.warn('[Login Page] Attempting login for:', formState.email)
     await pb.collection('users')
       .authWithPassword(formState.email, formState.password)
+    console.warn('[Login Page] Login successful, auth state:', {
+      isValid: pb.authStore.isValid,
+      hasToken: !!pb.authStore.token,
+    })
     await navigateTo('/dashboard')
   }
   catch (err: unknown) {
-    console.error('Login error:', err)
+    console.error('[Login Page] Login error:', err)
     const typedErr = err as { response?: { message?: string }, message?: string }
     error.value = typedErr?.response?.message || typedErr?.message || 'Failed to login. Please check your credentials.'
+  }
+  finally {
     loading.value = false
   }
 }

@@ -38,6 +38,7 @@ export default withNuxt(antfu({
     'src/**',
     '**/.nuxt/**',
     'docs/**',
+    'app/plugins/*.client.ts',
   ],
 
   // Disable formats you don't use
