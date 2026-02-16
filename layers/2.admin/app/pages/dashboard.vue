@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { PortfolioProjectsResponse } from '#layers/2.admin/app/shared/types/pocketbase-types'
-import { getImageUrl, pb } from '#layers/2.admin/app/utils/pocketbase'
-import { useSortable } from '@vueuse/integrations/useSortable'
+import { pb } from '#layers/2.admin/app/utils/pocketbase'
 
 definePageMeta({
   layout: 'admin',
@@ -15,8 +14,6 @@ const showSettings = ref(false)
 const isDeleteModalOpen = ref(false)
 const projectToDelete = ref<string | null>(null)
 
-const projectListRef = useTemplateRef('projectListRef')
-
 const { data: rawProjects, refresh: refreshProjects, status: projectsStatus, error: projectsError } = useAsyncData(
   'admin-projects',
   () => pb.collection('Portfolio_Projects')
@@ -28,31 +25,6 @@ watch(rawProjects, (val) => {
   if (val)
     projects.value = [...val]
 }, { immediate: true })
-
-useSortable(projectListRef, projects, {
-  animation: 150,
-  handle: '.drag-handle',
-  onEnd: async () => {
-    if (isReordering.value)
-      return
-
-    isReordering.value = true
-    try {
-      for (const [index, project] of projects.value.entries()) {
-        await pb.collection('Portfolio_Projects')
-          .update(project.id, { Order: index + 1 })
-      }
-    }
-    catch (err: unknown) {
-      await refreshProjects()
-      const typedErr = err as { data?: { message?: string }, message?: string }
-      showToast(`Failed to reorder projects: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
-    }
-    finally {
-      isReordering.value = false
-    }
-  },
-})
 
 const loading = computed(() => projectsStatus.value === 'pending')
 const error = computed(() => projectsError.value ? 'Failed to load projects' : null)
@@ -166,6 +138,16 @@ async function handlePublishChanges() {
             variant="outline"
             color="neutral"
             size="sm"
+            icon="i-ph-plus"
+            class="text-xs tracking-wide uppercase"
+            @click="showNewProjectForm = true"
+          >
+            New Project
+          </UButton>
+          <UButton
+            variant="outline"
+            color="neutral"
+            size="sm"
             icon="i-ph-cloud-arrow-up"
             class="text-xs tracking-wide uppercase"
             @click="handlePublishChanges"
@@ -200,131 +182,6 @@ async function handlePublishChanges() {
       />
 
       <div class="border-default mb-12 border-t" />
-
-      <div
-        ref="projectListRef"
-        class="flex flex-col gap-3"
-      >
-        <div
-          v-for="project in projects"
-          :key="project.id"
-          class="project-card group from-elevated to-elevated/50 border-default hover:border-accented hover:from-elevated hover:to-elevated/70 flex cursor-grab items-stretch gap-0 overflow-hidden border bg-gradient-to-br backdrop-blur-sm active:cursor-grabbing"
-          role="button"
-          tabindex="0"
-        >
-          <div class="bg-elevated border-default relative w-1/3 flex-shrink-0 self-stretch overflow-hidden border-r">
-            <template v-if="project.Images && project.Images.length > 0">
-              <img
-                :src="getImageUrl(project, project.Images[0])"
-                :alt="project.Title"
-                class="absolute inset-0 h-full w-full object-cover"
-              >
-            </template>
-            <div
-              v-else
-              class="bg-elevated flex h-full w-full items-center justify-center"
-            >
-              <span class="text-dimmed text-sm">&ndash;</span>
-            </div>
-            <div class="bg-default/70 text-highlighted absolute top-2 left-2 px-2 py-1 text-xs font-medium tracking-wide backdrop-blur-md">
-              {{ project.Images?.length || 0 }} {{ project.Images?.length === 1 ? 'image' : 'images' }}
-            </div>
-          </div>
-
-          <div class="min-w-0 flex-1 p-5">
-            <div class="mb-2">
-              <h3 class="text-highlighted text-base font-semibold tracking-tight">
-                {{ project.Title }}
-              </h3>
-            </div>
-            <p class="text-muted mb-3 line-clamp-2 text-sm leading-relaxed">
-              {{ project.Description }}
-            </p>
-
-            <div
-              v-if="(project.Responsibility && project.Responsibility.length > 0) || (project.Responsibility_json && project.Responsibility_json.length > 0)"
-              class="mb-4 flex flex-wrap gap-2"
-            >
-              <span
-                v-for="(resp, idx) in (project.Responsibility_json || project.Responsibility || [])"
-                :key="`${resp}-${idx}`"
-                class="bg-elevated border-default text-toned border px-2.5 py-1 text-xs font-medium tracking-wider uppercase backdrop-blur-sm"
-              >
-                {{ resp }}
-              </span>
-            </div>
-
-            <div class="flex gap-2.5">
-              <UButton
-                variant="outline"
-                color="neutral"
-                size="sm"
-                class="text-xs tracking-wide uppercase"
-                @click="editingProject = project"
-              >
-                Edit
-              </UButton>
-              <UButton
-                color="error"
-                variant="soft"
-                size="sm"
-                class="text-xs tracking-wide uppercase"
-                @click="handleDelete(project.id)"
-              >
-                Delete
-              </UButton>
-            </div>
-          </div>
-
-          <div class="drag-handle text-muted group-hover:text-toned border-default flex cursor-grab items-center border-l px-4 transition-colors duration-200 active:cursor-grabbing">
-            <UIcon
-              name="i-ph-dots-six-vertical"
-              class="size-6"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div
-        v-if="projects.length === 0"
-        class="py-20 text-center"
-      >
-        <p class="text-dimmed text-sm tracking-wider uppercase">
-          No projects yet
-        </p>
-        <p class="text-dimmed mt-2 text-xs">
-          Create your first project to get started
-        </p>
-      </div>
-
-      <div class="mt-12">
-        <UButton
-          variant="outline"
-          color="neutral"
-          size="md"
-          class="text-sm tracking-wide uppercase"
-          @click="showNewProjectForm = true"
-        >
-          <template #leading>
-            <UIcon
-              name="i-ph-plus"
-              class="size-4"
-            />
-          </template>
-          New Project
-        </UButton>
-      </div>
-
-      <div class="border-default my-12 border-t" />
-
-      <div class="mb-4">
-        <h2 class="text-highlighted text-lg font-medium">
-          Table Version (Preview)
-        </h2>
-        <p class="text-muted text-xs tracking-wide uppercase">
-          Testing new table layout
-        </p>
-      </div>
 
       <ProjectTable
         :projects="projects"
@@ -382,9 +239,5 @@ async function handlePublishChanges() {
 <style scoped>
 .admin-container {
   font-family: 'EnduroWeb', sans-serif;
-}
-
-.project-card {
-  position: relative;
 }
 </style>
