@@ -60,16 +60,6 @@ const carouselItems = computed(() => {
   return [...existing, ...newItems]
 })
 
-const totalImageCount = computed(() => carouselItems.value.length)
-
-const canSubmit = computed(() => {
-  return (
-    totalImageCount.value >= 3
-    && formState.title.trim().length > 0
-    && formState.description.trim().length > 0
-  )
-})
-
 watch(() => props.project, (project) => {
   if (project) {
     formState.title = project.Title ?? ''
@@ -114,9 +104,6 @@ function handleFilesAdded(files: File[] | File) {
 }
 
 async function handleSubmit() {
-  if (!canSubmit.value)
-    return
-
   loading.value = true
 
   try {
@@ -179,8 +166,6 @@ function handleAddTag(value: string) {
 <template>
   <UDrawer
     v-model:open="open"
-    :title="project ? 'Edit Project' : 'New Project'"
-    :description="project ? 'Update project details and images' : 'Create a new portfolio project'"
     :direction="isMobile ? 'bottom' : 'right'"
     :handle="isMobile"
     :ui="{
@@ -188,53 +173,46 @@ function handleAddTag(value: string) {
         ? 'h-[90vh] max-h-[90vh] rounded-t-2xl'
         : 'h-full w-full md:w-2/3 lg:w-1/2 max-w-none',
       body: 'p-0 overflow-y-auto',
-      header: 'p-4 border-b border-default flex-shrink-0',
+      header: 'p-6 border-b border-default flex-shrink-0',
     }"
   >
+    <template #header>
+      <h2 class="text-highlighted text-xl font-medium tracking-tight">
+        {{ project ? 'Edit Project' : 'New Project' }}
+      </h2>
+      <p class="text-muted mt-1 text-xs tracking-wide uppercase">
+        {{ project ? 'Update project details and images' : 'Create a new portfolio project' }}
+      </p>
+    </template>
+
     <template #body>
       <div class="flex flex-col">
-        <!-- Image Carousel (Mobile: shows partial next image to suggest scroll) -->
+        <!-- Image Carousel -->
         <div
           v-if="carouselItems.length > 0"
-          class="border-default border-b"
+          class="border-default border-b p-6"
         >
+          <p class="text-toned mb-3 text-xs font-medium tracking-wider uppercase">
+            Project Images ({{ carouselItems.length }})
+          </p>
           <UCarousel
             :items="carouselItems"
-            class="w-full"
-            :ui="isMobile ? {
-              item: 'basis-[85%] snap-center pl-2',
-              viewport: 'aspect-square',
-            } : {
-              item: 'basis-full snap-center',
-              viewport: 'aspect-square',
+            arrows
+            dots
+            class="w-full rounded-lg"
+            :ui="{
+              item: 'basis-full',
+              container: 'rounded-lg overflow-hidden',
             }"
           >
             <template #default="{ item }">
               <img
                 :src="item.src"
                 :alt="item.filename"
-                class="size-full object-cover"
+                class="h-48 w-full object-cover md:h-64"
               >
             </template>
           </UCarousel>
-        </div>
-
-        <!-- Image Upload (Mobile: below carousel) -->
-        <div
-          v-if="isMobile"
-          class="border-default border-b p-4"
-        >
-          <UFileUpload
-            :model-value="null"
-            accept="image/*"
-            multiple
-            variant="button"
-            label="Add Images"
-            icon="i-ph-plus"
-            color="neutral"
-            class="w-full"
-            @update:model-value="handleFilesAdded"
-          />
         </div>
 
         <!-- Form -->
@@ -256,7 +234,7 @@ function handleAddTag(value: string) {
           <UFormField label="Description">
             <UTextarea
               v-model="formState.description"
-              :rows="isMobile ? 8 : 4"
+              :rows="4"
               placeholder="Project description..."
               color="neutral"
               variant="subtle"
@@ -279,8 +257,8 @@ function handleAddTag(value: string) {
             />
           </UFormField>
 
-          <!-- Image Upload (Desktop: in form) -->
-          <div v-if="!isMobile">
+          <!-- Image Upload -->
+          <div>
             <p class="text-toned mb-3 text-xs font-medium tracking-wider uppercase">
               Add More Images
             </p>
@@ -317,7 +295,6 @@ function handleAddTag(value: string) {
             variant="outline"
             color="neutral"
             :loading="loading"
-            :disabled="!canSubmit"
             class="flex-1"
             @click="handleSubmit"
           >
