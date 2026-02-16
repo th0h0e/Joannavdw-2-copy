@@ -1,3 +1,5 @@
+import process from 'node:process'
+
 export default defineNuxtConfig({
   // Client-side only rendering
   ssr: false,
@@ -31,7 +33,7 @@ export default defineNuxtConfig({
   ],
 
   devtools: {
-    enabled: true,
+    enabled: process.env.NODE_ENV !== 'production',
   },
 
   // Sentry configuration for source map uploads
@@ -52,13 +54,12 @@ export default defineNuxtConfig({
   css: ['~/assets/main.css'],
 
   // Runtime config — environment-driven values
-  // Override via NUXT_PB_URL (server-only) and NUXT_PUBLIC_SENTRY_DSN env vars
+  // Set NUXT_PUBLIC_PB_URL and NUXT_PUBLIC_SENTRY_DSN in .env
   runtimeConfig: {
-    pbUrl: 'https://admin.kontext.site',
     public: {
-      pbUrl: 'https://admin.kontext.site',
+      pbUrl: process.env.NUXT_PUBLIC_PB_URL || 'https://admin.kontext.site',
       sentry: {
-        dsn: 'https://4981600ff5cc02441de606ca9943a126@o4510808141398016.ingest.de.sentry.io/4510808149983312',
+        dsn: process.env.NUXT_PUBLIC_SENTRY_DSN || '',
       },
     },
   },

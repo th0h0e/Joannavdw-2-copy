@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { projectTitles } = defineProps<{
+const props = defineProps<{
   projectTitles: string[]
 }>()
 
@@ -17,7 +17,7 @@ function handleClick(e: MouseEvent, index: number) {
   <div class="w-full text-center px-6 md:w-4/5 md:px-0">
     <ul class="space-y-1">
       <li
-        v-for="(title, index) in projectTitles"
+        v-for="(title, index) in props.projectTitles"
         :key="`${title}-${index}`"
       >
         <a

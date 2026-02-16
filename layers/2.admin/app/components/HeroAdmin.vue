@@ -51,9 +51,16 @@ async function handleHeroImageUpdate(event: Event) {
     await pb.collection('Homepage')
       .update(homepageId.value, formData)
     await refreshHomepage()
+    emit('showToast', 'Hero image updated successfully', 'success')
   }
   catch (err: unknown) {
-    const typedErr = err as { data?: { message?: string }, message?: string }
+    const typedErr = err as { status?: number, data?: { message?: string }, message?: string }
+    if (typedErr?.status === 401 || typedErr?.status === 403) {
+      emit('showToast', 'Your session has expired. Please login again.', 'error')
+      pb.authStore.clear()
+      navigateTo('/admin')
+      return
+    }
     emit('showToast', `Failed to update hero image: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
   }
 }
@@ -68,9 +75,16 @@ async function handleHeroImageMobileUpdate(event: Event) {
     await pb.collection('Homepage')
       .update(homepageId.value, formData)
     await refreshHomepage()
+    emit('showToast', 'Mobile hero image updated successfully', 'success')
   }
   catch (err: unknown) {
-    const typedErr = err as { data?: { message?: string }, message?: string }
+    const typedErr = err as { status?: number, data?: { message?: string }, message?: string }
+    if (typedErr?.status === 401 || typedErr?.status === 403) {
+      emit('showToast', 'Your session has expired. Please login again.', 'error')
+      pb.authStore.clear()
+      navigateTo('/admin')
+      return
+    }
     emit('showToast', `Failed to update mobile hero image: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
   }
 }
@@ -90,9 +104,16 @@ async function handleTitleSave() {
       .update(homepageId.value, { Hero_Title: tempTitle.value.trim() })
     heroTitle.value = tempTitle.value.trim()
     isEditingTitle.value = false
+    emit('showToast', 'Hero title updated successfully', 'success')
   }
   catch (err: unknown) {
-    const typedErr = err as { data?: { message?: string }, message?: string }
+    const typedErr = err as { status?: number, data?: { message?: string }, message?: string }
+    if (typedErr?.status === 401 || typedErr?.status === 403) {
+      emit('showToast', 'Your session has expired. Please login again.', 'error')
+      pb.authStore.clear()
+      navigateTo('/admin')
+      return
+    }
     emit('showToast', `Failed to update hero title: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
     isEditingTitle.value = false
   }

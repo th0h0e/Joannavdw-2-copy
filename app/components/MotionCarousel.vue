@@ -144,18 +144,23 @@ function calculateBlurIntensity() {
 }
 
 if (!isMobile) {
-  onKeyDown('ArrowRight', (e) => {
+  const cleanupRight = onKeyDown('ArrowRight', (e) => {
     if (currentSlide.value < props.totalSlides - 1) {
       e.preventDefault()
       scrollX.value = (currentSlide.value + 1) * halfWidth.value
     }
   })
 
-  onKeyDown('ArrowLeft', (e) => {
+  const cleanupLeft = onKeyDown('ArrowLeft', (e) => {
     if (currentSlide.value > 0) {
       e.preventDefault()
       scrollX.value = (currentSlide.value - 1) * halfWidth.value
     }
+  })
+
+  onUnmounted(() => {
+    cleanupRight()
+    cleanupLeft()
   })
 }
 

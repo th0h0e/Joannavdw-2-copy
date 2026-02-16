@@ -1,6 +1,6 @@
 /* ============================================
    Frontend Custom Styles
-   
+
    Table of Contents:
    1. CSS Custom Properties
    2. Title Font
@@ -17,10 +17,10 @@
   /* Typography */
   --font-display: 'EnduroWeb', sans-serif;
   --letter-spacing-tight: 0.03em;
-  
+
   /* Popup dimensions */
   --popup-width: 280px;
-  
+
   /* Transitions */
   --transition-fast: 0.2s ease;
   --transition-medium: 0.3s ease-out;
@@ -44,15 +44,21 @@
 }
 
 @media (min-width: 768px) {
-  .title-font { font-size: 2.5rem; }
+  .title-font {
+    font-size: 2.5rem;
+  }
 }
 
 @media (min-width: 1024px) {
-  .title-font { font-size: 2.25rem; }
+  .title-font {
+    font-size: 2.25rem;
+  }
 }
 
 @media (min-width: 1280px) {
-  .title-font { font-size: 3rem; }
+  .title-font {
+    font-size: 3rem;
+  }
 }
 
 /* ============================================

@@ -8,6 +8,7 @@ const props = withDefaults(defineProps<{
 const { projectTitles } = usePortfolioProjects()
 
 const isOpen = ref(false)
+const timeoutIds = ref<number[]>([])
 
 function toggleMenu() {
   if (props.isPopupVisible)
@@ -22,10 +23,10 @@ function closeMenu() {
 function handleLinkClick(index: number) {
   closeMenu()
 
-  setTimeout(() => {
+  const id1 = window.setTimeout(() => {
     window.location.hash = `#project-${index}`
 
-    setTimeout(() => {
+    const id2 = window.setTimeout(() => {
       const carousels = document.querySelectorAll('[data-carousel]')
       carousels.forEach((carousel) => {
         if (carousel instanceof HTMLElement) {
@@ -33,8 +34,14 @@ function handleLinkClick(index: number) {
         }
       })
     }, 100)
+    timeoutIds.value.push(id2)
   }, 300)
+  timeoutIds.value.push(id1)
 }
+
+onUnmounted(() => {
+  timeoutIds.value.forEach(id => clearTimeout(id))
+})
 </script>
 
 <template>

@@ -16,7 +16,7 @@ const { isMobile, isTablet } = useDevice()
 const containerWidth = computed(() => isMobile ? '160px' : '200px')
 const containerHeight = computed(() => isMobile ? '60px' : '80px')
 const containerHeightPx = computed(() => isMobile ? 60 : 80)
-const isHidden = computed(() => props.showAboutPopup || (props.showPopup && isMobile))
+const isHidden = computed(() => props.showAboutPopup || props.showPopup)
 
 const yOffset = computed(() => {
   if (!props.isHero)
@@ -53,7 +53,7 @@ const enterVariant = {
       pointerEvents: isHidden ? 'none' : 'auto',
       transition: 'opacity 0.3s ease-out, width 0.3s ease-out, height 0.3s ease-out',
     }"
-    aria-label="Open menu"
+    aria-label="Open about"
     @click="emit('click')"
   >
     <div

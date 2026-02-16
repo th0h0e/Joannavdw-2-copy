@@ -18,12 +18,15 @@ interface HomepageResponse {
 export function useHomepageData() {
   const config = useRuntimeConfig()
 
-  const { data: response } = useFetch<HomepageResponse>(
+  const { data: response, status, error, refresh } = useFetch<HomepageResponse>(
     `${config.public.pbUrl}/api/collections/Homepage/records`,
     {
       key: 'homepage',
     },
   )
+
+  const loading = computed(() => status.value === 'pending')
+  const hasError = computed(() => !!error.value)
 
   const homepage = computed(() => {
     return response.value?.items.find(item => item.Is_Active) ?? null
@@ -37,5 +40,5 @@ export function useHomepageData() {
 
   const heroTitle = computed(() => homepage.value?.Hero_Title || 'Creative Strategy and Communication')
 
-  return { heroImage, heroTitle }
+  return { heroImage, heroTitle, loading, hasError, error, refresh }
 }

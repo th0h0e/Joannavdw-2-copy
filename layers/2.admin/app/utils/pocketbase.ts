@@ -10,10 +10,13 @@ export function usePocketBase(): PocketBase {
   return pbInstance
 }
 
-// Legacy export for backward compatibility
-export const pb = new PocketBase('https://admin.kontext.site')
+export const pb = new Proxy({} as PocketBase, {
+  get(_target, prop) {
+    const instance = usePocketBase()
+    return Reflect.get(instance, prop)
+  },
+})
 
-// Image URL helper
 export function getImageUrl(record: { collectionId: string, id: string }, filename: string): string {
   const config = useRuntimeConfig()
   return `${config.public.pbUrl}/api/files/${record.collectionId}/${record.id}/${filename}`

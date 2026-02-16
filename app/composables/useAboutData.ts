@@ -22,16 +22,19 @@ interface AboutResponse {
 export function useAboutData() {
   const config = useRuntimeConfig()
 
-  const { data: response } = useFetch<AboutResponse>(
+  const { data: response, status, error, refresh } = useFetch<AboutResponse>(
     `${config.public.pbUrl}/api/collections/About/records`,
     {
       key: 'about',
     },
   )
 
+  const loading = computed(() => status.value === 'pending')
+  const hasError = computed(() => !!error.value)
+
   const aboutData = computed(() => {
     return response.value?.items.find(item => item.Is_Active) ?? null
   })
 
-  return { aboutData }
+  return { aboutData, loading, hasError, error, refresh }
 }

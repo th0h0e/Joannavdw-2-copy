@@ -21,12 +21,15 @@ interface PortfolioResponse {
 export function usePortfolioProjects() {
   const config = useRuntimeConfig()
 
-  const { data: response } = useFetch<PortfolioResponse>(
+  const { data: response, status, error, refresh } = useFetch<PortfolioResponse>(
     `${config.public.pbUrl}/api/collections/Portfolio_Projects/records`,
     {
       key: 'portfolio',
     },
   )
+
+  const loading = computed(() => status.value === 'pending')
+  const hasError = computed(() => !!error.value)
 
   const projects = computed(() => {
     if (!response.value)
@@ -46,5 +49,5 @@ export function usePortfolioProjects() {
 
   const projectTitles = computed(() => projects.value.map(p => p.title))
 
-  return { projects, projectTitles }
+  return { projects, projectTitles, loading, hasError, error, refresh }
 }

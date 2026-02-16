@@ -41,6 +41,8 @@ function generateCss(sizes: Record<string, number>): string {
 }
 
 export default defineEventHandler(async (event) => {
+  getAuthenticatedPb(event)
+
   const body = await readBody(event)
 
   if (!body || typeof body !== 'object') {

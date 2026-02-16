@@ -22,8 +22,6 @@ const emit = defineEmits<{
   showToast: [message: string, type: 'success' | 'error']
 }>()
 
-useScrollLock(document.body, true)
-
 const formState = reactive({
   title: props.project?.Title ?? '',
   description: props.project?.Description ?? '',
@@ -35,6 +33,17 @@ const images = ref<ImageItem[]>([])
 const imagesToDelete = ref<string[]>([])
 const loading = ref(false)
 const { isMobile } = useDevice()
+
+const scrollLock = useScrollLock(document.body, true)
+
+onUnmounted(() => {
+  scrollLock.value = false
+  images.value.forEach((img) => {
+    if (!img.isExisting) {
+      URL.revokeObjectURL(img.url)
+    }
+  })
+})
 
 const dropZoneRef = useTemplateRef('dropZoneRef')
 const imageGridRef = useTemplateRef('imageGridRef')

@@ -52,7 +52,7 @@ const enterVariant = {
       pointerEvents: isHidden ? 'none' : 'auto',
       transition: 'opacity 0.3s ease-out, width 0.3s ease-out, height 0.3s ease-out',
     }"
-    aria-label="Open menu"
+    aria-label="Open about"
     @click="emit('click')"
   >
     <div
