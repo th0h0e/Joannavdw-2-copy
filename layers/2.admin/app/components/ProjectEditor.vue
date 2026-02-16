@@ -257,23 +257,6 @@ function handleAddTag(value: string) {
             />
           </UFormField>
 
-          <!-- Position: Desktop only -->
-          <UFormField
-            v-if="!isMobile"
-            label="Position in Portfolio"
-            required
-          >
-            <UInputNumber
-              v-model="formState.order"
-              :min="0"
-              :increment="false"
-              :decrement="false"
-              color="neutral"
-              variant="subtle"
-              class="w-full"
-            />
-          </UFormField>
-
           <UFormField
             label="Responsibilities"
             help="Press Enter to add a responsibility"
