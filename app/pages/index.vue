@@ -9,21 +9,54 @@ const projectCount = computed(() => projectsData.value.length)
 
 const showPopup = ref(false)
 const showAboutPopup = ref(false)
+const popupReady = ref(false)
+const aboutPopupReady = ref(false)
 const popupProjectTitle = ref('')
+
+const TRANSITION_STAGGER_MS = 50
 
 function handleShowPopup(projectTitle: string) {
   popupProjectTitle.value = projectTitle
   showPopup.value = true
+  setTimeout(() => {
+    popupReady.value = true
+  }, TRANSITION_STAGGER_MS)
+}
+
+function handleShowAboutPopup() {
+  showAboutPopup.value = true
+  setTimeout(() => {
+    aboutPopupReady.value = true
+  }, TRANSITION_STAGGER_MS)
 }
 
 function closePopups() {
-  showPopup.value = false
-  showAboutPopup.value = false
+  popupReady.value = false
+  aboutPopupReady.value = false
+  setTimeout(() => {
+    showPopup.value = false
+    showAboutPopup.value = false
+  }, TRANSITION_STAGGER_MS)
 }
 
 defineShortcuts({
-  o: () => showAboutPopup.value = !showAboutPopup.value,
-  p: () => showPopup.value = !showPopup.value,
+  o: () => {
+    if (showAboutPopup.value) {
+      closePopups()
+    }
+    else {
+      handleShowAboutPopup()
+    }
+  },
+  p: () => {
+    if (showPopup.value) {
+      closePopups()
+    }
+    else {
+      showPopup.value = true
+      setTimeout(() => { popupReady.value = true }, TRANSITION_STAGGER_MS)
+    }
+  },
   escape: () => closePopups(),
 })
 
@@ -42,13 +75,13 @@ useEdgeGesturePrevention()
       :is-hero="currentSectionIndex === 0"
       :show-about-popup="showAboutPopup"
       :show-popup="showPopup"
-      @click="showAboutPopup = true"
+      @click="handleShowAboutPopup"
     />
     <LogoBottom
       :is-hero="currentSectionIndex === 0"
       :show-about-popup="showAboutPopup"
       :show-popup="showPopup"
-      @click="showAboutPopup = true"
+      @click="handleShowAboutPopup"
     />
 
     <LazyHamburgerMenu
@@ -94,7 +127,7 @@ useEdgeGesturePrevention()
         leave-to-class="opacity-0"
       >
         <div
-          v-if="showPopup"
+          v-if="popupReady"
           class="fixed inset-0 z-9998"
           role="button"
           tabindex="-1"
@@ -112,7 +145,7 @@ useEdgeGesturePrevention()
         leave-to-class="opacity-0"
       >
         <div
-          v-if="showAboutPopup"
+          v-if="aboutPopupReady"
           class="popup-backdrop fixed inset-0 z-9998"
           role="button"
           tabindex="-1"
@@ -130,7 +163,7 @@ useEdgeGesturePrevention()
         leave-to-class="opacity-0 scale-90"
       >
         <ProjectPopup
-          v-if="showPopup"
+          v-if="popupReady"
           class="relative z-9999"
           :project-title="popupProjectTitle"
           @click.stop
@@ -144,7 +177,7 @@ useEdgeGesturePrevention()
         leave-to-class="opacity-0 scale-90"
       >
         <AboutPopup
-          v-if="showAboutPopup"
+          v-if="aboutPopupReady"
           class="relative z-9999"
           @click.stop
         />
