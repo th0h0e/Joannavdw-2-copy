@@ -1,0 +1,9 @@
+.form-base {
+  font-size: 16px;
+}
+
+.form-base input,
+.form-base textarea,
+.form-base select {
+  font-size: 16px;
+}

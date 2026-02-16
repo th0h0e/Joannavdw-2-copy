@@ -26,7 +26,6 @@ export default defineNuxtConfig({
     '@nuxtjs/device',
     '@nuxt/a11y',
     '@nuxt/hints',
-    'nuxt-ssr-api-logger',
     '@nuxt/image',
     '@nuxt/ui',
   ],

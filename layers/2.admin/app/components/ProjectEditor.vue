@@ -60,6 +60,16 @@ const carouselItems = computed(() => {
   return [...existing, ...newItems]
 })
 
+const totalImageCount = computed(() => carouselItems.value.length)
+
+const canSubmit = computed(() => {
+  return (
+    totalImageCount.value >= 3
+    && formState.title.trim().length > 0
+    && formState.description.trim().length > 0
+  )
+})
+
 watch(() => props.project, (project) => {
   if (project) {
     formState.title = project.Title ?? ''
@@ -104,6 +114,9 @@ function handleFilesAdded(files: File[] | File) {
 }
 
 async function handleSubmit() {
+  if (!canSubmit.value)
+    return
+
   loading.value = true
 
   try {
@@ -230,10 +243,7 @@ function handleAddTag(value: string) {
           class="flex-1 space-y-6 p-6"
           @submit="handleSubmit"
         >
-          <UFormField
-            label="Project Title"
-            required
-          >
+          <UFormField label="Project Title">
             <UInput
               v-model="formState.title"
               placeholder="e.g., Maria Bodil for Nike"
@@ -243,10 +253,7 @@ function handleAddTag(value: string) {
             />
           </UFormField>
 
-          <UFormField
-            label="Description"
-            required
-          >
+          <UFormField label="Description">
             <UTextarea
               v-model="formState.description"
               :rows="isMobile ? 8 : 4"
@@ -310,6 +317,7 @@ function handleAddTag(value: string) {
             variant="outline"
             color="neutral"
             :loading="loading"
+            :disabled="!canSubmit"
             class="flex-1"
             @click="handleSubmit"
           >

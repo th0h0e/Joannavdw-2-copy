@@ -6,6 +6,13 @@ const props = defineProps<{
 const { heroImage, heroTitle } = useHomepageData()
 const { isMobile } = useDevice()
 
+useHead({
+  link: computed(() =>
+    heroImage.value
+      ? [{ rel: 'preload', as: 'image', href: heroImage.value }]
+      : []),
+})
+
 const imageScaled = ref(false)
 
 const showTitle = computed(() => !props.isAboutPopupVisible)
