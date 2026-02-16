@@ -45,20 +45,20 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <button
-    v-if="!isPopupVisible"
-    class="hamburger-button"
-    :class="{ 'hamburger-button--open': isOpen }"
-    aria-label="Toggle menu"
-    @click="toggleMenu"
-  >
-    <div
-      class="hamburger-icon pointer-events-none"
-      :class="[isOpen ? 'hamburger-icon--open' : 'hamburger-icon--closed']"
-    />
-  </button>
-
   <Teleport to="body">
+    <button
+      v-if="!isPopupVisible"
+      class="hamburger-button"
+      :class="{ 'hamburger-button--open': isOpen }"
+      aria-label="Toggle menu"
+      @click="toggleMenu"
+    >
+      <div
+        class="hamburger-icon pointer-events-none"
+        :class="[isOpen ? 'hamburger-icon--open' : 'hamburger-icon--closed']"
+      />
+    </button>
+
     <Transition name="fade">
       <div
         v-if="isOpen"
@@ -94,15 +94,11 @@ onUnmounted(() => {
   position: fixed;
   top: 80px;
   right: 20px;
-  z-index: 10001;
+  z-index: 10000;
   cursor: pointer;
   border: 0;
   background: none;
   padding: 0;
-}
-
-.hamburger-button--open {
-  z-index: 10002;
 }
 
 @media (min-width: 768px) {
