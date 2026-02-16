@@ -2,7 +2,7 @@ import process from 'node:process'
 
 export default defineNuxtConfig({
   routeRules: {
-    '/': { prerender: true },
+    '/': { ssr: false },
     '/admin/**': { ssr: false },
     '/dashboard': { ssr: false },
   },
@@ -33,6 +33,10 @@ export default defineNuxtConfig({
 
   devtools: {
     enabled: process.env.NODE_ENV !== 'production',
+
+    timeline: {
+      enabled: true,
+    },
   },
 
   eslint: {
