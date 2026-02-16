@@ -11,6 +11,7 @@ const emit = defineEmits<{
   showToast: [message: string, type: 'success' | 'error']
 }>()
 
+const isVisible = ref(false)
 const faviconFileInput = ref<HTMLInputElement | null>(null)
 const saving = ref(false)
 
@@ -30,6 +31,21 @@ const { data: rawData, refresh, status } = useAsyncData(
   },
   { immediate: false },
 )
+
+watch(() => props.isOpen, (isOpen) => {
+  if (isOpen) {
+    isVisible.value = true
+    refresh()
+  }
+}, { immediate: true })
+
+function handleClose() {
+  isVisible.value = false
+}
+
+function handleAfterLeave() {
+  emit('close')
+}
 
 const loading = computed(() => status.value === 'pending' || saving.value)
 
@@ -66,11 +82,6 @@ watch(rawData, (data) => {
   desktopFontSize.value = data.fontSizes.desktop
   largeDesktopFontSize.value = data.fontSizes.largeDesktop
   faviconUrl.value = `/assets/favicon.ico?v=${data.settings.updated}`
-})
-
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen)
-    refresh()
 })
 
 function handleAddTag(value: string) {
@@ -139,7 +150,7 @@ async function handleSubmit(e: Event) {
     })
 
     emit('showToast', 'Settings saved successfully!', 'success')
-    emit('close')
+    handleClose()
   }
   catch (err: unknown) {
     console.error('Error saving settings:', err)
@@ -163,259 +174,253 @@ watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEma
     }
   }
 }, { deep: true })
+
+const backdropInitial = { opacity: 0 }
+const backdropEnter = { opacity: 1, transition: { duration: 200, ease: 'easeOut' } }
+const backdropLeave = { opacity: 0, transition: { duration: 200, ease: 'easeIn' } }
+
+const slideInitial = { x: '100%', opacity: 0 }
+const slideEnter = { x: 0, opacity: 1, transition: { duration: 300, ease: 'easeOut' } }
+const slideLeave = { x: '100%', opacity: 0, transition: { duration: 300, ease: 'easeIn' } }
 </script>
 
 <template>
-  <template v-if="isOpen">
-    <Transition
-      name="backdrop"
-      appear
-    >
-      <button
-        class="bg-default/70 fixed inset-0 z-40 m-0 appearance-none border-0 bg-transparent p-0 text-left backdrop-blur-md"
-        aria-label="Close settings"
-        @click="emit('close')"
-      />
-    </Transition>
+  <Teleport to="body">
+    <button
+      v-if="isOpen"
+      v-motion
+      :initial="backdropInitial"
+      :enter="backdropEnter"
+      :leave="backdropLeave"
+      class="bg-default/70 fixed inset-0 z-40 m-0 appearance-none border-0 bg-transparent p-0 text-left backdrop-blur-md"
+      aria-label="Close settings"
+      @click="handleClose"
+    />
 
-    <div class="fixed top-1/2 left-[25%] z-45 -translate-x-1/2 -translate-y-1/2">
+    <div
+      v-if="isOpen"
+      class="pointer-events-none fixed top-1/2 left-[25%] z-45 -translate-x-1/2 -translate-y-1/2"
+    >
       <LazyAboutPopup
-        :is-visible="true"
+        :is-visible="isVisible"
         :about-data="previewAboutData"
         @close="() => {}"
       />
     </div>
 
-    <Transition
-      name="slide"
-      appear
+    <div
+      v-if="isOpen"
+      v-motion
+      :initial="slideInitial"
+      :enter="slideEnter"
+      :leave="slideLeave"
+      class="bg-elevated border-default fixed top-0 right-0 z-50 flex h-full w-3/4 flex-col border-l font-['EnduroWeb',sans-serif] shadow-2xl backdrop-blur-xl md:w-1/2"
+      @leave="handleAfterLeave"
     >
-      <div class="bg-elevated border-default fixed top-0 right-0 z-50 flex h-full w-3/4 flex-col border-l font-['EnduroWeb',sans-serif] shadow-2xl backdrop-blur-xl md:w-1/2">
-        <UForm
-          :state="{}"
-          class="flex h-full flex-col"
-          @submit="handleSubmit"
-        >
-          <div class="border-default flex flex-shrink-0 items-center gap-4 border-b p-8 backdrop-blur-sm">
-            <div class="flex-1">
-              <h2 class="text-highlighted text-xl font-medium tracking-tight">
-                Settings
-              </h2>
-              <p class="text-muted mt-1 text-xs tracking-wide uppercase">
-                Configure site content
-              </p>
-            </div>
-
-            <UButton
-              variant="ghost"
-              class="h-12 w-12 flex-shrink-0 overflow-hidden"
-              title="Click to update favicon"
-              @click="faviconFileInput?.click()"
-            >
-              <img
-                v-if="faviconUrl"
-                :src="faviconUrl"
-                alt="Favicon"
-                class="h-full w-full object-cover"
-              >
-              <div
-                v-else
-                class="flex h-full w-full items-center justify-center"
-              >
-                <UIcon
-                  name="i-ph-image"
-                  class="size-6"
-                />
-              </div>
-            </UButton>
-
-            <input
-              id="faviconFileInput"
-              ref="faviconFileInput"
-              type="file"
-              accept="image/png,image/x-icon,image/svg+xml"
-              class="hidden"
-              aria-label="Update Favicon"
-              @change="handleFaviconUpdate"
-            >
+      <UForm
+        :state="{}"
+        class="flex h-full flex-col"
+        @submit="handleSubmit"
+      >
+        <div class="border-default flex flex-shrink-0 items-center gap-4 border-b p-8 backdrop-blur-sm">
+          <div class="flex-1">
+            <h2 class="text-highlighted text-xl font-medium tracking-tight">
+              Settings
+            </h2>
+            <p class="text-muted mt-1 text-xs tracking-wide uppercase">
+              Configure site content
+            </p>
           </div>
 
-          <div class="flex-1 space-y-8 overflow-y-auto p-8">
-            <div>
-              <h3 class="text-highlighted mb-4 text-sm font-medium tracking-wider uppercase">
-                Hero Section
-              </h3>
-              <UFormField label="Hero Title">
-                <UInput
-                  v-model="heroTitle"
-                  placeholder="Creative Strategy and Communication"
+          <UButton
+            variant="ghost"
+            class="h-12 w-12 flex-shrink-0 overflow-hidden"
+            title="Click to update favicon"
+            @click="faviconFileInput?.click()"
+          >
+            <img
+              v-if="faviconUrl"
+              :src="faviconUrl"
+              alt="Favicon"
+              class="h-full w-full object-cover"
+            >
+            <div
+              v-else
+              class="flex h-full w-full items-center justify-center"
+            >
+              <UIcon
+                name="i-ph-image"
+                class="size-6"
+              />
+            </div>
+          </UButton>
+
+          <input
+            id="faviconFileInput"
+            ref="faviconFileInput"
+            type="file"
+            accept="image/png,image/x-icon,image/svg+xml"
+            class="hidden"
+            aria-label="Update Favicon"
+            @change="handleFaviconUpdate"
+          >
+        </div>
+
+        <div class="flex-1 space-y-8 overflow-y-auto p-8">
+          <div>
+            <h3 class="text-highlighted mb-4 text-sm font-medium tracking-wider uppercase">
+              Hero Section
+            </h3>
+            <UFormField label="Hero Title">
+              <UInput
+                v-model="heroTitle"
+                placeholder="Creative Strategy and Communication"
+                color="neutral"
+                variant="subtle"
+                class="w-full"
+              />
+            </UFormField>
+          </div>
+
+          <div class="border-default border-t" />
+
+          <div>
+            <h3 class="text-highlighted mb-4 text-sm font-medium tracking-wider uppercase">
+              About Section
+            </h3>
+            <div class="space-y-4">
+              <UFormField label="About Description">
+                <UTextarea
+                  v-model="aboutDescription"
+                  :rows="4"
                   color="neutral"
                   variant="subtle"
+                  class="w-full"
                 />
               </UFormField>
+              <UFormField label="Expertise Description">
+                <UTextarea
+                  v-model="expertiseDescription"
+                  :rows="3"
+                  color="neutral"
+                  variant="subtle"
+                  class="w-full"
+                />
+              </UFormField>
+              <div>
+                <UFormField
+                  label="Client List"
+                  help="Press Enter to add a client"
+                >
+                  <UInputTags
+                    v-model="clientList"
+                    placeholder="e.g., NIKE"
+                    color="neutral"
+                    variant="subtle"
+                    :display-value="uppercaseDisplay"
+                    :convert-value="handleAddTag"
+                    class="w-full"
+                  />
+                </UFormField>
+              </div>
             </div>
+          </div>
 
-            <div class="border-default border-t" />
+          <div class="border-default border-t" />
 
-            <div>
-              <h3 class="text-highlighted mb-4 text-sm font-medium tracking-wider uppercase">
-                About Section
-              </h3>
-              <div class="space-y-4">
-                <UFormField label="About Description">
-                  <UTextarea
-                    v-model="aboutDescription"
-                    :rows="4"
-                    color="neutral"
-                    variant="subtle"
-                  />
-                </UFormField>
-                <UFormField label="Expertise Description">
-                  <UTextarea
-                    v-model="expertiseDescription"
-                    :rows="3"
-                    color="neutral"
-                    variant="subtle"
-                  />
-                </UFormField>
-                <div>
-                  <UFormField
-                    label="Client List"
-                    help="Press Enter to add a client"
-                  >
-                    <UInputTags
-                      v-model="clientList"
-                      placeholder="e.g., NIKE"
+          <div>
+            <h3 class="text-highlighted mb-4 text-sm font-medium tracking-wider uppercase">
+              Global Settings
+            </h3>
+            <div class="space-y-4">
+              <UFormField label="Contact Email">
+                <UInput
+                  v-model="contactEmail"
+                  type="email"
+                  placeholder="hello@example.com"
+                  color="neutral"
+                  variant="subtle"
+                  class="w-full"
+                />
+              </UFormField>
+              <div>
+                <p class="text-toned mb-2 text-xs font-medium tracking-wider uppercase">
+                  Font Sizes (rem)
+                </p>
+                <div class="grid grid-cols-4 gap-2">
+                  <UFormField label="Mobile">
+                    <UInputNumber
+                      v-model="mobileFontSize"
+                      :step="0.125"
+                      :increment="false"
+                      :decrement="false"
                       color="neutral"
                       variant="subtle"
-                      :display-value="uppercaseDisplay"
-                      :convert-value="handleAddTag"
+                    />
+                  </UFormField>
+                  <UFormField label="Tablet">
+                    <UInputNumber
+                      v-model="tabletFontSize"
+                      :step="0.125"
+                      :increment="false"
+                      :decrement="false"
+                      color="neutral"
+                      variant="subtle"
+                    />
+                  </UFormField>
+                  <UFormField label="Desktop">
+                    <UInputNumber
+                      v-model="desktopFontSize"
+                      :step="0.125"
+                      :increment="false"
+                      :decrement="false"
+                      color="neutral"
+                      variant="subtle"
+                    />
+                  </UFormField>
+                  <UFormField label="Large">
+                    <UInputNumber
+                      v-model="largeDesktopFontSize"
+                      :step="0.125"
+                      :increment="false"
+                      :decrement="false"
+                      color="neutral"
+                      variant="subtle"
                     />
                   </UFormField>
                 </div>
               </div>
-            </div>
-
-            <div class="border-default border-t" />
-
-            <div>
-              <h3 class="text-highlighted mb-4 text-sm font-medium tracking-wider uppercase">
-                Global Settings
-              </h3>
-              <div class="space-y-4">
-                <UFormField label="Contact Email">
-                  <UInput
-                    v-model="contactEmail"
-                    type="email"
-                    placeholder="hello@example.com"
-                    color="neutral"
-                    variant="subtle"
-                  />
-                </UFormField>
-                <div>
-                  <p class="text-toned mb-2 text-xs font-medium tracking-wider uppercase">
-                    Font Sizes (rem)
-                  </p>
-                  <div class="grid grid-cols-4 gap-2">
-                    <UFormField label="Mobile">
-                      <UInputNumber
-                        v-model="mobileFontSize"
-                        :step="0.125"
-                        :increment="false"
-                        :decrement="false"
-                        color="neutral"
-                        variant="subtle"
-                      />
-                    </UFormField>
-                    <UFormField label="Tablet">
-                      <UInputNumber
-                        v-model="tabletFontSize"
-                        :step="0.125"
-                        :increment="false"
-                        :decrement="false"
-                        color="neutral"
-                        variant="subtle"
-                      />
-                    </UFormField>
-                    <UFormField label="Desktop">
-                      <UInputNumber
-                        v-model="desktopFontSize"
-                        :step="0.125"
-                        :increment="false"
-                        :decrement="false"
-                        color="neutral"
-                        variant="subtle"
-                      />
-                    </UFormField>
-                    <UFormField label="Large">
-                      <UInputNumber
-                        v-model="largeDesktopFontSize"
-                        :step="0.125"
-                        :increment="false"
-                        :decrement="false"
-                        color="neutral"
-                        variant="subtle"
-                      />
-                    </UFormField>
-                  </div>
-                </div>
-                <UFormField>
-                  <USwitch
-                    v-model="showTopProgressBar"
-                    label="Show Top Progress Bar"
-                  />
-                  <p class="text-dimmed mt-1 text-xs">
-                    Display progress bar at top of carousel
-                  </p>
-                </UFormField>
-              </div>
+              <UFormField>
+                <USwitch
+                  v-model="showTopProgressBar"
+                  label="Show Top Progress Bar"
+                />
+                <p class="text-dimmed mt-1 text-xs">
+                  Display progress bar at top of carousel
+                </p>
+              </UFormField>
             </div>
           </div>
+        </div>
 
-          <div class="border-default flex flex-shrink-0 gap-3 border-t p-8 backdrop-blur-sm">
-            <UButton
-              type="button"
-              variant="outline"
-              class="flex-1"
-              @click="emit('close')"
-            >
-              Cancel
-            </UButton>
-            <UButton
-              type="submit"
-              :loading="loading"
-              class="flex-1"
-            >
-              {{ loading ? 'Saving...' : 'Save Changes' }}
-            </UButton>
-          </div>
-        </UForm>
-      </div>
-    </Transition>
-  </template>
+        <div class="border-default flex flex-shrink-0 gap-3 border-t p-8 backdrop-blur-sm">
+          <UButton
+            type="button"
+            variant="outline"
+            class="flex-1"
+            @click="handleClose"
+          >
+            Cancel
+          </UButton>
+          <UButton
+            type="submit"
+            :loading="loading"
+            class="flex-1"
+          >
+            {{ loading ? 'Saving...' : 'Save Changes' }}
+          </UButton>
+        </div>
+      </UForm>
+    </div>
+  </Teleport>
 </template>
-
-<style scoped>
-.backdrop-enter-active,
-.backdrop-leave-active {
-  transition: opacity 0.2s ease-out;
-}
-
-.backdrop-enter-from,
-.backdrop-leave-to {
-  opacity: 0;
-}
-
-.slide-enter-active,
-.slide-leave-active {
-  transition:
-    transform 0.3s ease-out,
-    opacity 0.2s ease-out;
-}
-
-.slide-enter-from,
-.slide-leave-to {
-  transform: translateX(100%);
-  opacity: 0;
-}
-</style>

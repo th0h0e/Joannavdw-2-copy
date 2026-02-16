@@ -33,6 +33,7 @@ const images = ref<ImageItem[]>([])
 const imagesToDelete = ref<string[]>([])
 const loading = ref(false)
 const { isMobile } = useDevice()
+const isVisible = ref(true)
 
 const scrollLock = useScrollLock(document.body, true)
 
@@ -44,6 +45,14 @@ onUnmounted(() => {
     }
   })
 })
+
+function handleCancel() {
+  isVisible.value = false
+}
+
+function handleAfterLeave() {
+  emit('cancel')
+}
 
 const dropZoneRef = useTemplateRef('dropZoneRef')
 const imageGridRef = useTemplateRef('imageGridRef')
@@ -195,14 +204,26 @@ async function handleSubmit(e?: Event) {
     loading.value = false
   }
 }
+
+const backdropInitial = { opacity: 0 }
+const backdropEnter = { opacity: 1, transition: { duration: 200, ease: 'easeOut' } }
+const backdropLeave = { opacity: 0, transition: { duration: 200, ease: 'easeIn' } }
+
+const slideInitial = { x: '100%', opacity: 0 }
+const slideEnter = { x: 0, opacity: 1, transition: { duration: 300, ease: 'easeOut' } }
+const slideLeave = { x: '100%', opacity: 0, transition: { duration: 300, ease: 'easeIn' } }
 </script>
 
 <template>
   <Teleport to="body">
     <button
-      class="bg-default/70 fixed inset-0 z-40 m-0 appearance-none border-0 bg-transparent p-0 text-left backdrop-blur-md transition-opacity duration-300"
+      v-motion
+      :initial="backdropInitial"
+      :enter="backdropEnter"
+      :leave="backdropLeave"
+      class="bg-default/70 fixed inset-0 z-40 m-0 appearance-none border-0 bg-transparent p-0 text-left backdrop-blur-md"
       aria-label="Cancel editing"
-      @click="emit('cancel')"
+      @click="handleCancel"
     />
 
     <div
@@ -217,7 +238,12 @@ async function handleSubmit(e?: Event) {
     </div>
 
     <div
+      v-motion
+      :initial="slideInitial"
+      :enter="slideEnter"
+      :leave="slideLeave"
       class="bg-elevated border-default fixed top-0 right-0 z-50 flex h-screen w-3/4 flex-col border-l font-['EnduroWeb',sans-serif] shadow-2xl backdrop-blur-xl md:w-2/3 lg:w-1/2"
+      @leave="handleAfterLeave"
     >
       <UForm
         :state="formState"
@@ -397,7 +423,7 @@ async function handleSubmit(e?: Event) {
             variant="outline"
             color="neutral"
             class="flex-1"
-            @click="emit('cancel')"
+            @click="handleCancel"
           >
             Cancel
           </UButton>
