@@ -17,8 +17,6 @@ const emit = defineEmits<{
 }>()
 
 const UButton = resolveComponent('UButton')
-const UBadge = resolveComponent('UBadge')
-const UDropdownMenu = resolveComponent('UDropdownMenu')
 const UIcon = resolveComponent('UIcon')
 
 const localProjects = ref<PortfolioProjectsResponse<string[]>[]>([])
@@ -64,18 +62,22 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
     enableSorting: false,
     meta: {
       class: {
-        th: 'w-16',
-        td: 'w-16',
+        th: 'w-20',
+        td: 'w-20',
       },
     },
     cell: ({ row }) => {
-      if (row.original.Images && row.original.Images.length > 0) {
+      const imageCount = row.original.Images?.length || 0
+      if (imageCount > 0) {
         return h('div', { class: 'bg-elevated relative size-12 overflow-hidden rounded-[var(--ui-radius)]' }, [
           h('img', {
             src: getImageUrl(row.original, row.original.Images[0]),
             alt: row.original.Title,
             class: 'size-full object-cover',
           }),
+          h('div', {
+            class: 'bg-default/70 text-highlighted absolute right-1 bottom-1 px-1.5 py-0.5 text-[10px] font-medium backdrop-blur-sm rounded-[var(--ui-radius)]',
+          }, imageCount),
         ])
       }
       return h('div', { class: 'bg-elevated flex size-12 items-center justify-center rounded-[var(--ui-radius)]' }, [
@@ -87,22 +89,6 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
     accessorKey: 'Title',
     header: 'Title',
     cell: ({ row }) => h('span', { class: 'text-highlighted font-medium' }, row.original.Title),
-  },
-  {
-    id: 'images',
-    header: 'Images',
-    enableSorting: false,
-    meta: {
-      class: {
-        th: 'w-20 text-center',
-        td: 'w-20 text-center',
-      },
-    },
-    cell: ({ row }) => h(UBadge, {
-      color: 'neutral',
-      variant: 'subtle',
-      size: 'sm',
-    }, () => `${row.original.Images?.length || 0}`),
   },
   {
     id: 'responsibilities',
@@ -125,40 +111,40 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
     },
   },
   {
-    id: 'actions',
+    id: 'edit',
+    enableSorting: false,
+    enableHiding: false,
+    meta: {
+      class: {
+        th: 'w-20',
+        td: 'w-20',
+      },
+    },
+    cell: ({ row }) => h(UButton, {
+      variant: 'outline',
+      color: 'neutral',
+      size: 'sm',
+      class: 'text-xs tracking-wide uppercase',
+      onClick: () => emit('edit', row.original),
+    }, () => 'Edit'),
+  },
+  {
+    id: 'delete',
     enableSorting: false,
     enableHiding: false,
     meta: {
       class: {
         th: 'w-24',
-        td: 'w-24 text-right',
+        td: 'w-24',
       },
     },
-    cell: ({ row }) => h(UDropdownMenu, {
-      content: { align: 'end' },
-      items: [
-        {
-          label: 'Edit',
-          icon: 'i-ph-pencil',
-          onSelect: () => emit('edit', row.original),
-        },
-        {
-          type: 'separator',
-        },
-        {
-          label: 'Delete',
-          icon: 'i-ph-trash',
-          color: 'error',
-          onSelect: () => emit('delete', row.original.id),
-        },
-      ],
-    }, () => h(UButton, {
-      'icon': 'i-ph-dots-three-vertical',
-      'color': 'neutral',
-      'variant': 'ghost',
-      'size': 'sm',
-      'aria-label': 'Actions',
-    })),
+    cell: ({ row }) => h(UButton, {
+      color: 'error',
+      variant: 'soft',
+      size: 'sm',
+      class: 'text-xs tracking-wide uppercase',
+      onClick: () => emit('delete', row.original.id),
+    }, () => 'Delete'),
   },
 ]
 </script>
@@ -167,8 +153,9 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
   <UTable
     :data="localProjects"
     :columns="columns"
+    sticky
     :ui="{
-      root: 'border-default border rounded-lg',
+      root: 'border-default border rounded-[var(--ui-radius)]',
       tbody: 'project-table-tbody',
     }"
     class="flex-1"

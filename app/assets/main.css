@@ -53,7 +53,7 @@
   --ui-border-accented: var(--ui-color-neutral-300);
   --ui-border-inverted: var(--ui-color-neutral-900);
 
-  --ui-radius: 0.25rem;
+  --ui-radius: 0.125rem;
   --ui-container: 80rem;
   --ui-header-height: calc(var(--spacing) * 16);
 }
