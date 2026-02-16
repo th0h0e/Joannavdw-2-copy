@@ -28,7 +28,13 @@ export default defineNuxtConfig({
     '@nuxt/hints',
     '@nuxt/image',
     '@nuxt/ui',
+    '@nuxt/icon',
   ],
+
+  // Use SVG mode to avoid server API URL parsing issues with client-side rendering
+  icon: {
+    mode: 'svg',
+  },
 
   devtools: {
     enabled: process.env.NODE_ENV !== 'production',
