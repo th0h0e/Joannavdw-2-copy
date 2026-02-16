@@ -11,7 +11,14 @@ const emit = defineEmits<{
   showToast: [message: string, type: 'success' | 'error']
 }>()
 
-const isVisible = ref(false)
+const open = computed({
+  get: () => props.isOpen,
+  set: (value) => {
+    if (!value)
+      emit('close')
+  },
+})
+
 const faviconFileInput = ref<HTMLInputElement | null>(null)
 const saving = ref(false)
 
@@ -32,20 +39,10 @@ const { data: rawData, refresh, status } = useAsyncData(
   { immediate: false },
 )
 
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen) {
-    isVisible.value = true
+watch(open, (isOpen) => {
+  if (isOpen)
     refresh()
-  }
-}, { immediate: true })
-
-function handleClose() {
-  isVisible.value = false
-}
-
-function handleAfterLeave() {
-  emit('close')
-}
+})
 
 const loading = computed(() => status.value === 'pending' || saving.value)
 
@@ -100,6 +97,7 @@ async function handleFaviconUpdate(event: Event) {
     await $fetch('/api/favicon', {
       method: 'PUT',
       body: formData,
+      headers: { Authorization: `Bearer ${pb.authStore.token}` },
     })
 
     faviconUrl.value = `/assets/favicon.ico?v=${Date.now()}`
@@ -147,14 +145,21 @@ async function handleSubmit(e: Event) {
         desktop: desktopFontSize.value,
         largeDesktop: largeDesktopFontSize.value,
       },
+      headers: { Authorization: `Bearer ${pb.authStore.token}` },
     })
 
     emit('showToast', 'Settings saved successfully!', 'success')
-    handleClose()
+    open.value = false
   }
   catch (err: unknown) {
     console.error('Error saving settings:', err)
-    const error = err as { data?: { message?: string }, message?: string }
+    const error = err as { status?: number, data?: { message?: string }, message?: string }
+    if (error?.status === 401 || error?.status === 403) {
+      emit('showToast', 'Your session has expired. Please login again.', 'error')
+      pb.authStore.clear()
+      navigateTo('/admin')
+      return
+    }
     emit('showToast', `Failed to save settings: ${error?.data?.message || error?.message || 'Unknown error'}`, 'error')
   }
   finally {
@@ -162,111 +167,83 @@ async function handleSubmit(e: Event) {
   }
 }
 
-const previewAboutData = ref<AboutResponse<string[]> | null>(null)
-watch([aboutData, aboutDescription, expertiseDescription, clientList, contactEmail], () => {
-  if (aboutData.value) {
-    previewAboutData.value = {
-      ...aboutData.value,
-      About_Description: aboutDescription.value,
-      Expertise_Description: expertiseDescription.value,
-      Client_List_Json: clientList.value,
-      Contact_Email: contactEmail.value,
-    }
+const previewAboutData = computed(() => {
+  if (!aboutData.value)
+    return null
+  return {
+    ...aboutData.value,
+    About_Description: aboutDescription.value,
+    Expertise_Description: expertiseDescription.value,
+    Client_List_Json: clientList.value,
+    Contact_Email: contactEmail.value,
   }
-}, { deep: true })
-
-const backdropInitial = { opacity: 0 }
-const backdropEnter = { opacity: 1, transition: { duration: 200, ease: 'easeOut' } }
-const backdropLeave = { opacity: 0, transition: { duration: 200, ease: 'easeIn' } }
-
-const slideInitial = { x: '100%', opacity: 0 }
-const slideEnter = { x: 0, opacity: 1, transition: { duration: 300, ease: 'easeOut' } }
-const slideLeave = { x: '100%', opacity: 0, transition: { duration: 300, ease: 'easeIn' } }
+})
 </script>
 
 <template>
-  <Teleport to="body">
-    <button
-      v-if="isOpen"
-      v-motion
-      :initial="backdropInitial"
-      :enter="backdropEnter"
-      :leave="backdropLeave"
-      class="bg-default/70 fixed inset-0 z-40 m-0 appearance-none border-0 bg-transparent p-0 text-left backdrop-blur-md"
-      aria-label="Close settings"
-      @click="handleClose"
-    />
+  <UDrawer
+    v-model:open="open"
+    direction="right"
+    :handle="false"
+    :ui="{
+      content: 'h-full w-3/4 md:w-1/2 max-w-none',
+      body: 'p-0',
+      header: 'p-6 border-b border-default',
+    }"
+  >
+    <template #header>
+      <div class="flex items-center gap-4">
+        <div class="flex-1">
+          <h2 class="text-highlighted text-xl font-medium tracking-tight">
+            Settings
+          </h2>
+          <p class="text-muted mt-1 text-xs tracking-wide uppercase">
+            Configure site content
+          </p>
+        </div>
 
-    <div
-      v-if="isOpen"
-      class="pointer-events-none fixed top-1/2 left-[25%] z-45 -translate-x-1/2 -translate-y-1/2"
-    >
-      <LazyAboutPopup
-        :is-visible="isVisible"
-        :about-data="previewAboutData"
-        @close="() => {}"
-      />
-    </div>
+        <UButton
+          variant="ghost"
+          class="h-12 w-12 flex-shrink-0 overflow-hidden"
+          title="Click to update favicon"
+          @click="faviconFileInput?.click()"
+        >
+          <img
+            v-if="faviconUrl"
+            :src="faviconUrl"
+            alt="Favicon"
+            class="h-full w-full object-cover"
+          >
+          <div
+            v-else
+            class="flex h-full w-full items-center justify-center"
+          >
+            <UIcon
+              name="i-ph-image"
+              class="size-6"
+            />
+          </div>
+        </UButton>
 
-    <div
-      v-if="isOpen"
-      v-motion
-      :initial="slideInitial"
-      :enter="slideEnter"
-      :leave="slideLeave"
-      class="bg-elevated border-default fixed top-0 right-0 z-50 flex h-full w-3/4 flex-col border-l font-['EnduroWeb',sans-serif] shadow-2xl backdrop-blur-xl md:w-1/2"
-      @leave="handleAfterLeave"
-    >
+        <input
+          id="faviconFileInput"
+          ref="faviconFileInput"
+          type="file"
+          accept="image/png,image/x-icon,image/svg+xml"
+          class="hidden"
+          aria-label="Update Favicon"
+          @change="handleFaviconUpdate"
+        >
+      </div>
+    </template>
+
+    <template #body>
       <UForm
         :state="{}"
         class="flex h-full flex-col"
         @submit="handleSubmit"
       >
-        <div class="border-default flex flex-shrink-0 items-center gap-4 border-b p-8 backdrop-blur-sm">
-          <div class="flex-1">
-            <h2 class="text-highlighted text-xl font-medium tracking-tight">
-              Settings
-            </h2>
-            <p class="text-muted mt-1 text-xs tracking-wide uppercase">
-              Configure site content
-            </p>
-          </div>
-
-          <UButton
-            variant="ghost"
-            class="h-12 w-12 flex-shrink-0 overflow-hidden"
-            title="Click to update favicon"
-            @click="faviconFileInput?.click()"
-          >
-            <img
-              v-if="faviconUrl"
-              :src="faviconUrl"
-              alt="Favicon"
-              class="h-full w-full object-cover"
-            >
-            <div
-              v-else
-              class="flex h-full w-full items-center justify-center"
-            >
-              <UIcon
-                name="i-ph-image"
-                class="size-6"
-              />
-            </div>
-          </UButton>
-
-          <input
-            id="faviconFileInput"
-            ref="faviconFileInput"
-            type="file"
-            accept="image/png,image/x-icon,image/svg+xml"
-            class="hidden"
-            aria-label="Update Favicon"
-            @change="handleFaviconUpdate"
-          >
-        </div>
-
-        <div class="flex-1 space-y-8 overflow-y-auto p-8">
+        <div class="flex-1 space-y-8 overflow-y-auto p-6">
           <div>
             <h3 class="text-highlighted mb-4 text-sm font-medium tracking-wider uppercase">
               Hero Section
@@ -307,22 +284,20 @@ const slideLeave = { x: '100%', opacity: 0, transition: { duration: 300, ease: '
                   class="w-full"
                 />
               </UFormField>
-              <div>
-                <UFormField
-                  label="Client List"
-                  help="Press Enter to add a client"
-                >
-                  <UInputTags
-                    v-model="clientList"
-                    placeholder="e.g., NIKE"
-                    color="neutral"
-                    variant="subtle"
-                    :display-value="uppercaseDisplay"
-                    :convert-value="handleAddTag"
-                    class="w-full"
-                  />
-                </UFormField>
-              </div>
+              <UFormField
+                label="Client List"
+                help="Press Enter to add a client"
+              >
+                <UInputTags
+                  v-model="clientList"
+                  placeholder="e.g., NIKE"
+                  color="neutral"
+                  variant="subtle"
+                  :display-value="uppercaseDisplay"
+                  :convert-value="handleAddTag"
+                  class="w-full"
+                />
+              </UFormField>
             </div>
           </div>
 
@@ -403,12 +378,12 @@ const slideLeave = { x: '100%', opacity: 0, transition: { duration: 300, ease: '
           </div>
         </div>
 
-        <div class="border-default flex flex-shrink-0 gap-3 border-t p-8 backdrop-blur-sm">
+        <div class="border-default flex flex-shrink-0 gap-3 border-t p-6">
           <UButton
             type="button"
             variant="outline"
             class="flex-1"
-            @click="handleClose"
+            @click="open = false"
           >
             Cancel
           </UButton>
@@ -421,6 +396,17 @@ const slideLeave = { x: '100%', opacity: 0, transition: { duration: 300, ease: '
           </UButton>
         </div>
       </UForm>
-    </div>
-  </Teleport>
+    </template>
+  </UDrawer>
+
+  <div
+    v-if="isOpen"
+    class="pointer-events-none fixed top-1/2 left-[25%] z-45 -translate-x-1/2 -translate-y-1/2"
+  >
+    <LazyAboutPopup
+      :is-visible="isOpen"
+      :about-data="previewAboutData"
+      @close="() => {}"
+    />
+  </div>
 </template>

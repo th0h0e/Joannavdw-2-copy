@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PortfolioProjectsResponse } from '#layers/2.admin/app/shared/types/pocketbase-types'
 import { getImageUrl, pb } from '#layers/2.admin/app/utils/pocketbase'
-import { useDropZone, useScrollLock } from '@vueuse/core'
+import { useDropZone } from '@vueuse/core'
 import { useSortable } from '@vueuse/integrations/useSortable'
 
 interface ImageItem {
@@ -14,6 +14,7 @@ interface ImageItem {
 
 const props = defineProps<{
   project: PortfolioProjectsResponse<string[]> | null
+  isOpen: boolean
 }>()
 
 const emit = defineEmits<{
@@ -22,55 +23,42 @@ const emit = defineEmits<{
   showToast: [message: string, type: 'success' | 'error']
 }>()
 
+const { isMobile } = useDevice()
+
 const formState = reactive({
-  title: props.project?.Title ?? '',
-  description: props.project?.Description ?? '',
-  order: props.project?.Order ?? 0,
-  responsibilities: props.project?.Responsibility_json ?? [],
+  title: '',
+  description: '',
+  order: 0,
+  responsibilities: [] as string[],
 })
 
 const images = ref<ImageItem[]>([])
 const imagesToDelete = ref<string[]>([])
 const loading = ref(false)
-const { isMobile } = useDevice()
-const isVisible = ref(true)
-
-const scrollLock = useScrollLock(document.body, true)
-
-onUnmounted(() => {
-  scrollLock.value = false
-  images.value.forEach((img) => {
-    if (!img.isExisting) {
-      URL.revokeObjectURL(img.url)
-    }
-  })
-})
-
-function handleCancel() {
-  isVisible.value = false
-}
-
-function handleAfterLeave() {
-  emit('cancel')
-}
 
 const dropZoneRef = useTemplateRef('dropZoneRef')
 const imageGridRef = useTemplateRef('imageGridRef')
 
 watch(() => props.project, (project) => {
-  if (project && project.Images) {
-    images.value = project.Images.map((filename, index) => ({
+  if (project) {
+    images.value = project.Images?.map((filename, index) => ({
       id: `existing-${index}`,
       url: getImageUrl(project, filename),
       filename,
       isExisting: true,
-    }))
-  }
-  if (project) {
+    })) ?? []
     formState.title = project.Title ?? ''
     formState.description = project.Description ?? ''
     formState.order = project.Order ?? 0
     formState.responsibilities = project.Responsibility_json ?? []
+  }
+  else {
+    images.value = []
+    imagesToDelete.value = []
+    formState.title = ''
+    formState.description = ''
+    formState.order = 0
+    formState.responsibilities = []
   }
 }, { immediate: true })
 
@@ -127,6 +115,15 @@ function handleDeleteImage(image: ImageItem) {
   if (!image.isExisting) {
     URL.revokeObjectURL(image.url)
   }
+}
+
+function handleClose() {
+  images.value.forEach((img) => {
+    if (!img.isExisting) {
+      URL.revokeObjectURL(img.url)
+    }
+  })
+  emit('cancel')
 }
 
 async function handleSubmit(e?: Event) {
@@ -204,62 +201,37 @@ async function handleSubmit(e?: Event) {
     loading.value = false
   }
 }
-
-const backdropInitial = { opacity: 0 }
-const backdropEnter = { opacity: 1, transition: { duration: 200, ease: 'easeOut' } }
-const backdropLeave = { opacity: 0, transition: { duration: 200, ease: 'easeIn' } }
-
-const slideInitial = { x: '100%', opacity: 0 }
-const slideEnter = { x: 0, opacity: 1, transition: { duration: 300, ease: 'easeOut' } }
-const slideLeave = { x: '100%', opacity: 0, transition: { duration: 300, ease: 'easeIn' } }
 </script>
 
 <template>
-  <Teleport to="body">
-    <button
-      v-motion
-      :initial="backdropInitial"
-      :enter="backdropEnter"
-      :leave="backdropLeave"
-      class="bg-default/70 fixed inset-0 z-40 m-0 appearance-none border-0 bg-transparent p-0 text-left backdrop-blur-md"
-      aria-label="Cancel editing"
-      @click="handleCancel"
-    />
+  <UDrawer
+    :open="isOpen"
+    direction="right"
+    :handle="false"
+    :dismissible="false"
+    :ui="{
+      content: 'h-full w-3/4 md:w-2/3 lg:w-1/2 max-w-none',
+      body: 'p-0',
+      header: 'p-6 border-b border-default',
+    }"
+    @close="handleClose"
+  >
+    <template #header>
+      <h2 class="text-highlighted text-xl font-medium tracking-tight">
+        {{ project ? 'Edit Project' : 'New Project' }}
+      </h2>
+      <p class="text-muted mt-1 text-xs tracking-wide uppercase">
+        {{ project ? 'Update project details and images' : 'Create a new portfolio project' }}
+      </p>
+    </template>
 
-    <div
-      v-if="project && !isMobile"
-      class="pointer-events-none absolute top-1/2 left-[25%] z-45 -translate-x-1/2 -translate-y-1/2"
-    >
-      <LazyProjectPopupPreview
-        :project-title="formState.title"
-        :project-description="formState.description"
-        :project-responsibility="formState.responsibilities"
-      />
-    </div>
-
-    <div
-      v-motion
-      :initial="slideInitial"
-      :enter="slideEnter"
-      :leave="slideLeave"
-      class="bg-elevated border-default fixed top-0 right-0 z-50 flex h-screen w-3/4 flex-col border-l font-['EnduroWeb',sans-serif] shadow-2xl backdrop-blur-xl md:w-2/3 lg:w-1/2"
-      @leave="handleAfterLeave"
-    >
+    <template #body>
       <UForm
         :state="formState"
         class="flex h-full flex-col"
         @submit="handleSubmit"
       >
-        <div class="border-default flex-shrink-0 border-b p-8 backdrop-blur-sm">
-          <h2 class="text-highlighted text-xl font-medium tracking-tight">
-            {{ project ? 'Edit Project' : 'New Project' }}
-          </h2>
-          <p class="text-muted mt-1 text-xs tracking-wide uppercase">
-            {{ project ? 'Update project details and images' : 'Create a new portfolio project' }}
-          </p>
-        </div>
-
-        <div class="flex-1 space-y-8 overflow-y-auto p-8">
+        <div class="flex-1 space-y-6 overflow-y-auto p-6">
           <div>
             <span
               id="images-label"
@@ -417,13 +389,13 @@ const slideLeave = { x: '100%', opacity: 0, transition: { duration: 300, ease: '
           </UFormField>
         </div>
 
-        <div class="border-default flex flex-shrink-0 gap-3 border-t p-8 backdrop-blur-sm">
+        <div class="border-default flex flex-shrink-0 gap-3 border-t p-6">
           <UButton
             type="button"
             variant="outline"
             color="neutral"
             class="flex-1"
-            @click="handleCancel"
+            @click="handleClose"
           >
             Cancel
           </UButton>
@@ -436,6 +408,17 @@ const slideLeave = { x: '100%', opacity: 0, transition: { duration: 300, ease: '
           </UButton>
         </div>
       </UForm>
-    </div>
-  </Teleport>
+    </template>
+  </UDrawer>
+
+  <div
+    v-if="isOpen && project && !isMobile"
+    class="pointer-events-none fixed top-1/2 left-[25%] z-45 -translate-x-1/2 -translate-y-1/2"
+  >
+    <LazyProjectPopupPreview
+      :project-title="formState.title"
+      :project-description="formState.description"
+      :project-responsibility="formState.responsibilities"
+    />
+  </div>
 </template>

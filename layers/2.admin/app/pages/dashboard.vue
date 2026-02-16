@@ -325,8 +325,8 @@ async function handlePublishChanges() {
     </main>
 
     <LazyProjectEditor
-      v-if="editingProject || showNewProjectForm"
       :project="editingProject"
+      :is-open="!!editingProject || showNewProjectForm"
       @save="handleSave"
       @cancel="editingProject = null; showNewProjectForm = false"
       @show-toast="(msg: string, type: 'success' | 'error') => showToast(msg, type)"
