@@ -93,10 +93,10 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
     header: 'Description',
     meta: {
       class: {
-        td: 'max-w-xs',
+        td: 'max-w-sm',
       },
     },
-    cell: ({ row }) => h('p', { class: 'text-muted line-clamp-2 text-sm' }, row.original.Description),
+    cell: ({ row }) => h('p', { class: 'text-muted line-clamp-3 text-sm leading-relaxed' }, row.original.Description),
   },
   {
     id: 'images',
