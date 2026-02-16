@@ -32,7 +32,7 @@ watch(rawProjects, (val) => {
 
 useSortable(projectListRef, projects, {
   animation: 150,
-  handle: '.project-card',
+  handle: '.drag-handle',
   onEnd: async () => {
     if (isReordering.value)
       return
@@ -286,7 +286,7 @@ async function handlePublishChanges() {
             </div>
           </div>
 
-          <div class="text-muted group-hover:text-toned border-default flex items-center border-l px-4 transition-colors duration-200">
+          <div class="drag-handle text-muted group-hover:text-toned border-default flex cursor-grab items-center border-l px-4 transition-colors duration-200 active:cursor-grabbing">
             <UIcon
               name="i-ph-dots-six-vertical"
               class="size-6"

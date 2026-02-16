@@ -67,7 +67,6 @@ watch(() => props.project, (project) => {
 
 useSortable(imageGridRef, images, {
   animation: 150,
-  handle: '.image-item',
 })
 
 const { isOverDropZone: isDraggingFile } = useDropZone(dropZoneRef, {
