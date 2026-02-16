@@ -6,14 +6,12 @@ import { useSortable } from '@vueuse/integrations/useSortable'
 
 const props = defineProps<{
   projects: PortfolioProjectsResponse<string[]>[]
-  isReordering: boolean
 }>()
 
 const emit = defineEmits<{
   edit: [project: PortfolioProjectsResponse<string[]>]
   delete: [projectId: string]
   reorder: [projects: PortfolioProjectsResponse<string[]>[]]
-  refresh: []
 }>()
 
 const UButton = resolveComponent('UButton')
@@ -28,10 +26,7 @@ watch(() => props.projects, (val) => {
 useSortable('.project-table-tbody', localProjects, {
   animation: 150,
   handle: '.drag-handle',
-  onEnd: async () => {
-    if (props.isReordering)
-      return
-
+  onEnd: () => {
     emit('reorder', [...localProjects.value])
   },
 })
@@ -69,18 +64,18 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
     cell: ({ row }) => {
       const imageCount = row.original.Images?.length || 0
       if (imageCount > 0) {
-        return h('div', { class: 'bg-elevated relative size-12 overflow-hidden rounded-[var(--ui-radius)]' }, [
+        return h('div', { class: 'bg-elevated relative size-12 overflow-hidden' }, [
           h('img', {
             src: getImageUrl(row.original, row.original.Images[0]),
             alt: row.original.Title,
             class: 'size-full object-cover',
           }),
           h('div', {
-            class: 'bg-default/70 text-highlighted absolute right-1 bottom-1 px-1.5 py-0.5 text-[10px] font-medium backdrop-blur-sm rounded-[var(--ui-radius)]',
+            class: 'bg-default/70 text-highlighted absolute right-1 bottom-1 px-1.5 py-0.5 text-[10px] font-medium backdrop-blur-sm',
           }, imageCount),
         ])
       }
-      return h('div', { class: 'bg-elevated flex size-12 items-center justify-center rounded-[var(--ui-radius)]' }, [
+      return h('div', { class: 'bg-elevated flex size-12 items-center justify-center' }, [
         h('span', { class: 'text-dimmed text-xs' }, '–'),
       ])
     },
@@ -155,8 +150,9 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
     :columns="columns"
     sticky
     :ui="{
-      root: 'border-default border rounded-[var(--ui-radius)]',
+      root: 'border-default border',
       tbody: 'project-table-tbody',
+      tr: 'hover:bg-elevated/50 transition-colors',
     }"
     class="flex-1"
   />

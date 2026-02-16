@@ -12,7 +12,6 @@ const { showToast } = useAppToast()
 const editingProject = ref<PortfolioProjectsResponse<string[]> | null>(null)
 const showNewProjectForm = ref(false)
 const showSettings = ref(false)
-const isReordering = ref(false)
 const isDeleteModalOpen = ref(false)
 const projectToDelete = ref<string | null>(null)
 
@@ -111,29 +110,17 @@ async function handleSave() {
   showToast(isCreating ? 'Project created successfully' : 'Project updated successfully', 'success')
 }
 
-async function handleReorder(reorderedProjects: PortfolioProjectsResponse<string[]>[]) {
-  isReordering.value = true
+function handleReorder(reorderedProjects: PortfolioProjectsResponse<string[]>[]) {
   projects.value = reorderedProjects
-
-  try {
-    for (const [index, project] of reorderedProjects.entries()) {
-      await pb.collection('Portfolio_Projects')
-        .update(project.id, { Order: index + 1 })
-    }
-    showToast('Project order updated', 'success')
-  }
-  catch (err: unknown) {
-    await refreshProjects()
-    const typedErr = err as { data?: { message?: string }, message?: string }
-    showToast(`Failed to reorder projects: ${typedErr?.data?.message || typedErr?.message || 'Unknown error'}`, 'error')
-  }
-  finally {
-    isReordering.value = false
-  }
 }
 
 async function handlePublishChanges() {
   try {
+    for (const [index, project] of projects.value.entries()) {
+      await pb.collection('Portfolio_Projects')
+        .update(project.id, { Order: index + 1 })
+    }
+
     await $fetch('/api/revalidate', {
       method: 'POST',
       body: {
@@ -359,11 +346,9 @@ async function handlePublishChanges() {
 
       <ProjectTable
         :projects="projects"
-        :is-reordering="isReordering"
         @edit="editingProject = $event"
         @delete="handleDelete"
         @reorder="handleReorder"
-        @refresh="refreshProjects"
       />
     </main>
 
