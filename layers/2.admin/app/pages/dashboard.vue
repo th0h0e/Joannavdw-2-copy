@@ -309,6 +309,8 @@ async function handlePublishChanges() {
 
       <div class="mt-12">
         <UButton
+          variant="outline"
+          color="neutral"
           size="md"
           class="text-sm tracking-wide uppercase"
           @click="showNewProjectForm = true"

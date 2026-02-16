@@ -204,6 +204,7 @@ const previewAboutData = computed(() => {
 
         <UButton
           variant="ghost"
+          color="neutral"
           class="h-12 w-12 flex-shrink-0 overflow-hidden"
           title="Click to update favicon"
           @click="faviconFileInput?.click()"
@@ -389,6 +390,8 @@ const previewAboutData = computed(() => {
           </UButton>
           <UButton
             type="submit"
+            variant="outline"
+            color="neutral"
             :loading="loading"
             class="flex-1"
           >

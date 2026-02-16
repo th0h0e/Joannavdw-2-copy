@@ -254,6 +254,8 @@ function handleAddTag(value: string) {
           </UButton>
           <UButton
             type="submit"
+            variant="outline"
+            color="neutral"
             :loading="loading"
             class="flex-1"
           >

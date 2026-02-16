@@ -189,6 +189,8 @@ function handleTitleCancel() {
                 @click="handleTitleCancel"
               />
               <UButton
+                variant="outline"
+                color="neutral"
                 size="sm"
                 icon="i-ph-check"
                 class="pointer-events-auto"

@@ -101,6 +101,8 @@ async function handleLogin() {
 
         <UButton
           type="submit"
+          variant="outline"
+          color="neutral"
           :loading="loading"
           class="w-full"
         >
