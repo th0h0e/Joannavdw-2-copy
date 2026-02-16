@@ -180,7 +180,7 @@ function handleAddTag(value: string) {
   >
     <template #body>
       <div class="flex flex-col">
-        <!-- Image Carousel -->
+        <!-- Image Carousel (Mobile: shows partial next image to suggest scroll) -->
         <div
           v-if="carouselItems.length > 0"
           class="border-default border-b"
@@ -188,7 +188,10 @@ function handleAddTag(value: string) {
           <UCarousel
             :items="carouselItems"
             class="w-full"
-            :ui="{
+            :ui="isMobile ? {
+              item: 'basis-[85%] snap-center pl-2',
+              viewport: 'aspect-square',
+            } : {
               item: 'basis-full snap-center',
               viewport: 'aspect-square',
             }"
@@ -201,6 +204,24 @@ function handleAddTag(value: string) {
               >
             </template>
           </UCarousel>
+        </div>
+
+        <!-- Image Upload (Mobile: below carousel) -->
+        <div
+          v-if="isMobile"
+          class="border-default border-b p-4"
+        >
+          <UFileUpload
+            :model-value="null"
+            accept="image/*"
+            multiple
+            variant="button"
+            label="Add Images"
+            icon="i-ph-plus"
+            color="neutral"
+            class="w-full"
+            @update:model-value="handleFilesAdded"
+          />
         </div>
 
         <!-- Form -->
@@ -228,7 +249,7 @@ function handleAddTag(value: string) {
           >
             <UTextarea
               v-model="formState.description"
-              :rows="4"
+              :rows="isMobile ? 8 : 4"
               placeholder="Project description..."
               color="neutral"
               variant="subtle"
@@ -236,7 +257,9 @@ function handleAddTag(value: string) {
             />
           </UFormField>
 
+          <!-- Position: Desktop only -->
           <UFormField
+            v-if="!isMobile"
             label="Position in Portfolio"
             required
           >
@@ -266,8 +289,8 @@ function handleAddTag(value: string) {
             />
           </UFormField>
 
-          <!-- Image Upload -->
-          <div>
+          <!-- Image Upload (Desktop: in form) -->
+          <div v-if="!isMobile">
             <p class="text-toned mb-3 text-xs font-medium tracking-wider uppercase">
               Add More Images
             </p>
