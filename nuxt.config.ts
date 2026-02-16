@@ -9,6 +9,10 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2025-01-01',
 
+  nitro: {
+    preset: 'bun',
+  },
+
   app: {
     head: {
       link: [{ rel: 'icon', type: 'image/x-icon', href: '/assets/favicon.ico' }],

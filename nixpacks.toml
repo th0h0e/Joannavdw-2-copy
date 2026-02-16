@@ -7,4 +7,4 @@ cmd = "bun install --frozen-lockfile"
 cmd = "bun run build"
 
 [start]
-cmd = "node .output/server/index.mjs"
+cmd = "bun run .output/server/index.mjs"
