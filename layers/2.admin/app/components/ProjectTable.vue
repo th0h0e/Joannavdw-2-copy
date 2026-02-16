@@ -130,7 +130,7 @@ const columns: TableColumn<PortfolioProjectsResponse<string[]>>[] = [
 
       return h('div', { class: 'flex flex-wrap gap-1' }, responsibilities.map((resp: string) =>
         h('span', {
-          class: 'bg-elevated border-default text-toned border px-1.5 py-0.5 text-xs font-medium tracking-wider uppercase',
+          class: 'bg-elevated border-default text-toned border px-1 py-0 text-[10px] font-medium tracking-wide uppercase',
         }, resp)))
     },
   },

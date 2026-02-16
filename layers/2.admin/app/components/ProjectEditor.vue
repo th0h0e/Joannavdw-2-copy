@@ -268,7 +268,7 @@ function handleAddTag(value: string) {
   <Teleport to="body">
     <div
       v-if="isOpen && project && !isMobile"
-      class="pointer-events-none fixed top-1/2 left-[25%] z-[60] -translate-x-1/2 -translate-y-1/2"
+      class="pointer-events-auto fixed top-1/2 left-[25%] z-[60] -translate-x-1/2 -translate-y-1/2"
     >
       <LazyProjectPopupPreview
         :project-title="formState.title"
