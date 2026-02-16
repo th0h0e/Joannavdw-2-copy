@@ -28,12 +28,13 @@
    ============================================ */
 
 :root {
-  --ui-primary: var(--ui-color-primary-500);
-  --ui-secondary: var(--ui-color-secondary-500);
-  --ui-success: var(--ui-color-success-500);
-  --ui-info: var(--ui-color-info-500);
-  --ui-warning: var(--ui-color-warning-500);
-  --ui-error: var(--ui-color-error-500);
+  /* Monochrome theme - dark grays on white */
+  --ui-primary: var(--ui-color-neutral-900);
+  --ui-secondary: var(--ui-color-neutral-400);
+  --ui-success: var(--ui-color-neutral-600);
+  --ui-info: var(--ui-color-neutral-400);
+  --ui-warning: var(--ui-color-neutral-500);
+  --ui-error: var(--ui-color-neutral-700);
 
   --ui-text-dimmed: var(--ui-color-neutral-400);
   --ui-text-muted: var(--ui-color-neutral-500);
@@ -59,6 +60,14 @@
 }
 
 .dark {
+  /* Monochrome theme - light grays on dark */
+  --ui-primary: var(--ui-color-neutral-100);
+  --ui-secondary: var(--ui-color-neutral-500);
+  --ui-success: var(--ui-color-neutral-400);
+  --ui-info: var(--ui-color-neutral-500);
+  --ui-warning: var(--ui-color-neutral-400);
+  --ui-error: var(--ui-color-neutral-300);
+
   --ui-text-dimmed: var(--ui-color-neutral-600);
   --ui-text-muted: var(--ui-color-neutral-500);
   --ui-text-toned: var(--ui-color-neutral-400);
