@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { HomepageResponse } from '#layers/2.admin/app/shared/types/pocketbase-types'
 import { getImageUrl, pb } from '#layers/2.admin/app/utils/pocketbase'
+import { useSwipe } from '@vueuse/core'
 
 const emit = defineEmits<{
   showToast: [message: string, type: 'success' | 'error']
@@ -11,6 +12,7 @@ const isEditingTitle = ref(false)
 const tempTitle = ref('')
 const heroFileInput = ref<HTMLInputElement | null>(null)
 const heroMobileFileInput = ref<HTMLInputElement | null>(null)
+const heroContainerRef = ref<HTMLElement | null>(null)
 
 const { data: homepageRaw, refresh: refreshHomepage, error: homepageError } = useAsyncData(
   'admin-homepage',
@@ -23,6 +25,19 @@ const heroImage = computed(() =>
 const heroImageMobile = computed(() =>
   homepageRaw.value?.Hero_Image_Mobile ? getImageUrl(homepageRaw.value, homepageRaw.value.Hero_Image_Mobile) : '')
 const homepageId = computed(() => homepageRaw.value?.id || '')
+
+useSwipe(heroContainerRef, {
+  onSwipeLeft: () => {
+    if (!isEditingTitle.value && heroImageMobile.value) {
+      showMobilePreview.value = true
+    }
+  },
+  onSwipeRight: () => {
+    if (!isEditingTitle.value) {
+      showMobilePreview.value = false
+    }
+  },
+})
 
 const heroTitle = ref('')
 watch(homepageRaw, (val) => {
@@ -128,6 +143,7 @@ function handleTitleCancel() {
 <template>
   <div
     v-if="heroImage || heroImageMobile"
+    ref="heroContainerRef"
     class="mb-12"
   >
     <div class="flex gap-6">
@@ -235,15 +251,23 @@ function handleTitleCancel() {
       </div>
     </div>
 
-    <UButton
-      variant="ghost"
-      color="neutral"
-      size="sm"
-      class="mt-3 text-xs tracking-wide uppercase"
-      @click="showMobilePreview = !showMobilePreview"
+    <div
+      v-if="heroImageMobile"
+      class="mt-3 flex items-center gap-3"
     >
-      {{ showMobilePreview ? 'Hide mobile preview' : 'Show mobile preview' }}
-    </UButton>
+      <UButton
+        variant="ghost"
+        color="neutral"
+        size="sm"
+        class="text-xs tracking-wide uppercase"
+        @click="showMobilePreview = !showMobilePreview"
+      >
+        {{ showMobilePreview ? 'Hide mobile preview' : 'Show mobile preview' }}
+      </UButton>
+      <span class="text-dimmed text-xs">
+        (or swipe left/right)
+      </span>
+    </div>
 
     <input
       id="heroFileInput"
